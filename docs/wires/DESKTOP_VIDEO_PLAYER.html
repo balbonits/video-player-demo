@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Player Wireframe - Desktop</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .video-player-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            aspect-ratio: 16 / 9;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .video-area {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #1a1a1a, #2d2d2d);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .video-placeholder {
+            color: rgba(255,255,255,0.6);
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .play-button-overlay {
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 4px solid transparent;
+            position: absolute;
+            z-index: 10;
+        }
+
+        .play-button-overlay:hover {
+            background: rgba(255,255,255,1);
+            transform: scale(1.1);
+        }
+
+        .play-button-overlay:focus {
+            border-color: #0066cc;
+            box-shadow: 0 0 0 4px rgba(0,102,204,0.3);
+            outline: none;
+        }
+
+        .play-icon {
+            width: 32px;
+            height: 32px;
+            fill: #000;
+            margin-left: 4px;
+        }
+
+        .video-overlays {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            right: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            z-index: 5;
+        }
+
+        .caption-indicator, .quality-indicator {
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+        }
+
+        .controls-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.9));
+            padding: 20px;
+            z-index: 10;
+        }
+
+        .progress-container {
+            margin-bottom: 16px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 3px;
+            position: relative;
+            cursor: pointer;
+            transition: height 0.2s ease;
+        }
+
+        .progress-bar:hover {
+            height: 8px;
+        }
+
+        .progress-bar:focus {
+            outline: 3px solid #0066cc;
+            outline-offset: 2px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 45%;
+            background: #0066cc;
+            border-radius: 3px;
+            position: relative;
+            transition: all 0.1s ease;
+        }
+
+        .progress-buffer {
+            position: absolute;
+            height: 100%;
+            width: 65%;
+            background: rgba(255,255,255,0.4);
+            border-radius: 3px;
+            top: 0;
+            left: 0;
+        }
+
+        .progress-handle {
+            position: absolute;
+            right: -8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            background: #0066cc;
+            border: 2px solid white;
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .progress-bar:hover .progress-handle,
+        .progress-bar:focus .progress-handle {
+            opacity: 1;
+        }
+
+        .controls-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .control-button {
+            width: 48px;
+            height: 48px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 3px solid transparent;
+            position: relative;
+        }
+
+        .control-button:hover {
+            background: rgba(255,255,255,0.2);
+            transform: scale(1.05);
+        }
+
+        .control-button:focus {
+            border-color: #0066cc;
+            box-shadow: 0 0 0 3px rgba(0,102,204,0.3);
+            outline: none;
+        }
+
+        .control-button.primary {
+            background: #0066cc;
+        }
+
+        .control-button.primary:hover {
+            background: #0052a3;
+        }
+
+        .volume-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .volume-slider {
+            width: 80px;
+            height: 4px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 2px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .volume-slider:focus {
+            outline: 2px solid #0066cc;
+            outline-offset: 2px;
+        }
+
+        .volume-fill {
+            height: 100%;
+            width: 70%;
+            background: white;
+            border-radius: 2px;
+        }
+
+        .time-display {
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            margin: 0 16px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .tab-indicators {
+            position: absolute;
+            bottom: -35px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            color: #666;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .smart-tv-hints {
+            position: absolute;
+            bottom: -65px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #666;
+            font-size: 14px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        /* Smart TV Focus Simulation */
+        .control-button[data-tab="1"] {
+            border-color: #0066cc;
+            box-shadow: 0 0 0 3px rgba(0,102,204,0.3);
+            transform: scale(1.05);
+        }
+
+        .annotation {
+            position: absolute;
+            background: #fff;
+            color: #333;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .annotation.play-annotation {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, 60px);
+        }
+
+        .annotation.controls-annotation {
+            bottom: 80px;
+            left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="video-player-container">
+        <!-- Video Area -->
+        <div class="video-area">
+            <!-- Video Placeholder -->
+            <div class="video-placeholder">VIDEO CONTENT AREA (16:9)</div>
+
+            <!-- Video Overlays -->
+            <div class="video-overlays">
+                <div class="caption-indicator">CC</div>
+                <div class="quality-indicator">HD 1080p</div>
+            </div>
+
+            <!-- Play Button Overlay -->
+            <div class="play-button-overlay" tabindex="0" role="button" aria-label="Play video">
+                <svg class="play-icon" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z"/>
+                </svg>
+            </div>
+
+            <!-- Annotations -->
+            <div class="annotation play-annotation">
+                Centered Play Button (80px)<br>
+                Tab Index: 0 (First Focus)
+            </div>
+        </div>
+
+        <!-- Player Controls -->
+        <div class="controls-container">
+            <!-- Progress Bar -->
+            <div class="progress-container">
+                <div class="progress-bar" role="slider" aria-label="Video progress: 12 minutes 34 seconds of 25 minutes 46 seconds"
+                     aria-valuemin="0" aria-valuemax="1546" aria-valuenow="754" tabindex="0">
+                    <div class="progress-buffer"></div>
+                    <div class="progress-fill">
+                        <div class="progress-handle"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Control Bar -->
+            <div class="controls-bar" role="toolbar" aria-label="Video controls">
+                <!-- Play/Pause (Currently Focused) -->
+                <button class="control-button primary" aria-label="Play video" data-tab="1">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M8 5v14l11-7z"/>
+                    </svg>
+                </button>
+
+                <!-- Volume Control -->
+                <div class="volume-container">
+                    <button class="control-button" aria-label="Volume: 70%, click to mute" data-tab="2">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                        </svg>
+                    </button>
+                    <div class="volume-slider" role="slider" aria-label="Volume control" tabindex="0">
+                        <div class="volume-fill"></div>
+                    </div>
+                </div>
+
+                <!-- Time Display -->
+                <div class="time-display" aria-live="polite">12:34 / 25:46</div>
+
+                <!-- Quality Settings -->
+                <button class="control-button" aria-label="Video quality: Auto (1080p)" data-tab="3">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                </button>
+
+                <!-- Settings -->
+                <button class="control-button" aria-label="Settings menu" data-tab="4">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.82,11.69,4.82,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/>
+                    </svg>
+                </button>
+
+                <!-- Picture-in-Picture -->
+                <button class="control-button" aria-label="Picture-in-Picture mode" data-tab="5">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zm-10-7h9v6h-9z"/>
+                    </svg>
+                </button>
+
+                <!-- Fullscreen -->
+                <button class="control-button" aria-label="Enter fullscreen" data-tab="6">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Controls Annotation -->
+            <div class="annotation controls-annotation">
+                Control Bar: Gradient Overlay (60px height)<br>
+                Tab Order: 1→2→3→4→5→6
+            </div>
+        </div>
+
+        <!-- Tab Order Indicators -->
+        <div style="position: absolute; bottom: -40px; left: 20px; right: 20px; display: flex; justify-content: space-between; color: #666; font-size: 12px; font-weight: 500;">
+            <span>①: Play (Space/Enter)</span>
+            <span>②: Volume (↑↓)</span>
+            <span>③: Quality</span>
+            <span>④: Settings</span>
+            <span>⑤: PiP</span>
+            <span>⑥: Fullscreen (F)</span>
+        </div>
+
+        <!-- Smart TV Navigation Hints -->
+        <div style="position: absolute; bottom: -70px; left: 50%; transform: translateX(-50%); color: #666; font-size: 14px; text-align: center; font-weight: 500;">
+            Smart TV: ↑↓←→ Navigate • Enter to Select • Back to Exit
+        </div>
+
+        <!-- Technical Specifications -->
+        <div style="position: absolute; top: -50px; left: 0; right: 0; background: #fff; padding: 12px 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); font-size: 14px;">
+            <strong>Technical Specs:</strong>
+            React TypeScript Component • Redux State Management • HLS.js Integration •
+            WCAG 2.1 AA Compliant • 90% Test Coverage • Smart TV D-pad Navigation
+        </div>
+    </div>
+
+    <script>
+        // Accessibility and interaction simulation
+        document.addEventListener('DOMContentLoaded', function() {
+            const playButton = document.querySelector('.play-button-overlay');
+            const progressBar = document.querySelector('.progress-bar');
+            const controlButtons = document.querySelectorAll('.control-button');
+
+            // Simulate focus management for demonstration
+            playButton.addEventListener('click', function() {
+                // Simulate play state change
+                this.innerHTML = '<svg class="play-icon" viewBox="0 0 24 24"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/></svg>';
+                this.setAttribute('aria-label', 'Pause video');
+            });
+
+            // Keyboard navigation simulation
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Tab') {
+                    // Tab navigation simulation
+                    console.log('Tab navigation: Moving to next focusable element');
+                }
+
+                if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+                    // D-pad navigation simulation
+                    console.log('D-pad navigation: Moving between controls');
+                }
+
+                if (e.key === ' ') {
+                    e.preventDefault();
+                    console.log('Spacebar: Play/pause toggle');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

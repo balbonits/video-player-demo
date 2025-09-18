@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Player Demo - Wireframe Gallery</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: #1a202c;
+        }
+
+        .header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+
+        .logo-text h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1a202c;
+        }
+
+        .logo-text p {
+            font-size: 0.9rem;
+            color: #718096;
+            font-weight: 500;
+        }
+
+        .project-info {
+            text-align: right;
+        }
+
+        .project-info .author {
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .project-info .context {
+            font-size: 0.85rem;
+            color: #718096;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .section {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            background: #667eea;
+            color: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .wireframe-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .wireframe-card {
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            background: #f8fafc;
+            position: relative;
+        }
+
+        .wireframe-card:hover {
+            transform: translateY(-4px);
+            border-color: #667eea;
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.15);
+        }
+
+        .wireframe-preview {
+            height: 200px;
+            background: linear-gradient(45deg, #f1f5f9, #e2e8f0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .wireframe-preview::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="80" height="45" x="10" y="20" fill="none" stroke="%23cbd5e0" stroke-width="2" rx="4"/><circle cx="50" cy="42" r="8" fill="%234299e1"/><rect width="60" height="4" x="20" y="70" fill="%23e2e8f0" rx="2"/><rect width="24" height="4" x="20" y="70" fill="%234299e1" rx="2"/></svg>') no-repeat center;
+            background-size: 120px;
+            opacity: 0.3;
+        }
+
+        .wireframe-preview-icon {
+            font-size: 3rem;
+            color: #667eea;
+            z-index: 1;
+        }
+
+        .wireframe-info {
+            padding: 20px;
+        }
+
+        .wireframe-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+
+        .wireframe-description {
+            font-size: 0.9rem;
+            color: #718096;
+            line-height: 1.4;
+            margin-bottom: 12px;
+        }
+
+        .wireframe-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .wireframe-platform {
+            padding: 4px 12px;
+            background: #edf2f7;
+            color: #4a5568;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .wireframe-creator {
+            font-size: 0.8rem;
+            color: #a0aec0;
+            font-weight: 500;
+        }
+
+        .status-indicator {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 12px;
+            height: 12px;
+            background: #48bb78;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .nav-item {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: #f1f5f9;
+            border-color: #e2e8f0;
+        }
+
+        .nav-item.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .project-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 2px solid #f1f5f9;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #718096;
+            font-weight: 500;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .wireframe-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .project-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+                color: #f7fafc;
+            }
+
+            .header,
+            .section,
+            .nav-menu,
+            .stat-card {
+                background: #2d3748;
+                border-color: #4a5568;
+            }
+
+            .wireframe-card {
+                background: #4a5568;
+                border-color: #718096;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">🎬</div>
+                <div class="logo-text">
+                    <h1>Video Player Demo</h1>
+                    <p>Wireframe & Design Gallery</p>
+                </div>
+            </div>
+            <div class="project-info">
+                <div class="author">John Dilig - Frontend Developer</div>
+                <div class="context">FOX Corporation Senior Web/JavaScript Engineer Application</div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Project Statistics -->
+        <div class="project-stats">
+            <div class="stat-card">
+                <div class="stat-number">6</div>
+                <div class="stat-label">Target Platforms</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">90%</div>
+                <div class="stat-label">Test Coverage Goal</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">5-7</div>
+                <div class="stat-label">Development Days</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">AA</div>
+                <div class="stat-label">WCAG 2.1 Compliance</div>
+            </div>
+        </div>
+
+        <!-- Navigation Menu -->
+        <div class="nav-menu">
+            <div class="nav-item active" data-category="all">All Wireframes</div>
+            <div class="nav-item" data-category="web">Web Platforms</div>
+            <div class="nav-item" data-category="mobile">Mobile Apps</div>
+            <div class="nav-item" data-category="tv">Smart TV</div>
+            <div class="nav-item" data-category="flows">User Flows</div>
+        </div>
+
+        <!-- Wireframes Section -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">🎨</div>
+                <div class="section-title">Interactive Wireframes & Prototypes</div>
+            </div>
+
+            <div class="wireframe-grid">
+                <!-- Desktop Video Player -->
+                <div class="wireframe-card" data-category="web" data-file="DESKTOP_VIDEO_PLAYER.html">
+                    <div class="status-indicator"></div>
+                    <div class="wireframe-preview">
+                        <div class="wireframe-preview-icon">🖥️</div>
+                    </div>
+                    <div class="wireframe-info">
+                        <div class="wireframe-title">Desktop Video Player</div>
+                        <div class="wireframe-description">
+                            Full-featured desktop interface with HLS streaming, accessibility compliance, and Smart TV navigation support.
+                        </div>
+                        <div class="wireframe-meta">
+                            <div class="wireframe-platform">Web • Desktop</div>
+                            <div class="wireframe-creator">Riley (UX)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Flow Interactive -->
+                <div class="wireframe-card" data-category="flows" data-file="USER_FLOW_INTERACTIVE.html">
+                    <div class="status-indicator"></div>
+                    <div class="wireframe-preview">
+                        <div class="wireframe-preview-icon">🔄</div>
+                    </div>
+                    <div class="wireframe-info">
+                        <div class="wireframe-title">User Flow - Video Playback</div>
+                        <div class="wireframe-description">
+                            Interactive user journey map showing complete video playback experience across all platforms.
+                        </div>
+                        <div class="wireframe-meta">
+                            <div class="wireframe-platform">Cross-Platform Flow</div>
+                            <div class="wireframe-creator">Riley (UX)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mobile Video Player (Coming Soon) -->
+                <div class="wireframe-card" data-category="mobile" data-file="#" style="opacity: 0.6;">
+                    <div class="wireframe-preview">
+                        <div class="wireframe-preview-icon">📱</div>
+                    </div>
+                    <div class="wireframe-info">
+                        <div class="wireframe-title">Mobile Video Player</div>
+                        <div class="wireframe-description">
+                            Touch-optimized interface for iOS and Android with gesture support and Picture-in-Picture.
+                        </div>
+                        <div class="wireframe-meta">
+                            <div class="wireframe-platform">iOS • Android</div>
+                            <div class="wireframe-creator">Coming Soon</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Smart TV Interface (Coming Soon) -->
+                <div class="wireframe-card" data-category="tv" data-file="#" style="opacity: 0.6;">
+                    <div class="wireframe-preview">
+                        <div class="wireframe-preview-icon">📺</div>
+                    </div>
+                    <div class="wireframe-info">
+                        <div class="wireframe-title">Smart TV Interface</div>
+                        <div class="wireframe-description">
+                            D-pad optimized interface for Roku, Samsung Tizen, and Vizio platforms with large buttons.
+                        </div>
+                        <div class="wireframe-meta">
+                            <div class="wireframe-platform">Roku • Tizen • Vizio</div>
+                            <div class="wireframe-creator">Coming Soon</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Panel (Coming Soon) -->
+                <div class="wireframe-card" data-category="web" data-file="#" style="opacity: 0.6;">
+                    <div class="wireframe-preview">
+                        <div class="wireframe-preview-icon">⚙️</div>
+                    </div>
+                    <div class="wireframe-info">
+                        <div class="wireframe-title">Settings Panel</div>
+                        <div class="wireframe-description">
+                            Caption customization, accessibility options, and quality settings with WCAG compliance.
+                        </div>
+                        <div class="wireframe-meta">
+                            <div class="wireframe-platform">All Platforms</div>
+                            <div class="wireframe-creator">Coming Soon</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Architecture (Coming Soon) -->
+                <div class="wireframe-card" data-category="flows" data-file="#" style="opacity: 0.6;">
+                    <div class="wireframe-preview">
+                        <div class="wireframe-preview-icon">🏗️</div>
+                    </div>
+                    <div class="wireframe-info">
+                        <div class="wireframe-title">System Architecture</div>
+                        <div class="wireframe-description">
+                            Technical architecture diagram showing Next.js, Redux, HLS streaming, and cross-platform integration.
+                        </div>
+                        <div class="wireframe-meta">
+                            <div class="wireframe-platform">Technical Diagram</div>
+                            <div class="wireframe-creator">Alex (Engineer)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">📊</div>
+                <div class="section-title">Project Progress</div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                <div style="text-align: center; padding: 20px;">
+                    <div style="font-size: 1.5rem; font-weight: 600; color: #48bb78; margin-bottom: 5px;">2 / 6</div>
+                    <div style="color: #718096;">Wireframes Complete</div>
+                </div>
+                <div style="text-align: center; padding: 20px;">
+                    <div style="font-size: 1.5rem; font-weight: 600; color: #4299e1; margin-bottom: 5px;">100%</div>
+                    <div style="color: #718096;">Documentation Ready</div>
+                </div>
+                <div style="text-align: center; padding: 20px;">
+                    <div style="font-size: 1.5rem; font-weight: 600; color: #ed8936; margin-bottom: 5px;">Day 1</div>
+                    <div style="color: #718096;">Setup & Planning</div>
+                </div>
+                <div style="text-align: center; padding: 20px;">
+                    <div style="font-size: 1.5rem; font-weight: 600; color: #667eea; margin-bottom: 5px;">Ready</div>
+                    <div style="color: #718096;">Implementation Tomorrow</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>Built with ❤️ for <a href="https://www.foxcorporation.com" target="_blank">FOX Corporation</a> •
+        <a href="https://github.com/balbonits" target="_blank">John Dilig Portfolio</a> •
+        <a href="https://jdilig.me" target="_blank">jdilig.me</a></p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const wireframeCards = document.querySelectorAll('.wireframe-card');
+            const navItems = document.querySelectorAll('.nav-item');
+
+            // Wireframe card interactions
+            wireframeCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const file = this.dataset.file;
+                    if (file && file !== '#') {
+                        // Open wireframe in new tab
+                        window.open(file, '_blank');
+                    }
+                });
+
+                // Add keyboard support
+                card.setAttribute('tabindex', '0');
+                card.setAttribute('role', 'button');
+                card.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        this.click();
+                    }
+                });
+            });
+
+            // Navigation filtering
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const category = this.dataset.category;
+
+                    // Update active nav item
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+
+                    // Filter wireframes
+                    wireframeCards.forEach(card => {
+                        const cardCategory = card.dataset.category;
+
+                        if (category === 'all' || cardCategory === category) {
+                            card.style.display = 'block';
+                            card.style.animation = 'fadeIn 0.3s ease-in-out';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                });
+            });
+
+            // Add ARIA labels for accessibility
+            wireframeCards.forEach((card, index) => {
+                const title = card.querySelector('.wireframe-title').textContent;
+                card.setAttribute('aria-label', `Open ${title} wireframe`);
+            });
+
+            // Auto-highlight available wireframes
+            const availableCards = document.querySelectorAll('.wireframe-card[data-file]:not([data-file="#"])');
+            availableCards.forEach(card => {
+                card.style.borderColor = '#48bb78';
+            });
+
+            // Coming soon indication
+            const comingSoonCards = document.querySelectorAll('.wireframe-card[data-file="#"]');
+            comingSoonCards.forEach(card => {
+                const overlay = document.createElement('div');
+                overlay.style.cssText = `
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: rgba(255,255,255,0.9);
+                    padding: 8px 16px;
+                    border-radius: 20px;
+                    font-size: 0.8rem;
+                    font-weight: 600;
+                    color: #718096;
+                    border: 1px solid #e2e8f0;
+                `;
+                overlay.textContent = 'Coming Tomorrow';
+                card.appendChild(overlay);
+            });
+        });
+
+        // CSS Animation for fade in
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+{
+  "name": "@video-player-demo/diagram-framework",
+  "version": "1.0.0",
+  "description": "Professional diagram generation framework for team visual documentation",
+  "main": "src/core/DiagramBase.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch cli/diagram-cli.js",
+    "build": "node build.js",
+    "test": "node --test test/**/*.test.js",
+    "generate:wireframe": "node generators/wireframe-generator.js",
+    "generate:architecture": "node generators/arch-generator.js",
+    "generate:userflow": "node generators/flow-generator.js",
+    "generate:pipeline": "node generators/pipeline-generator.js",
+    "cli": "node cli/diagram-cli.js"
+  },
+  "bin": {
+    "diagram": "./cli/diagram-cli.js"
+  },
+  "keywords": [
+    "diagrams",
+    "wireframes",
+    "architecture",
+    "visualization",
+    "documentation",
+    "accessibility",
+    "interactive"
+  ],
+  "author": "Alex (Engineer) - Video Player Demo Team",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^11.1.0",
+    "inquirer": "^9.2.12",
+    "puppeteer": "^21.5.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

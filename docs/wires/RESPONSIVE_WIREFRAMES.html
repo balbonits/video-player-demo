@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Video Player Wireframes - All Viewports</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #1a202c;
+        }
+
+        .wireframe-gallery {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .gallery-header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .gallery-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .gallery-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .viewport-section {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .section-icon {
+            width: 50px;
+            height: 50px;
+            background: #667eea;
+            color: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .section-title {
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .viewport-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .wireframe-container {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .wireframe-container:hover {
+            transform: translateY(-4px);
+            border-color: #667eea;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+        }
+
+        .wireframe-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .wireframe-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .viewport-dimensions {
+            font-size: 0.85rem;
+            color: #718096;
+            background: #edf2f7;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .wireframe-preview {
+            border: 1px solid #cbd5e0;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #000;
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        /* Mobile Wireframes */
+        .mobile-preview {
+            width: 187px; /* 375px at 50% scale */
+            height: 406px; /* 812px at 50% scale */
+            margin: 0 auto;
+        }
+
+        .mobile-landscape-preview {
+            width: 406px; /* 812px at 50% scale */
+            height: 187px; /* 375px at 50% scale */
+            margin: 0 auto;
+        }
+
+        /* Tablet Wireframes */
+        .tablet-preview {
+            width: 384px; /* 768px at 50% scale */
+            height: 512px; /* 1024px at 50% scale */
+            margin: 0 auto;
+        }
+
+        .tablet-landscape-preview {
+            width: 512px; /* 1024px at 50% scale */
+            height: 384px; /* 768px at 50% scale */
+            margin: 0 auto;
+        }
+
+        /* Desktop Wireframes */
+        .desktop-preview {
+            width: 640px; /* 1280px at 50% scale */
+            height: 360px; /* 720px at 50% scale */
+            margin: 0 auto;
+        }
+
+        .large-desktop-preview {
+            width: 720px; /* 1440px at 50% scale */
+            height: 405px; /* 810px at 50% scale */
+            margin: 0 auto;
+        }
+
+        /* Smart TV Wireframes */
+        .tv-preview {
+            width: 480px; /* 1920px at 25% scale */
+            height: 270px; /* 1080px at 25% scale */
+            margin: 0 auto;
+        }
+
+        /* Wireframe Content */
+        .video-area {
+            background: linear-gradient(45deg, #2d3748, #4a5568);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #a0aec0;
+            font-weight: 600;
+        }
+
+        .mobile-video {
+            height: 180px;
+            font-size: 0.7rem;
+        }
+
+        .tablet-video {
+            height: 280px;
+            font-size: 0.8rem;
+        }
+
+        .desktop-video {
+            height: 240px;
+            font-size: 0.9rem;
+        }
+
+        .tv-video {
+            height: 180px;
+            font-size: 0.6rem;
+        }
+
+        .play-button {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-size: 16px;
+        }
+
+        .mobile-play {
+            width: 32px;
+            height: 32px;
+            font-size: 14px;
+        }
+
+        .tv-play {
+            width: 24px;
+            height: 24px;
+            font-size: 12px;
+        }
+
+        .controls {
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .mobile-controls {
+            padding: 6px;
+            gap: 4px;
+        }
+
+        .tv-controls {
+            padding: 4px;
+            gap: 3px;
+        }
+
+        .control-button {
+            width: 24px;
+            height: 24px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .mobile-control {
+            width: 20px;
+            height: 20px;
+            font-size: 10px;
+        }
+
+        .tv-control {
+            width: 16px;
+            height: 16px;
+            font-size: 8px;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 3px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 2px;
+            position: relative;
+        }
+
+        .progress-fill {
+            width: 40%;
+            height: 100%;
+            background: #667eea;
+            border-radius: 2px;
+        }
+
+        .time-display {
+            color: white;
+            font-size: 0.7rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .mobile-time {
+            font-size: 0.6rem;
+        }
+
+        .tv-time {
+            font-size: 0.5rem;
+        }
+
+        .wireframe-features {
+            background: #f7fafc;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 0.85rem;
+            color: #4a5568;
+        }
+
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .feature-icon {
+            color: #48bb78;
+            font-size: 0.8rem;
+        }
+
+        .orientation-toggle {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            justify-content: center;
+        }
+
+        .toggle-btn {
+            padding: 6px 12px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s ease;
+        }
+
+        .toggle-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .specs-table {
+            margin-top: 15px;
+            font-size: 0.8rem;
+        }
+
+        .specs-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .specs-label {
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .specs-value {
+            color: #718096;
+            font-family: 'JetBrains Mono', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="wireframe-gallery">
+        <div class="gallery-header">
+            <h1>📱 Responsive Video Player Wireframes</h1>
+            <p>All Viewport Sizes & Orientations - FOX Corporation Demo</p>
+        </div>
+
+        <!-- Mobile Viewport Section -->
+        <div class="viewport-section">
+            <div class="section-header">
+                <div class="section-icon">📱</div>
+                <div class="section-title">Mobile Viewports (375px - 428px)</div>
+            </div>
+
+            <div class="viewport-grid">
+                <!-- iPhone 14 Portrait -->
+                <div class="wireframe-container">
+                    <div class="wireframe-header">
+                        <div class="wireframe-title">iPhone 14 Portrait</div>
+                        <div class="viewport-dimensions">393×852</div>
+                    </div>
+
+                    <div class="orientation-toggle">
+                        <div class="toggle-btn active">Portrait</div>
+                        <div class="toggle-btn" onclick="toggleOrientation(this, 'landscape')">Landscape</div>
+                    </div>
+
+                    <div class="wireframe-preview mobile-preview">
+                        <div class="video-area mobile-video">
+                            📱 MOBILE VIDEO
+                            <div class="play-button mobile-play">▶</div>
+                        </div>
+                        <div class="controls mobile-controls">
+                            <div class="control-button mobile-control">▶</div>
+                            <div class="control-button mobile-control">🔊</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill"></div>
+                            </div>
+                            <div class="control-button mobile-control">⛶</div>
+                        </div>
+                    </div>
+
+                    <div class="wireframe-features">
+                        <strong>Mobile-Optimized Features:</strong>
+                        <div class="feature-list">
+                            <div class="feature-item">
+                                <span class="feature-icon">✅</span>
+                                <span>Touch Controls</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">✅</span>
+                                <span>56px Touch Targets</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">✅</span>
+                                <span>Swipe Gestures</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">✅</span>
+                                <span>Picture-in-Picture</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="specs-table">
+                        <div class="specs-row">
+                            <span class="specs-label">Resolution:</span>
+                            <span class="specs-value">393×852 (iPhone 14)</span>
+                        </div>
+                        <div class="specs-row">
+                            <span class="specs-label">DPR:</span>
+                            <span class="specs-value">3x (Retina)</span>
+                        </div>
+                        <div class="specs-row">
+                            <span class="specs-label">Safe Area:</span>
+                            <span class="specs-value">Top: 59px, Bottom: 34px</span>
+                        </div>
+                        <div class="specs-row">
+                            <span class="specs-label">Touch Targets:</span>
+                            <span class="specs-value">56px minimum</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Android Portrait -->
+                <div class="wireframe-container">
+                    <div class="wireframe-header">
+                        <div class="wireframe-title">Android Portrait</div>
+                        <div class="viewport-dimensions">412×915</div>
+                    </div>
+
+                    <div class="orientation-toggle">
+                        <div class="toggle-btn active">Portrait</div>
+                        <div class="toggle-btn">Landscape</div>
+                    </div>
+
+                    <div class="wireframe-preview mobile-preview" style="width: 206px; height: 457px;">
+                        <div class="video-area mobile-video">
+                            🤖 ANDROID VIDEO
+                            <div class="play-button mobile-play">▶</div>
+                        </div>
+                        <div class="controls mobile-controls">
+                            <div class="control-button mobile-control">▶</div>
+                            <div class="control-button mobile-control">🔊</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill"></div>
+                            </div>
+                            <div class="control-button mobile-control">📺</div>
+                        </div>
+                    </div>
+
+                    <div class="wireframe-features">
+                        <strong>Android-Optimized Features:</strong>
+                        <div class="feature-list">
+                            <div class="feature-item">
+                                <span class="feature-icon">✅</span>
+                                <span>Material Design</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">✅</span>
+                                <span>Chromecast</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">✅</span>
+                                <span>TalkBack Support</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">✅</span>
+                                <span>Background Play</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="specs-table">
+                        <div class="specs-row">
+                            <span class="specs-label">Resolution:</span>
+                            <span class="specs-value">412×915 (Pixel 7)</span>
+                        </div>
+                        <div class="specs-row">
+                            <span class="specs-label">DPR:</span>
+                            <span class="specs-value">2.625x</span>
+                        </div>
+                        <div class="specs-row">
+                            <span class="specs-label">Status Bar:</span>
+                            <span class="specs-value">24px</span>
+                        </div>
+                        <div class="specs-row">
+                            <span class="specs-label">Navigation:</span>
+                            <span class="specs-value">48px (gesture)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tablet Viewport Section -->
+        <div class="viewport-section">
+            <div class="section-header">
+                <div class="section-icon">📟</div>
+                <div class="section-title">Tablet Viewports (768px - 1024px)</div>
+            </div>
+
+            <div class="viewport-grid">
+                <!-- iPad Portrait -->
+                <div class="wireframe-container">
+                    <div class="wireframe-header">
+                        <div class="wireframe-title">iPad Portrait</div>
+                        <div class="viewport-dimensions">820×1180</div>
+                    </div>
+
+                    <div class="wireframe-preview tablet-preview">
+                        <div class="video-area tablet-video">
+                            📟 TABLET VIDEO (16:9)
+                            <div class="play-button">▶</div>
+                        </div>
+                        <div class="controls">
+                            <div class="control-button">▶</div>
+                            <div class="control-button">🔊</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill"></div>
+                            </div>
+                            <div class="time-display">12:34</div>
+                            <div class="control-button">⚙️</div>
+                            <div class="control-button">⛶</div>
+                        </div>
+                    </div>
+
+                    <div class="wireframe-features">
+                        <strong>Tablet Features:</strong>
+                        <div class="feature-list">
+                            <div class="feature-item">
+                                <span class="feature-icon">✅</span>
+                                <span>Hybrid Input</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">✅</span>
+                                <span>Split View</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">✅</span>
+                                <span>Rotation Lock</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">✅</span>
+                                <span>External Keyboard</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="specs-table">
+                        <div class="specs-row">
+                            <span class="specs-label">Resolution:</span>
+                            <span class="specs-value">820×1180 (iPad Air)</span>
+                        </div>
+                        <div class="specs-row">
+                            <span class="specs-label">Video Ratio:</span>
+                            <span class="specs-value">16:9 with letterbox</span>
+                        </div>
+                        <div class="specs-row">
+                            <span class="specs-label">Touch Targets:</span>
+                            <span class="specs-value">48px minimum</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- iPad Landscape -->
+                <div class="wireframe-container">
+                    <div class="wireframe-header">
+                        <div class="wireframe-title">iPad Landscape</div>
+                        <div class="viewport-dimensions">1180×820</div>
+                    </div>
+
+                    <div class="wireframe-preview tablet-landscape-preview">
+                        <div class="video-area" style="height: 280px;">
+                            📟 TABLET LANDSCAPE (16:9 optimal)
+                            <div class="play-button">▶</div>
+                        </div>
+                        <div class="controls">
+                            <div class="control-button">▶</div>
+                            <div class="control-button">🔊</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill"></div>
+                            </div>
+                            <div class="time-display">12:34 / 25:46</div>
+                            <div class="control-button">📺</div>
+                            <div class="control-button">⚙️</div>
+                            <div class="control-button">⛶</div>
+                        </div>
+                    </div>
+
+                    <div class="wireframe-features">
+                        <strong>Landscape Optimization:</strong>
+                        <div class="feature-list">
+                            <div class="feature-item">
+                                <span class="feature-icon">✅</span>
+                                <span>Full Control Bar</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">✅</span>
+                                <span>Optimal 16:9</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">✅</span>
+                                <span>Desktop-like UX</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">✅</span>
+                                <span>Hover Support</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Desktop Viewport Section -->
+        <div class="viewport-section">
+            <div class="section-header">
+                <div class="section-icon">🖥️</div>
+                <div class="section-title">Desktop Viewports (1280px - 2560px)</div>
+            </div>
+
+            <div class="viewport-grid">
+                <!-- Standard Desktop -->
+                <div class="wireframe-container">
+                    <div class="wireframe-header">
+                        <div class="wireframe-title">Standard Desktop</div>
+                        <div class="viewport-dimensions">1440×900</div>
+                    </div>
+
+                    <div class="wireframe-preview desktop-preview">
+                        <div class="video-area desktop-video">
+                            🖥️ DESKTOP VIDEO (16:9)
+                            <div class="play-button">▶</div>
+                        </div>
+                        <div class="controls">
+                            <div class="control-button">▶</div>
+                            <div class="control-button">🔊</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill"></div>
+                            </div>
+                            <div class="time-display">12:34 / 25:46</div>
+                            <div class="control-button">📺</div>
+                            <div class="control-button">⚙️</div>
+                            <div class="control-button">📄</div>
+                            <div class="control-button">⛶</div>
+                        </div>
+                    </div>
+
+                    <div class="wireframe-features">
+                        <strong>Desktop Features:</strong>
+                        <div class="feature-list">
+                            <div class="feature-item">
+                                <span class="feature-icon">✅</span>
+                                <span>Mouse + Keyboard</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">✅</span>
+                                <span>Hover Effects</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">✅</span>
+                                <span>Full Feature Set</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">✅</span>
+                                <span>Keyboard Shortcuts</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="specs-table">
+                        <div class="specs-row">
+                            <span class="specs-label">Resolution:</span>
+                            <span class="specs-value">1440×900 (MacBook Air)</span>
+                        </div>
+                        <div class="specs-row">
+                            <span class="specs-label">Player Max:</span>
+                            <span class="specs-value">1200px width</span>
+                        </div>
+                        <div class="specs-row">
+                            <span class="specs-label">Controls:</span>
+                            <span class="specs-value">48px buttons</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Large Desktop -->
+                <div class="wireframe-container">
+                    <div class="wireframe-header">
+                        <div class="wireframe-title">Large Desktop</div>
+                        <div class="viewport-dimensions">1920×1080</div>
+                    </div>
+
+                    <div class="wireframe-preview large-desktop-preview">
+                        <div class="video-area desktop-video">
+                            🖥️ LARGE DESKTOP (16:9 optimal)
+                            <div class="play-button">▶</div>
+                        </div>
+                        <div class="controls">
+                            <div class="control-button">▶</div>
+                            <div class="control-button">🔊</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill"></div>
+                            </div>
+                            <div class="time-display">12:34 / 25:46</div>
+                            <div class="control-button">📺</div>
+                            <div class="control-button">⚙️</div>
+                            <div class="control-button">📄</div>
+                            <div class="control-button">🔗</div>
+                            <div class="control-button">⛶</div>
+                        </div>
+                    </div>
+
+                    <div class="wireframe-features">
+                        <strong>Large Desktop Features:</strong>
+                        <div class="feature-list">
+                            <div class="feature-item">
+                                <span class="feature-icon">✅</span>
+                                <span>Multi-Monitor</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">✅</span>
+                                <span>High DPI</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">✅</span>
+                                <span>Advanced Controls</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">✅</span>
+                                <span>Performance Tools</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Smart TV Viewport Section -->
+        <div class="viewport-section">
+            <div class="section-header">
+                <div class="section-icon">📺</div>
+                <div class="section-title">Smart TV Viewports (1920×1080 - 3840×2160)</div>
+            </div>
+
+            <div class="viewport-grid">
+                <!-- 1080p Smart TV -->
+                <div class="wireframe-container">
+                    <div class="wireframe-header">
+                        <div class="wireframe-title">Smart TV 1080p</div>
+                        <div class="viewport-dimensions">1920×1080</div>
+                    </div>
+
+                    <div class="wireframe-preview tv-preview">
+                        <div class="video-area tv-video">
+                            📺 SMART TV (16:9 full)
+                            <div class="play-button tv-play">▶</div>
+                        </div>
+                        <div class="controls tv-controls">
+                            <div class="control-button tv-control" style="border: 2px solid #667eea;">▶</div>
+                            <div class="control-button tv-control">🔊</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill"></div>
+                            </div>
+                            <div class="time-display tv-time">12:34</div>
+                            <div class="control-button tv-control">⚙️</div>
+                            <div class="control-button tv-control">⛶</div>
+                        </div>
+                    </div>
+
+                    <div class="wireframe-features">
+                        <strong>Smart TV Features:</strong>
+                        <div class="feature-list">
+                            <div class="feature-item">
+                                <span class="feature-icon">✅</span>
+                                <span>D-pad Navigation</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">✅</span>
+                                <span>TV-Safe Margins</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">✅</span>
+                                <span>Large UI (64px)</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">✅</span>
+                                <span>10-foot Optimized</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="specs-table">
+                        <div class="specs-row">
+                            <span class="specs-label">Resolution:</span>
+                            <span class="specs-value">1920×1080 (FHD)</span>
+                        </div>
+                        <div class="specs-row">
+                            <span class="specs-label">Safe Area:</span>
+                            <span class="specs-value">48px H, 27px V</span>
+                        </div>
+                        <div class="specs-row">
+                            <span class="specs-label">Buttons:</span>
+                            <span class="specs-value">64px minimum</span>
+                        </div>
+                        <div class="specs-row">
+                            <span class="specs-label">Font Size:</span>
+                            <span class="specs-value">24px minimum</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4K Smart TV -->
+                <div class="wireframe-container">
+                    <div class="wireframe-header">
+                        <div class="wireframe-title">Smart TV 4K</div>
+                        <div class="viewport-dimensions">3840×2160</div>
+                    </div>
+
+                    <div class="wireframe-preview tv-preview">
+                        <div class="video-area tv-video">
+                            📺 4K SMART TV (Ultra HD)
+                            <div class="play-button tv-play">▶</div>
+                        </div>
+                        <div class="controls tv-controls">
+                            <div class="control-button tv-control" style="border: 2px solid #667eea;">▶</div>
+                            <div class="control-button tv-control">🔊</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill"></div>
+                            </div>
+                            <div class="time-display tv-time">12:34</div>
+                            <div class="control-button tv-control">🎞️</div>
+                            <div class="control-button tv-control">⚙️</div>
+                            <div class="control-button tv-control">⛶</div>
+                        </div>
+                    </div>
+
+                    <div class="wireframe-features">
+                        <strong>4K TV Features:</strong>
+                        <div class="feature-list">
+                            <div class="feature-item">
+                                <span class="feature-icon">✅</span>
+                                <span>4K/HDR Support</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">✅</span>
+                                <span>Larger UI Scale</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">✅</span>
+                                <span>Performance Monitor</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">✅</span>
+                                <span>Quality Priority</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Responsive Behavior Section -->
+        <div class="viewport-section">
+            <div class="section-header">
+                <div class="section-icon">🔄</div>
+                <div class="section-title">Responsive Behavior & Breakpoints</div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
+                <!-- CSS Breakpoints -->
+                <div style="background: #f7fafc; padding: 20px; border-radius: 8px;">
+                    <h3 style="margin-bottom: 15px; color: #2d3748;">CSS Media Queries</h3>
+                    <pre style="font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; line-height: 1.4; color: #4a5568;">
+/* Mobile First Approach */
+.video-player {
+  font-size: 14px;
+  --button-size: 44px;
+}
+
+@media (min-width: 375px) {
+  /* Small mobile */
+  .video-player {
+    --button-size: 48px;
+  }
+}
+
+@media (min-width: 768px) {
+  /* Tablet */
+  .video-player {
+    font-size: 16px;
+    --button-size: 52px;
+  }
+}
+
+@media (min-width: 1024px) {
+  /* Desktop */
+  .video-player {
+    max-width: 1200px;
+  }
+}
+
+@media (min-width: 1920px) {
+  /* Smart TV */
+  .video-player {
+    font-size: 24px;
+    --button-size: 64px;
+    margin: 27px 48px;
+  }
+}
+                    </pre>
+                </div>
+
+                <!-- Feature Adaptation -->
+                <div style="background: #f7fafc; padding: 20px; border-radius: 8px;">
+                    <h3 style="margin-bottom: 15px; color: #2d3748;">Feature Adaptation</h3>
+                    <div style="font-size: 0.9rem; color: #4a5568; line-height: 1.5;">
+                        <div style="margin-bottom: 12px;">
+                            <strong>Mobile (< 768px):</strong><br>
+                            • Essential controls only<br>
+                            • Touch gestures primary<br>
+                            • Bottom sheet settings<br>
+                            • Large touch targets (56px)
+                        </div>
+                        <div style="margin-bottom: 12px;">
+                            <strong>Tablet (768px - 1024px):</strong><br>
+                            • Hybrid touch + mouse<br>
+                            • Expanded control set<br>
+                            • Hover interactions<br>
+                            • Orientation-aware layout
+                        </div>
+                        <div style="margin-bottom: 12px;">
+                            <strong>Desktop (1024px - 1920px):</strong><br>
+                            • Full feature set<br>
+                            • Keyboard shortcuts<br>
+                            • Hover states<br>
+                            • Multi-monitor support
+                        </div>
+                        <div>
+                            <strong>Smart TV (1920px+):</strong><br>
+                            • D-pad spatial navigation<br>
+                            • Large UI elements (64px+)<br>
+                            • TV-safe margins<br>
+                            • 10-foot viewing optimization
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Implementation Notes -->
+        <div class="viewport-section">
+            <div class="section-header">
+                <div class="section-icon">🛠️</div>
+                <div class="section-title">Implementation Notes & Technical Specifications</div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                <div style="background: #fff5f5; border: 1px solid #fed7d7; border-radius: 8px; padding: 15px;">
+                    <h4 style="color: #c53030; margin-bottom: 10px;">🎯 Priority Implementation Order</h4>
+                    <ol style="color: #4a5568; font-size: 0.9rem; line-height: 1.5;">
+                        <li>Desktop (1440px) - Primary development target</li>
+                        <li>Mobile Portrait (375px) - Touch optimization</li>
+                        <li>Smart TV (1920px) - D-pad navigation</li>
+                        <li>Tablet Landscape (1024px) - Hybrid interaction</li>
+                        <li>Mobile Landscape - Secondary mobile experience</li>
+                    </ol>
+                </div>
+
+                <div style="background: #f0fff4; border: 1px solid #9ae6b4; border-radius: 8px; padding: 15px;">
+                    <h4 style="color: #22543d; margin-bottom: 10px;">✅ Accessibility Compliance</h4>
+                    <ul style="color: #4a5568; font-size: 0.9rem; line-height: 1.5; list-style: none;">
+                        <li>✓ Touch targets: 44px minimum (mobile), 64px (TV)</li>
+                        <li>✓ Focus indicators: 3px outline minimum</li>
+                        <li>✓ Color contrast: 4.5:1 ratio compliance</li>
+                        <li>✓ Keyboard navigation: Full feature access</li>
+                        <li>✓ Screen reader: ARIA labels and announcements</li>
+                    </ul>
+                </div>
+
+                <div style="background: #fffaf0; border: 1px solid #fbd38d; border-radius: 8px; padding: 15px;">
+                    <h4 style="color: #c05621; margin-bottom: 10px;">⚡ Performance Targets</h4>
+                    <ul style="color: #4a5568; font-size: 0.9rem; line-height: 1.5; list-style: none;">
+                        <li>📱 Mobile: <2s load, <5% battery/hour</li>
+                        <li>🖥️ Desktop: <3s load, >95 Lighthouse</li>
+                        <li>📺 Smart TV: <200ms input, <150MB memory</li>
+                        <li>🌐 Web: LCP <2.5s, FID <100ms, CLS <0.1</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const wireframes = document.querySelectorAll('.wireframe-container');
+            const toggleButtons = document.querySelectorAll('.toggle-btn');
+
+            // Add click interactions to wireframes
+            wireframes.forEach(wireframe => {
+                wireframe.addEventListener('click', function() {
+                    // Highlight clicked wireframe
+                    wireframes.forEach(w => w.style.borderColor = '#e2e8f0');
+                    this.style.borderColor = '#667eea';
+                    this.style.boxShadow = '0 8px 25px rgba(102, 126, 234, 0.15)';
+
+                    // Show wireframe details
+                    const title = this.querySelector('.wireframe-title').textContent;
+                    console.log(`Selected wireframe: ${title}`);
+                });
+
+                // Add keyboard support
+                wireframe.setAttribute('tabindex', '0');
+                wireframe.setAttribute('role', 'button');
+                wireframe.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        this.click();
+                    }
+                });
+            });
+
+            // Orientation toggle functionality
+            function toggleOrientation(button, orientation) {
+                const container = button.closest('.wireframe-container');
+                const toggles = container.querySelectorAll('.toggle-btn');
+                const preview = container.querySelector('.wireframe-preview');
+
+                // Update toggle state
+                toggles.forEach(t => t.classList.remove('active'));
+                button.classList.add('active');
+
+                // Update preview based on orientation
+                if (orientation === 'landscape') {
+                    if (preview.classList.contains('mobile-preview')) {
+                        preview.className = 'wireframe-preview mobile-landscape-preview';
+                    } else if (preview.classList.contains('tablet-preview')) {
+                        preview.className = 'wireframe-preview tablet-landscape-preview';
+                    }
+                } else {
+                    if (preview.classList.contains('mobile-landscape-preview')) {
+                        preview.className = 'wireframe-preview mobile-preview';
+                    } else if (preview.classList.contains('tablet-landscape-preview')) {
+                        preview.className = 'wireframe-preview tablet-preview';
+                    }
+                }
+            }
+
+            // Make function globally available
+            window.toggleOrientation = toggleOrientation;
+
+            // Add ARIA labels for accessibility
+            wireframes.forEach((wireframe, index) => {
+                const title = wireframe.querySelector('.wireframe-title').textContent;
+                wireframe.setAttribute('aria-label', `View ${title} wireframe details`);
+            });
+        });
+    </script>
+</body>
+</html>

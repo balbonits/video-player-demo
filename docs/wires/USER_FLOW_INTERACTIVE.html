@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Player User Flow - Interactive Diagram</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .diagram-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .diagram-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .diagram-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 10px;
+        }
+
+        .diagram-header p {
+            font-size: 1.1rem;
+            color: #718096;
+            font-weight: 500;
+        }
+
+        .flow-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            position: relative;
+        }
+
+        .flow-step {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(0);
+        }
+
+        .flow-step:hover {
+            transform: translateY(-5px);
+            border-color: #4299e1;
+            box-shadow: 0 10px 25px rgba(66, 153, 225, 0.15);
+        }
+
+        .flow-step.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+        }
+
+        .flow-step.active .step-icon {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        .step-icon {
+            width: 60px;
+            height: 60px;
+            background: #4299e1;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 24px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .step-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: inherit;
+        }
+
+        .step-description {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            line-height: 1.4;
+        }
+
+        .flow-arrow {
+            position: absolute;
+            top: 50%;
+            right: -10px;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            opacity: 0.6;
+            transition: all 0.3s ease;
+        }
+
+        .flow-arrow.animated {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: translateY(-50%) scale(1); opacity: 0.6; }
+            50% { transform: translateY(-50%) scale(1.2); opacity: 1; }
+        }
+
+        .flow-details {
+            margin-top: 40px;
+            padding: 30px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border-left: 4px solid #4299e1;
+        }
+
+        .flow-details h3 {
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .flow-details-content {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .flow-details-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .technical-specs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .spec-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .spec-label {
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+        }
+
+        .spec-value {
+            color: #2d3748;
+            font-weight: 500;
+        }
+
+        .platform-indicators {
+            display: flex;
+            gap: 10px;
+            margin-top: 40px;
+            justify-content: center;
+        }
+
+        .platform-badge {
+            padding: 8px 16px;
+            background: #edf2f7;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #4a5568;
+            transition: all 0.3s ease;
+        }
+
+        .platform-badge:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .legend {
+            margin-top: 30px;
+            padding: 20px;
+            background: #fff5f5;
+            border-radius: 8px;
+            border: 1px solid #fed7d7;
+        }
+
+        .legend h4 {
+            color: #c53030;
+            margin-bottom: 10px;
+        }
+
+        .legend-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 10px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="diagram-container">
+        <div class="diagram-header">
+            <h1>Video Player User Flow</h1>
+            <p>Interactive Journey Map - FOX Corporation Demo</p>
+        </div>
+
+        <div class="flow-container">
+            <!-- Step 1: Landing -->
+            <div class="flow-step" data-step="landing">
+                <div class="step-icon">🏠</div>
+                <div class="step-title">User Arrives</div>
+                <div class="step-description">Demo page loads with video player interface</div>
+                <div class="flow-arrow">→</div>
+            </div>
+
+            <!-- Step 2: Video Load -->
+            <div class="flow-step" data-step="video-load">
+                <div class="step-icon">📺</div>
+                <div class="step-title">Video Loads</div>
+                <div class="step-description">HLS stream initializes with adaptive quality</div>
+                <div class="flow-arrow">→</div>
+            </div>
+
+            <!-- Step 3: Interaction -->
+            <div class="flow-step" data-step="interaction">
+                <div class="step-icon">🎮</div>
+                <div class="step-title">User Controls</div>
+                <div class="step-description">Play, volume, seek, settings interaction</div>
+                <div class="flow-arrow">→</div>
+            </div>
+
+            <!-- Step 4: Platform Experience -->
+            <div class="flow-step" data-step="platform">
+                <div class="step-icon">📱</div>
+                <div class="step-title">Cross-Platform</div>
+                <div class="step-description">Consistent experience across devices</div>
+            </div>
+        </div>
+
+        <!-- Detailed Flow Information -->
+        <div class="flow-details">
+            <h3 id="details-title">Click any step above to see detailed specifications</h3>
+
+            <!-- Landing Details -->
+            <div class="flow-details-content" data-content="landing">
+                <h3>🏠 User Landing Experience</h3>
+                <div class="technical-specs">
+                    <div class="spec-item">
+                        <div class="spec-label">Load Time Target</div>
+                        <div class="spec-value">< 3 seconds (Smart TV)</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">First Paint</div>
+                        <div class="spec-value">< 1 second</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Accessibility</div>
+                        <div class="spec-value">WCAG 2.1 AA compliant</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Navigation</div>
+                        <div class="spec-value">Keyboard + D-pad ready</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Load Details -->
+            <div class="flow-details-content" data-content="video-load">
+                <h3>📺 HLS Video Initialization</h3>
+                <div class="technical-specs">
+                    <div class="spec-item">
+                        <div class="spec-label">Stream Protocol</div>
+                        <div class="spec-value">HLS.js adaptive streaming</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Quality Levels</div>
+                        <div class="spec-value">Auto, 1080p, 720p, 480p</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Fallback</div>
+                        <div class="spec-value">MP4 for Safari</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Error Handling</div>
+                        <div class="spec-value">Graceful degradation</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interaction Details -->
+            <div class="flow-details-content" data-content="interaction">
+                <h3>🎮 User Interaction Patterns</h3>
+                <div class="technical-specs">
+                    <div class="spec-item">
+                        <div class="spec-label">Input Methods</div>
+                        <div class="spec-value">Mouse, Keyboard, Touch, D-pad</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Response Time</div>
+                        <div class="spec-value">< 200ms (Smart TV)</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Accessibility</div>
+                        <div class="spec-value">Screen reader support</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">State Management</div>
+                        <div class="spec-value">Redux Action Creators</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Platform Details -->
+            <div class="flow-details-content" data-content="platform">
+                <h3>📱 Cross-Platform Excellence</h3>
+                <div class="technical-specs">
+                    <div class="spec-item">
+                        <div class="spec-label">Web Platforms</div>
+                        <div class="spec-value">Pages + App Router</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Mobile Native</div>
+                        <div class="spec-value">iOS SwiftUI + Android Compose</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Smart TV</div>
+                        <div class="spec-value">Roku (priority), Tizen, Vizio</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Consistency</div>
+                        <div class="spec-value">Shared core logic</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Platform Indicators -->
+        <div class="platform-indicators">
+            <div class="platform-badge">Web (Next.js)</div>
+            <div class="platform-badge">iOS (SwiftUI)</div>
+            <div class="platform-badge">Android (Compose)</div>
+            <div class="platform-badge">Roku (Priority)</div>
+            <div class="platform-badge">Samsung Tizen</div>
+            <div class="platform-badge">Vizio</div>
+        </div>
+
+        <!-- Interactive Legend -->
+        <div class="legend">
+            <h4>🎯 Interactive Features</h4>
+            <div class="legend-items">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #667eea;"></div>
+                    <span>Click steps to see technical details</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #4299e1;"></div>
+                    <span>Hover for interaction feedback</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #48bb78;"></div>
+                    <span>Animated flow progression</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #ed8936;"></div>
+                    <span>Platform badges show scope</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const flowSteps = document.querySelectorAll('.flow-step');
+            const flowDetails = document.querySelectorAll('.flow-details-content');
+            const detailsTitle = document.getElementById('details-title');
+            const flowArrows = document.querySelectorAll('.flow-arrow');
+
+            // Add click handlers to flow steps
+            flowSteps.forEach(step => {
+                step.addEventListener('click', function() {
+                    const stepType = this.dataset.step;
+
+                    // Remove active class from all steps
+                    flowSteps.forEach(s => s.classList.remove('active'));
+
+                    // Add active class to clicked step
+                    this.classList.add('active');
+
+                    // Hide all detail content
+                    flowDetails.forEach(detail => detail.classList.remove('active'));
+
+                    // Show relevant detail content
+                    const relevantDetail = document.querySelector(`[data-content="${stepType}"]`);
+                    if (relevantDetail) {
+                        relevantDetail.classList.add('active');
+                    }
+
+                    // Animate arrows
+                    flowArrows.forEach(arrow => arrow.classList.add('animated'));
+                    setTimeout(() => {
+                        flowArrows.forEach(arrow => arrow.classList.remove('animated'));
+                    }, 2000);
+                });
+            });
+
+            // Auto-play through steps
+            let currentStep = 0;
+            const autoPlay = () => {
+                if (currentStep < flowSteps.length) {
+                    flowSteps[currentStep].click();
+                    currentStep++;
+                    setTimeout(autoPlay, 3000);
+                } else {
+                    currentStep = 0;
+                    setTimeout(autoPlay, 5000);
+                }
+            };
+
+            // Start auto-play after 2 seconds
+            setTimeout(autoPlay, 2000);
+
+            // Platform badge interactions
+            const platformBadges = document.querySelectorAll('.platform-badge');
+            platformBadges.forEach(badge => {
+                badge.addEventListener('click', function() {
+                    this.style.transform = 'translateY(-4px) scale(1.05)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 200);
+                });
+            });
+
+            // Add keyboard navigation
+            document.addEventListener('keydown', function(e) {
+                if (e.key >= '1' && e.key <= '4') {
+                    const stepIndex = parseInt(e.key) - 1;
+                    if (flowSteps[stepIndex]) {
+                        flowSteps[stepIndex].click();
+                    }
+                }
+            });
+
+            // Add ARIA labels and accessibility
+            flowSteps.forEach((step, index) => {
+                step.setAttribute('role', 'button');
+                step.setAttribute('tabindex', '0');
+                step.setAttribute('aria-label', `Flow step ${index + 1}: ${step.querySelector('.step-title').textContent}`);
+
+                step.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        this.click();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
