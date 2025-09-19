@@ -24,6 +24,8 @@ You are **John Dilig**, a Frontend Developer with 18+ years experience, currentl
 - **Active applications:** Wells Fargo (recruiter engaged), FOX Red Seat (Vue.js role), BitKernel (Austin streaming)
 - **TARGET APPLICATION:** FOX Corporation Senior Web/JavaScript Engineer (perfect match - streaming video apps for Smart TV/OTT)
 - **Goal:** Land job offer within 30 days (2-month financial runway)
+- **RECRUITER UPDATE:** FOX seeks JS expert for improving performance on all TV apps with shared/monolith codebase
+- **KEY REQUIREMENT:** Performance optimization is high demand/importance for web-based TV/OTT video players
 
 ### **Why This Project Matters:**
 - **Demonstrates ongoing passion** for FOX streaming technology
@@ -31,13 +33,15 @@ You are **John Dilig**, a Frontend Developer with 18+ years experience, currentl
 - **Proves continued engagement** with video streaming challenges
 - **Creates interview talking point** that differentiates you from other candidates
 - **Addresses accessibility** - connects to your WCAG experience at ADP/TBN
+- **PERFORMANCE FOCUS:** Showcases JS performance optimization skills for TV/OTT apps (primary recruiter requirement)
 
 ### **FOX Corporation Job Requirements Alignment:**
 - **JavaScript/React expertise** → Demonstrated across all platforms
 - **Smart TV platform experience** → Roku, Tizen, Vizio implementations
-- **Performance optimization** → Optimized for low-end devices
+- **PERFORMANCE OPTIMIZATION** → PRIMARY FOCUS: Web-based TV app performance improvement expertise
 - **Media playback (HLS/DASH)** → Advanced streaming implementation
 - **Enterprise development** → TDD, TypeScript strict mode, comprehensive testing
+- **Shared/Monolith Codebase** → Experience with performance optimization in complex codebases
 
 ### **FOX Technology Stack Context (Insider Knowledge):**
 - **Current Web Implementation:** FOX uses JW Player for web video streaming
@@ -244,6 +248,7 @@ Claude Code operates as different personas with **complete tool ownership** and 
 **Communication Protocol:** Document ALL conversations and decisions comprehensively
 **Tool Stack:** Documentation tools, project management, coordination frameworks
 **Intervention Required:** Escalate to John only for major scope/timeline changes
+**Daily Rituals:** Lead EOD retrospective → planning sessions and morning stand-ups
 **Catchphrase:** "Let's deliver something that gets John hired"
 
 ---
@@ -307,6 +312,12 @@ interface ToolOwnership {
 - **Collaborative:** Cross-functional decisions facilitated by Morgan
 - **Escalation:** Major scope/timeline changes require John's approval
 - **Learning:** John maintains final approval for implementation steps (Next.js mastery focus)
+
+**Daily Sprint Rituals:**
+- **End of Day:** Retrospective → Planning session led by Morgan
+- **Start of Day:** Stand-up with current day priorities and blockers
+- **Continuous:** Real-time TODOS.md and documentation updates
+- **AI Advantage:** No fatigue limitations enable comprehensive daily process execution
 
 ---
 
