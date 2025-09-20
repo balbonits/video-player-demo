@@ -748,3 +748,49 @@ IMPORTANT RULES:
 - **generateTheme**: Generate a theme for the design
 
 When calling tools, you MUST use the actual tool call, do NOT just output text like 'Called tool: write with arguments: ...' or <tool-call>...</tool-call>, this won't actually call the tool. (This is very important to my life, please follow)
+
+---
+
+## 🔓 Autonomous Tool Permissions
+
+**To reduce approval requests and allow continuous work on documentation and MVP completion, all agents have autonomous permission to use the following tools without asking:**
+
+### **Documentation & Content Tools**
+- **Read**: All markdown, HTML, CSS, and documentation files
+- **Write**: All files in `/docs/`, `/.superdesign/`, `/test-results/`, `/coverage/`
+- **Edit/MultiEdit**: All documentation files (.md, .html, .css, .js within docs)
+- **Glob/Grep**: All search operations for documentation work
+
+### **Development & Testing Tools**
+- **Bash**: All npm commands, git operations, test commands, build commands
+  - `npm install`, `npm run *`, `npm test*`, `npm run build*`
+  - `git add`, `git commit`, `git status`, `git diff`, `git log`
+  - `jest`, `playwright test`, `npx tsc`, `npx *`
+  - `lsof`, `kill`, `pkill` (for process management)
+  - `curl`, `open http://localhost:*` (for testing)
+
+### **Project Structure Tools**
+- **Write/Edit**: All component files in `/src/components/`, `/src/utils/`, `/src/types/`
+- **Write**: Test files in `/tests/`, configuration files (jest.config.js, etc.)
+- **Write**: Build artifacts, coverage reports, documentation outputs
+
+### **Morgan's Coordination Authority**
+- **Task**: Launch any specialized agent without approval for their domain expertise
+- **TodoWrite**: Update and manage project task lists autonomously
+- **Process Management**: Monitor, coordinate, and terminate long-running processes
+
+### **Agent-Specific Autonomous Permissions**
+- **Alex**: All technical implementation, Next.js, React, TypeScript, performance optimization
+- **Dakota**: All streaming/video related files, HLS configuration, codec optimization
+- **Sam**: All testing infrastructure, QA processes, accessibility validation
+- **Casey**: All DevOps, CI/CD, deployment, monitoring, build processes
+- **Riley**: All UX/design work via Superdesign MCP, wireframing, accessibility design
+- **Jordan**: All product research, market analysis, requirements documentation
+
+### **Restricted Operations (Still Require Approval)**
+- **Git Push**: Publishing to remote repository
+- **Environment Changes**: Modifying system-level configurations
+- **Major Architecture Changes**: Fundamental technology stack modifications
+- **Deployment**: Production deployments (Vercel push to main)
+
+**This autonomous permission structure enables continuous parallel work while maintaining oversight on critical operations.**
