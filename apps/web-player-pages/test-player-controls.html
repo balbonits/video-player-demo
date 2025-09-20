@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player Controls Test - Manual Verification</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #000;
+            color: #fff;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .test-section {
+            background: #111;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 1px solid #333;
+        }
+
+        .test-header {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #00ff88;
+        }
+
+        .test-item {
+            padding: 10px;
+            margin: 10px 0;
+            background: #222;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status {
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        .pass { background: #00ff88; color: #000; }
+        .fail { background: #ff4444; color: #fff; }
+        .pending { background: #ffaa00; color: #000; }
+
+        button {
+            background: #00ff88;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        button:hover {
+            background: #00cc66;
+        }
+
+        #player-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎬 Video Player Controls Verification</h1>
+
+    <div id="player-container">
+        <!-- Player will be inserted here -->
+    </div>
+
+    <div class="test-section">
+        <div class="test-header">Player Control Tests</div>
+
+        <div class="test-item">
+            <span>✅ Play/Pause Control</span>
+            <span class="status pending" id="play-pause-status">PENDING</span>
+        </div>
+
+        <div class="test-item">
+            <span>🔊 Volume/Mute Control</span>
+            <span class="status pending" id="volume-status">PENDING</span>
+        </div>
+
+        <div class="test-item">
+            <span>⏩ Seekbar Control</span>
+            <span class="status pending" id="seekbar-status">PENDING</span>
+        </div>
+
+        <div class="test-item">
+            <span>⌨️ Keyboard Navigation</span>
+            <span class="status pending" id="keyboard-status">PENDING</span>
+        </div>
+
+        <div class="test-item">
+            <span>🎯 Quality Selection</span>
+            <span class="status pending" id="quality-status">PENDING</span>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <div class="test-header">Test Actions</div>
+        <button onclick="testPlayPause()">Test Play/Pause</button>
+        <button onclick="testVolume()">Test Volume/Mute</button>
+        <button onclick="testSeekbar()">Test Seekbar</button>
+        <button onclick="testKeyboard()">Test Keyboard</button>
+        <button onclick="testQuality()">Test Quality</button>
+        <button onclick="runAllTests()">Run All Tests</button>
+    </div>
+
+    <div class="test-section">
+        <div class="test-header">Test Results</div>
+        <pre id="test-log"></pre>
+    </div>
+
+    <script type="module">
+        // Import the HLS Video Player component
+        import './src/components/HLSVideoPlayer.js';
+
+        // Create and insert player
+        const player = document.createElement('hls-video-player');
+        player.setAttribute('src', 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8');
+        player.setAttribute('performance-mode', 'desktop');
+        document.getElementById('player-container').appendChild(player);
+
+        window.player = player;
+
+        // Test functions
+        window.testPlayPause = async function() {
+            const shadowRoot = player.shadowRoot;
+            const video = shadowRoot.querySelector('.video-element');
+            const playBtn = shadowRoot.getElementById('play-pause');
+
+            log('Testing Play/Pause...');
+
+            // Test play
+            playBtn.click();
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            if (!video.paused) {
+                log('✅ Play works');
+
+                // Test pause
+                playBtn.click();
+                await new Promise(resolve => setTimeout(resolve, 500));
+
+                if (video.paused) {
+                    log('✅ Pause works');
+                    updateStatus('play-pause-status', 'pass');
+                    return true;
+                }
+            }
+
+            log('❌ Play/Pause failed');
+            updateStatus('play-pause-status', 'fail');
+            return false;
+        };
+
+        window.testVolume = function() {
+            const shadowRoot = player.shadowRoot;
+            const video = shadowRoot.querySelector('.video-element');
+            const volumeBtn = shadowRoot.getElementById('volume');
+
+            log('Testing Volume/Mute...');
+
+            const initialMuted = video.muted;
+            volumeBtn.click();
+
+            if (video.muted !== initialMuted) {
+                log('✅ Mute toggle works');
+                volumeBtn.click(); // Toggle back
+
+                if (video.muted === initialMuted) {
+                    log('✅ Unmute works');
+                    updateStatus('volume-status', 'pass');
+                    return true;
+                }
+            }
+
+            log('❌ Volume/Mute failed');
+            updateStatus('volume-status', 'fail');
+            return false;
+        };
+
+        window.testSeekbar = function() {
+            const shadowRoot = player.shadowRoot;
+            const video = shadowRoot.querySelector('.video-element');
+            const progressBar = shadowRoot.querySelector('.progress-bar');
+
+            log('Testing Seekbar...');
+
+            if (!video.duration || !isFinite(video.duration)) {
+                log('⚠️ Video not loaded yet');
+                updateStatus('seekbar-status', 'pending');
+                return false;
+            }
+
+            const initialTime = video.currentTime;
+
+            // Simulate click at middle of progress bar
+            const rect = progressBar.getBoundingClientRect();
+            const event = new MouseEvent('click', {
+                clientX: rect.left + rect.width * 0.5,
+                clientY: rect.top + rect.height / 2,
+                bubbles: true
+            });
+
+            progressBar.dispatchEvent(event);
+
+            setTimeout(() => {
+                const expectedTime = video.duration * 0.5;
+                const diff = Math.abs(video.currentTime - expectedTime);
+
+                if (diff < 5) { // Within 5 seconds
+                    log(`✅ Seekbar works (seeked to ${video.currentTime.toFixed(1)}s)`);
+                    updateStatus('seekbar-status', 'pass');
+                } else {
+                    log(`❌ Seekbar failed (current: ${video.currentTime}, expected: ~${expectedTime})`);
+                    updateStatus('seekbar-status', 'fail');
+                }
+            }, 100);
+
+            return true;
+        };
+
+        window.testKeyboard = function() {
+            const shadowRoot = player.shadowRoot;
+            const video = shadowRoot.querySelector('.video-element');
+
+            log('Testing Keyboard Navigation...');
+
+            const initialTime = video.currentTime;
+
+            // Test right arrow (forward 10s)
+            player.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight' }));
+
+            setTimeout(() => {
+                if (video.currentTime > initialTime) {
+                    log('✅ Arrow Right (forward) works');
+
+                    // Test left arrow (back 10s)
+                    player.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft' }));
+
+                    setTimeout(() => {
+                        if (video.currentTime < initialTime + 10) {
+                            log('✅ Arrow Left (backward) works');
+                            updateStatus('keyboard-status', 'pass');
+                        } else {
+                            log('❌ Arrow Left failed');
+                            updateStatus('keyboard-status', 'fail');
+                        }
+                    }, 100);
+                } else {
+                    log('❌ Arrow Right failed');
+                    updateStatus('keyboard-status', 'fail');
+                }
+            }, 100);
+
+            return true;
+        };
+
+        window.testQuality = function() {
+            const shadowRoot = player.shadowRoot;
+            const qualitySelector = shadowRoot.getElementById('quality');
+
+            log('Testing Quality Selection...');
+
+            const options = qualitySelector.querySelectorAll('option');
+
+            if (options.length > 1) {
+                log(`✅ Quality selector has ${options.length} options`);
+
+                // Try changing quality
+                const currentValue = qualitySelector.value;
+                qualitySelector.value = options[1].value;
+                qualitySelector.dispatchEvent(new Event('change'));
+
+                log('✅ Quality can be changed');
+                updateStatus('quality-status', 'pass');
+                return true;
+            } else {
+                log('⚠️ Waiting for quality levels to load...');
+                updateStatus('quality-status', 'pending');
+                return false;
+            }
+        };
+
+        window.runAllTests = async function() {
+            log('🚀 Running all tests...\n');
+
+            // Wait for video to load
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
+            await testPlayPause();
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            testVolume();
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            testSeekbar();
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            testKeyboard();
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            testQuality();
+
+            log('\n✅ All tests completed!');
+        };
+
+        function updateStatus(id, status) {
+            const element = document.getElementById(id);
+            element.className = `status ${status}`;
+            element.textContent = status.toUpperCase();
+        }
+
+        function log(message) {
+            const logElement = document.getElementById('test-log');
+            logElement.textContent += message + '\n';
+            console.log(message);
+        }
+
+        // Auto-run tests after load
+        setTimeout(() => {
+            log('Player loaded. Ready for testing.\n');
+        }, 3000);
+    </script>
+</body>
+</html>

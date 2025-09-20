@@ -1,0 +1,88 @@
+{
+  "version": 2,
+  "buildCommand": "cd apps/web-player-pages && npm ci && npm run build",
+  "outputDirectory": "apps/web-player-pages/.next",
+  "installCommand": "cd apps/web-player-pages && npm ci",
+  "framework": "nextjs",
+  "builds": [
+    {
+      "src": "apps/web-player-pages/package.json",
+      "use": "@vercel/next"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/apps/web-player-pages/$1"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production",
+    "NEXT_PUBLIC_APP_VERSION": "@app_version",
+    "NEXT_PUBLIC_GA_ID": "@ga_tracking_id",
+    "NEXT_PUBLIC_ANALYTICS_ENDPOINT": "@analytics_endpoint",
+    "NEXT_PUBLIC_FEATURE_FLAGS": "@feature_flags"
+  },
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=()"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=31536000; includeSubDomains; preload"
+        }
+      ]
+    },
+    {
+      "source": "/static/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/_next/static/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/home",
+      "destination": "/",
+      "permanent": true
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/apps/web-player-pages/api/$1"
+    }
+  ]
+}

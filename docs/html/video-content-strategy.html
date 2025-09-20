@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎬 Video Content Strategy & Test Streams</title>
+    <link rel="stylesheet" href="../shared-style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/javascript.min.js"></script>
+    <style>
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: var(--space-lg);
+            margin: var(--space-xl) 0;
+        }
+
+        .content-card {
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+            border: 2px solid var(--border-secondary);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .content-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .content-card:hover {
+            border-color: var(--accent-primary);
+            box-shadow: var(--shadow-accent);
+            transform: translateY(-4px);
+        }
+
+        .content-card:hover::before {
+            transform: translateX(0);
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--space-md);
+        }
+
+        .content-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+            margin-bottom: var(--space-sm);
+        }
+
+        .content-url {
+            background: var(--bg-code);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-sm);
+            padding: var(--space-xs) var(--space-sm);
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            word-break: break-all;
+            margin: var(--space-sm) 0;
+        }
+
+        .content-specs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-sm);
+            margin: var(--space-md) 0;
+        }
+
+        .spec-item {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--space-xs);
+            border-bottom: 1px solid var(--border-primary);
+            font-size: 0.9rem;
+        }
+
+        .spec-label {
+            color: var(--text-secondary);
+        }
+
+        .spec-value {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .content-purpose {
+            background: rgba(0, 255, 136, 0.1);
+            border-left: 3px solid var(--accent-primary);
+            padding: var(--space-sm);
+            margin: var(--space-md) 0;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            font-style: italic;
+            color: var(--text-secondary);
+        }
+
+        .license-badge {
+            background: var(--accent-secondary);
+            color: var(--bg-primary);
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: var(--radius-sm);
+            font-size: 0.7rem;
+            font-weight: 600;
+            position: absolute;
+            top: var(--space-sm);
+            right: var(--space-sm);
+        }
+
+        .validation-checklist {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-secondary);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            margin: var(--space-xl) 0;
+        }
+
+        .checklist-section {
+            margin-bottom: var(--space-lg);
+        }
+
+        .checklist-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--accent-primary);
+            margin-bottom: var(--space-sm);
+            display: flex;
+            align-items: center;
+        }
+
+        .checklist-title::before {
+            content: '✓';
+            margin-right: var(--space-sm);
+            color: var(--accent-primary);
+            font-weight: 700;
+        }
+
+        .checklist-items {
+            list-style: none;
+            margin: 0;
+        }
+
+        .checklist-items li {
+            margin: var(--space-sm) 0;
+            padding-left: var(--space-lg);
+            position: relative;
+            color: var(--text-secondary);
+        }
+
+        .checklist-items li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: var(--accent-primary);
+            font-weight: 700;
+        }
+
+        .demo-flow {
+            background: var(--bg-code);
+            border: 2px solid var(--accent-primary);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            margin: var(--space-xl) 0;
+            position: relative;
+        }
+
+        .demo-step {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-secondary);
+            border-radius: var(--radius-md);
+            padding: var(--space-md);
+            margin: var(--space-md) 0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .demo-step:hover {
+            border-color: var(--accent-primary);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .step-number {
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 0.8rem;
+            display: inline-block;
+            margin-right: var(--space-sm);
+        }
+
+        .step-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .step-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .streaming-mode-selector {
+            display: flex;
+            gap: var(--space-md);
+            margin: var(--space-lg) 0;
+            justify-content: center;
+        }
+
+        .mode-button {
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-secondary);
+            border-radius: var(--radius-md);
+            padding: var(--space-md) var(--space-lg);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .mode-button:hover,
+        .mode-button.active {
+            border-color: var(--accent-primary);
+            background: rgba(0, 255, 136, 0.1);
+            color: var(--accent-primary);
+        }
+
+        .performance-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-md);
+            margin: var(--space-lg) 0;
+        }
+
+        .metric-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-secondary);
+            border-radius: var(--radius-md);
+            padding: var(--space-md);
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .metric-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .content-selector {
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            margin: var(--space-xl) 0;
+            text-align: center;
+        }
+
+        .selector-title {
+            color: var(--accent-primary);
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: var(--space-md);
+        }
+
+        .content-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-sm);
+            justify-content: center;
+        }
+
+        .content-option {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-secondary);
+            border-radius: var(--radius-sm);
+            padding: var(--space-sm) var(--space-md);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .content-option:hover,
+        .content-option.selected {
+            border-color: var(--accent-primary);
+            background: rgba(0, 255, 136, 0.1);
+            color: var(--accent-primary);
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>🎬 Video Content Strategy & Test Streams</h1>
+            <p class="subtitle">Comprehensive video content sources for demo and testing</p>
+            <div style="text-align: center; margin-top: var(--space-md);">
+                <span class="badge">Content Manager: Jordan (Product)</span>
+                <span class="badge">Validation: Morgan (Team Lead)</span>
+                <span class="badge success">All sources verified legal</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Interactive Content Selector -->
+        <section class="content-selector">
+            <div class="selector-title">🎯 Interactive Content Demo</div>
+            <p>Select content type to see streaming configuration:</p>
+            <div class="streaming-mode-selector">
+                <div class="mode-button active" onclick="switchMode('vod')">VOD Mode</div>
+                <div class="mode-button" onclick="switchMode('live')">Live Simulation</div>
+                <div class="mode-button" onclick="switchMode('performance')">4K Performance</div>
+            </div>
+            <div class="content-options" id="content-options">
+                <div class="content-option selected" onclick="selectContent('big-buck-bunny')">Big Buck Bunny</div>
+                <div class="content-option" onclick="selectContent('tears-of-steel')">Tears of Steel</div>
+                <div class="content-option" onclick="selectContent('4k-skate')">4K Skate Demo</div>
+                <div class="content-option" onclick="selectContent('apple-test')">Apple HLS Test</div>
+            </div>
+        </section>
+
+        <!-- Primary Content Sources -->
+        <section>
+            <h2>🎯 Primary Video Content Sources</h2>
+
+            <div class="content-grid">
+                <div class="content-card" onclick="highlightContent('primary')">
+                    <div class="license-badge">Creative Commons</div>
+                    <div class="content-title">Big Buck Bunny (Mux)</div>
+                    <div class="content-url">https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8</div>
+
+                    <div class="content-specs">
+                        <div class="spec-item">
+                            <span class="spec-label">Resolution:</span>
+                            <span class="spec-value">1080x1920</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Segments:</span>
+                            <span class="spec-value">11s segments</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Quality Levels:</span>
+                            <span class="spec-value">Multiple ABR</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Uptime:</span>
+                            <span class="spec-value">99.9% reliable</span>
+                        </div>
+                    </div>
+
+                    <div class="content-purpose">
+                        Primary HLS streaming demonstration with professional encoding and reliable uptime
+                    </div>
+                </div>
+
+                <div class="content-card" onclick="highlightContent('secondary')">
+                    <div class="license-badge">Creative Commons</div>
+                    <div class="content-title">Tears of Steel (JW Platform)</div>
+                    <div class="content-url">https://content.jwplatform.com/manifests/vM7nH0Kl.m3u8</div>
+
+                    <div class="content-specs">
+                        <div class="spec-item">
+                            <span class="spec-label">Resolution:</span>
+                            <span class="spec-value">858x1920</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Segments:</span>
+                            <span class="spec-value">4s segments</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Platform:</span>
+                            <span class="spec-value">JW Platform</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Comparison:</span>
+                            <span class="spec-value">vs JW Player</span>
+                        </div>
+                    </div>
+
+                    <div class="content-purpose">
+                        Alternative HLS source for compatibility testing and JW Player comparison
+                    </div>
+                </div>
+
+                <div class="content-card" onclick="highlightContent('4k')">
+                    <div class="license-badge">Test Content</div>
+                    <div class="content-title">Skate Phantom Flex 4K</div>
+                    <div class="content-url">https://sample.vodobox.net/skate_phantom_flex_4k/skate_phantom_flex_4k.m3u8</div>
+
+                    <div class="content-specs">
+                        <div class="spec-item">
+                            <span class="spec-label">Resolution:</span>
+                            <span class="spec-value">2160x3840 (4K)</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Segments:</span>
+                            <span class="spec-value">4s segments</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Use Case:</span>
+                            <span class="spec-value">Performance demo</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Testing:</span>
+                            <span class="spec-value">Stress testing</span>
+                        </div>
+                    </div>
+
+                    <div class="content-purpose">
+                        4K streaming demonstration for high-end devices and performance optimization showcase
+                    </div>
+                </div>
+
+                <div class="content-card" onclick="highlightContent('captions')">
+                    <div class="license-badge">Creative Commons</div>
+                    <div class="content-title">Sintel with WebVTT Captions</div>
+                    <div class="content-url">https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8</div>
+
+                    <div class="content-specs">
+                        <div class="spec-item">
+                            <span class="spec-label">Duration:</span>
+                            <span class="spec-value">14:48</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Captions:</span>
+                            <span class="spec-value">WebVTT tracks</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Accessibility:</span>
+                            <span class="spec-value">WCAG compliant</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Testing:</span>
+                            <span class="spec-value">Accessibility</span>
+                        </div>
+                    </div>
+
+                    <div class="content-purpose">
+                        Caption functionality demonstration and accessibility testing with built-in WebVTT support
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Content Validation -->
+        <section>
+            <h2>📋 Content Validation & Legal Compliance</h2>
+
+            <div class="validation-checklist">
+                <div class="checklist-section">
+                    <div class="checklist-title">Technical Validation</div>
+                    <ul class="checklist-items">
+                        <li>Test each HLS stream in Chrome, Safari, Firefox, Edge</li>
+                        <li>Validate on iOS Safari and Android Chrome</li>
+                        <li>Test with TV user agent simulation</li>
+                        <li>Verify adaptive streaming and quality levels</li>
+                        <li>Confirm HLS manifests contain multiple quality options</li>
+                        <li>Validate quality switching works smoothly</li>
+                    </ul>
+                </div>
+
+                <div class="checklist-section">
+                    <div class="checklist-title">Legal Compliance</div>
+                    <ul class="checklist-items">
+                        <li>Big Buck Bunny: Creative Commons license verified</li>
+                        <li>Tears of Steel: Creative Commons (Blender Foundation)</li>
+                        <li>Apple Test Streams: Apple developer test content</li>
+                        <li>All content verified as free for demonstration use</li>
+                        <li>No copyright restrictions for portfolio presentation</li>
+                        <li>Safe for commercial presentation to FOX Corporation</li>
+                    </ul>
+                </div>
+
+                <div class="checklist-section">
+                    <div class="checklist-title">Content Appropriateness</div>
+                    <ul class="checklist-items">
+                        <li>All content appropriate for business presentation</li>
+                        <li>Content showcases video player capabilities effectively</li>
+                        <li>Shorter videos preferred for demo scenarios (under 15 minutes)</li>
+                        <li>High enough quality to demonstrate streaming capabilities</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Live Streaming Simulation -->
+        <section>
+            <h2>📡 Live Streaming Simulation Strategy</h2>
+
+            <div class="demo-flow">
+                <h3 style="color: var(--accent-primary); margin-bottom: var(--space-lg);">Interactive Demo Flow (5 minutes total)</h3>
+
+                <div class="demo-step" onclick="demonstrateStep(1)">
+                    <div class="step-title">
+                        <span class="step-number">1</span>
+                        VOD Demonstration (Standard Video Player)
+                    </div>
+                    <div class="step-description">
+                        Show standard video player capabilities with Big Buck Bunny - seeking, quality selection, basic controls
+                    </div>
+                </div>
+
+                <div class="demo-step" onclick="demonstrateStep(2)">
+                    <div class="step-title">
+                        <span class="step-number">2</span>
+                        Simulated Live Mode (Live Streaming Concepts)
+                    </div>
+                    <div class="step-description">
+                        Switch to live mode simulation - disable seeking, show live indicator, demonstrate live edge behavior
+                    </div>
+                </div>
+
+                <div class="demo-step" onclick="demonstrateStep(3)">
+                    <div class="step-title">
+                        <span class="step-number">3</span>
+                        4K Performance Demo (Optimization Capabilities)
+                    </div>
+                    <div class="step-description">
+                        Load 4K content to showcase performance optimization and Smart TV capabilities
+                    </div>
+                </div>
+
+                <div class="demo-step" onclick="demonstrateStep(4)">
+                    <div class="step-title">
+                        <span class="step-number">4</span>
+                        Smart TV Navigation (D-pad Interaction)
+                    </div>
+                    <div class="step-description">
+                        Demonstrate TV remote navigation, spatial focus management, and TV-optimized UI
+                    </div>
+                </div>
+
+                <div class="demo-step" onclick="demonstrateStep(5)">
+                    <div class="step-title">
+                        <span class="step-number">5</span>
+                        Accessibility Features (WCAG Compliance)
+                    </div>
+                    <div class="step-description">
+                        Show caption customization, keyboard navigation, and accessibility improvements
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Performance Metrics -->
+        <section>
+            <h2>📊 Content Performance Targets</h2>
+
+            <div class="performance-metrics">
+                <div class="metric-card">
+                    <div class="metric-value">>99%</div>
+                    <div class="metric-label">Stream Availability</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value"><2s</div>
+                    <div class="metric-label">Stream Initialization</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">0ms</div>
+                    <div class="metric-label">Quality Switch Buffering</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">5min</div>
+                    <div class="metric-label">Total Demo Duration</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Implementation Code Example -->
+        <section>
+            <h2>🔧 Content Integration Implementation</h2>
+
+            <div class="streaming-flow">
+                <h4>React Hook for Content Management</h4>
+                <pre><code class="language-typescript">const useVideoContent = () => {
+  const [selectedContent, setSelectedContent] = useState('big-buck-bunny-hls')
+  const [contentSources] = useState(VideoSourceConfig.contentSources)
+
+  const getCurrentContent = useCallback(() => {
+    return contentSources[selectedContent]
+  }, [selectedContent, contentSources])
+
+  const switchContent = useCallback((contentId: string) => {
+    if (contentSources[contentId]) {
+      setSelectedContent(contentId)
+      // Track content switching for analytics
+      trackVideoEvent('content_switch', { from: selectedContent, to: contentId })
+    }
+  }, [selectedContent])
+
+  return {
+    currentContent: getCurrentContent(),
+    availableContent: Object.keys(contentSources),
+    switchContent
+  }
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- FOX Relevance -->
+        <section>
+            <h2>🎯 FOX Interview Relevance</h2>
+
+            <div class="drm-system">
+                <h4>Live Streaming Understanding</h4>
+                <p>FOX streams live news and sports content - our live simulation demonstrates understanding of live vs VOD differences and streaming constraints.</p>
+            </div>
+
+            <div class="drm-system">
+                <h4>Performance Optimization</h4>
+                <p>4K content performance testing shows optimization capabilities relevant to FOX's high-quality streaming requirements.</p>
+            </div>
+
+            <div class="drm-system">
+                <h4>Content Strategy</h4>
+                <p>Multiple content source management demonstrates experience with content delivery and fallback strategies.</p>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Initialize syntax highlighting
+        hljs.highlightAll();
+
+        let currentMode = 'vod';
+        let selectedContent = 'big-buck-bunny';
+
+        function switchMode(mode) {
+            currentMode = mode;
+
+            // Update button states
+            document.querySelectorAll('.mode-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Update content display based on mode
+            updateContentDisplay();
+        }
+
+        function selectContent(contentId) {
+            selectedContent = contentId;
+
+            // Update selected state
+            document.querySelectorAll('.content-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+
+            // Update content display
+            updateContentDisplay();
+        }
+
+        function updateContentDisplay() {
+            console.log(`Mode: ${currentMode}, Content: ${selectedContent}`);
+
+            // Simulate content configuration change
+            const configs = {
+                vod: {
+                    features: ['Full seeking', 'Quality selection', 'Standard controls'],
+                    purpose: 'General video player capabilities'
+                },
+                live: {
+                    features: ['Live edge seeking', 'Latency display', 'Live indicator'],
+                    purpose: 'Live streaming demonstration'
+                },
+                performance: {
+                    features: ['4K quality', 'Performance monitoring', 'Smart TV optimization'],
+                    purpose: 'High-performance streaming'
+                }
+            };
+
+            // Could update UI here to show current configuration
+        }
+
+        function highlightContent(contentType) {
+            // Remove existing highlights
+            document.querySelectorAll('.content-card').forEach(card => {
+                card.style.transform = '';
+                card.style.boxShadow = '';
+            });
+
+            // Highlight selected content
+            event.currentTarget.style.transform = 'translateY(-8px) scale(1.02)';
+            event.currentTarget.style.boxShadow = 'var(--shadow-accent)';
+        }
+
+        function demonstrateStep(stepNumber) {
+            // Highlight the selected step
+            document.querySelectorAll('.demo-step').forEach(step => {
+                step.style.borderColor = 'var(--border-secondary)';
+                step.style.backgroundColor = 'var(--bg-tertiary)';
+            });
+
+            event.currentTarget.style.borderColor = 'var(--accent-primary)';
+            event.currentTarget.style.backgroundColor = 'rgba(0, 255, 136, 0.1)';
+
+            console.log(`Demo Step ${stepNumber} activated`);
+        }
+
+        // Add intersection observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animation = 'fadeInUp 0.6s ease forwards';
+                }
+            });
+        }, observerOptions);
+
+        // Observe content cards
+        document.querySelectorAll('.content-card, .demo-step, .metric-card').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Add CSS for animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

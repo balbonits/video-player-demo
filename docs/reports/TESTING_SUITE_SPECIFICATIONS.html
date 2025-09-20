@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Testing Suite Specifications - Video Player Demo</title>
+    <style>
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #1a1a1a;
+            --bg-accent: #252525;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --text-muted: #666666;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --info: #3b82f6;
+            --accent: #8b5cf6;
+            --border: #333333;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-accent) 100%);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--info) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border);
+        }
+
+        .section h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent);
+        }
+
+        .section h3 {
+            font-size: 1.3rem;
+            margin: 1.5rem 0 1rem 0;
+            color: var(--text-primary);
+        }
+
+        .framework-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .framework-card {
+            background: var(--bg-accent);
+            border-radius: 8px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            position: relative;
+        }
+
+        .framework-card.recommended {
+            border-color: var(--success);
+        }
+
+        .framework-card.recommended::before {
+            content: "RECOMMENDED";
+            position: absolute;
+            top: -10px;
+            right: 10px;
+            background: var(--success);
+            color: var(--bg-primary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .framework-card h4 {
+            color: var(--accent);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .code-block {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 1rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-accent);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-primary);
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        tr:hover {
+            background: rgba(139, 92, 246, 0.1);
+        }
+
+        .config-section {
+            background: var(--bg-accent);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-left: 4px solid var(--accent);
+        }
+
+        .testing-layers {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .layer-card {
+            background: var(--bg-accent);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .layer-card .percentage {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .layer-card.unit .percentage { color: var(--success); }
+        .layer-card.integration .percentage { color: var(--warning); }
+        .layer-card.e2e .percentage { color: var(--info); }
+
+        .browser-matrix {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .browser-card {
+            background: var(--bg-accent);
+            padding: 1rem;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .browser-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-badge.critical {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--error);
+            border: 1px solid var(--error);
+        }
+
+        .status-badge.high {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+            border: 1px solid var(--warning);
+        }
+
+        .status-badge.medium {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--info);
+            border: 1px solid var(--info);
+        }
+
+        .pipeline-flow {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .pipeline-step {
+            background: var(--bg-accent);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            text-align: center;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .pipeline-arrow {
+            font-size: 1.5rem;
+            color: var(--accent);
+        }
+
+        .nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .nav-item {
+            padding: 0.5rem 1rem;
+            background: var(--bg-accent);
+            color: var(--text-primary);
+            text-decoration: none;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .nav-item:hover {
+            background: var(--accent);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .pipeline-flow {
+                flex-direction: column;
+            }
+
+            .pipeline-arrow {
+                transform: rotate(90deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🧪 Testing Suite Specifications</h1>
+            <p style="color: var(--text-secondary); font-size: 1.1rem; margin-top: 1rem;">
+                Comprehensive testing framework analysis and implementation strategy for enterprise-level quality assurance
+            </p>
+            <p style="color: var(--text-muted); margin-top: 0.5rem;">
+                QA Engineer: Sam | Created: 2024-09-18 | Target Coverage: 90%
+            </p>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="nav">
+            <a href="#framework-selection" class="nav-item">Framework Selection</a>
+            <a href="#unit-testing" class="nav-item">Unit Testing</a>
+            <a href="#e2e-testing" class="nav-item">E2E Testing</a>
+            <a href="#cross-browser" class="nav-item">Cross-Browser</a>
+            <a href="#automation" class="nav-item">Automation</a>
+            <a href="#configuration" class="nav-item">Configuration</a>
+        </nav>
+
+        <!-- Testing Framework Selection -->
+        <section id="framework-selection" class="section">
+            <h2>🏗️ Testing Framework Selection & Rationale</h2>
+
+            <div class="testing-layers">
+                <div class="layer-card unit">
+                    <div class="percentage">70%</div>
+                    <h4>Unit Tests</h4>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">Jest + Testing Library</p>
+                    <p style="color: var(--text-muted); font-size: 0.8rem;">Pure functions, hooks, utilities</p>
+                </div>
+                <div class="layer-card integration">
+                    <div class="percentage">20%</div>
+                    <h4>Integration Tests</h4>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">Component interaction</p>
+                    <p style="color: var(--text-muted); font-size: 0.8rem;">API integration, state flow</p>
+                </div>
+                <div class="layer-card e2e">
+                    <div class="percentage">10%</div>
+                    <h4>E2E Tests</h4>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">Playwright</p>
+                    <p style="color: var(--text-muted); font-size: 0.8rem;">Critical user journeys</p>
+                </div>
+            </div>
+
+            <div class="framework-grid">
+                <div class="framework-card recommended">
+                    <h4>Jest + Testing Library</h4>
+                    <div style="margin-bottom: 1rem;">
+                        <span class="status-badge critical">Unit Testing</span>
+                        <span class="status-badge high">Integration</span>
+                    </div>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                        Industry standard with excellent TypeScript support and built-in coverage reporting.
+                    </p>
+                    <ul style="color: var(--text-secondary); font-size: 0.9rem;">
+                        <li>✅ Accessibility-focused testing approach</li>
+                        <li>✅ Excellent TypeScript and React integration</li>
+                        <li>✅ Built-in coverage with threshold enforcement</li>
+                        <li>✅ Zero configuration for Next.js projects</li>
+                        <li>✅ Comprehensive mocking capabilities</li>
+                    </ul>
+                </div>
+
+                <div class="framework-card recommended">
+                    <h4>Playwright</h4>
+                    <div style="margin-bottom: 1rem;">
+                        <span class="status-badge critical">E2E Testing</span>
+                        <span class="status-badge high">Cross-Browser</span>
+                    </div>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                        Modern E2E framework with superior cross-browser support and video testing capabilities.
+                    </p>
+                    <ul style="color: var(--text-secondary); font-size: 0.9rem;">
+                        <li>✅ Real browser engines (Chromium, Firefox, WebKit)</li>
+                        <li>✅ Excellent video element interaction support</li>
+                        <li>✅ Mobile device and Smart TV simulation</li>
+                        <li>✅ Superior debugging with trace viewer</li>
+                        <li>✅ Built-in parallelization and sharding</li>
+                    </ul>
+                </div>
+
+                <div class="framework-card">
+                    <h4>Cypress</h4>
+                    <div style="margin-bottom: 1rem;">
+                        <span class="status-badge medium">Alternative</span>
+                    </div>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                        Good developer experience but limited to Chromium-based browsers.
+                    </p>
+                    <ul style="color: var(--text-secondary); font-size: 0.9rem;">
+                        <li>✅ Excellent time-travel debugging</li>
+                        <li>❌ Chromium-only (major limitation)</li>
+                        <li>❌ No built-in parallelization</li>
+                        <li>❌ Same-origin policy restrictions</li>
+                    </ul>
+                </div>
+
+                <div class="framework-card">
+                    <h4>Selenium WebDriver</h4>
+                    <div style="margin-bottom: 1rem;">
+                        <span class="status-badge medium">Legacy</span>
+                    </div>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                        Mature ecosystem but slower performance and complex setup.
+                    </p>
+                    <ul style="color: var(--text-secondary); font-size: 0.9rem;">
+                        <li>✅ Extensive third-party support</li>
+                        <li>❌ Slower due to WebDriver protocol overhead</li>
+                        <li>❌ Complex configuration requirements</li>
+                        <li>❌ Flaky tests without built-in wait mechanisms</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Unit Testing Configuration -->
+        <section id="unit-testing" class="section">
+            <h2>🔧 Unit Testing Configuration</h2>
+
+            <div class="config-section">
+                <h3>Jest Configuration</h3>
+                <div class="code-block">export default {
+  preset: 'ts-jest',
+  testEnvironment: 'jsdom',
+  setupFilesAfterEnv: ['&lt;rootDir&gt;/src/test/setup.ts'],
+
+  // Module mapping for Next.js
+  moduleNameMapping: {
+    '^@/(.*)$': '&lt;rootDir&gt;/src/$1',
+    '^@/components/(.*)$': '&lt;rootDir&gt;/src/components/$1',
+    '^@/lib/(.*)$': '&lt;rootDir&gt;/src/lib/$1',
+  },
+
+  // Coverage configuration
+  collectCoverageFrom: [
+    'src/**/*.{ts,tsx}',
+    '!src/**/*.d.ts',
+    '!src/test/**/*',
+  ],
+
+  coverageThreshold: {
+    global: {
+      branches: 90,
+      functions: 90,
+      lines: 90,
+      statements: 90,
+    },
+    // Critical components require 95%
+    './src/components/VideoPlayer/': {
+      branches: 95,
+      functions: 95,
+      lines: 95,
+      statements: 95,
+    },
+  },
+}</div>
+            </div>
+
+            <h3>Test Structure Pattern</h3>
+            <div class="code-block">// Standard test structure: Arrange, Act, Assert
+describe('VideoPlayer Component', () => {
+  beforeEach(() => {
+    // Arrange: Set up test environment
+  })
+
+  afterEach(() => {
+    // Cleanup: Reset state, clear mocks
+  })
+
+  describe('Video Playback', () => {
+    it('should start playing when play button is clicked', async () => {
+      // Arrange
+      const mockVideo = createMockVideoElement()
+      const { getByLabelText } = render(&lt;VideoPlayer src="test.mp4" /&gt;)
+
+      // Act
+      await user.click(getByLabelText('Play video'))
+
+      // Assert
+      expect(mockVideo.play).toHaveBeenCalledTimes(1)
+      expect(getByLabelText('Pause video')).toBeInTheDocument()
+    })
+  })
+})</div>
+
+            <h3>Mock Strategies</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Component</th>
+                            <th>Mock Strategy</th>
+                            <th>Purpose</th>
+                            <th>Implementation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Video Element</td>
+                            <td>Custom Mock</td>
+                            <td>Test playback controls</td>
+                            <td>play, pause, currentTime, duration mocks</td>
+                        </tr>
+                        <tr>
+                            <td>HLS.js</td>
+                            <td>Jest Mock</td>
+                            <td>Test streaming logic</td>
+                            <td>loadSource, attachMedia, quality levels</td>
+                        </tr>
+                        <tr>
+                            <td>Redux Store</td>
+                            <td>Test Store</td>
+                            <td>Test state management</td>
+                            <td>configureStore with test reducers</td>
+                        </tr>
+                        <tr>
+                            <td>Browser APIs</td>
+                            <td>Global Mocks</td>
+                            <td>Test web features</td>
+                            <td>IntersectionObserver, ResizeObserver</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- E2E Testing Configuration -->
+        <section id="e2e-testing" class="section">
+            <h2>🎭 E2E Testing Configuration</h2>
+
+            <div class="config-section">
+                <h3>Playwright Configuration</h3>
+                <div class="code-block">import { defineConfig, devices } from '@playwright/test'
+
+export default defineConfig({
+  testDir: './e2e',
+  fullyParallel: true,
+  forbidOnly: !!process.env.CI,
+  retries: process.env.CI ? 2 : 0,
+  workers: process.env.CI ? 1 : undefined,
+
+  reporter: [
+    ['html'],
+    ['junit', { outputFile: 'test-results/junit.xml' }],
+    ['github'],
+  ],
+
+  use: {
+    baseURL: 'http://localhost:3000',
+    trace: 'on-first-retry',
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
+  },
+
+  projects: [
+    // Desktop browsers
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+    { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
+    { name: 'webkit', use: { ...devices['Desktop Safari'] } },
+
+    // Mobile devices
+    { name: 'Mobile Chrome', use: { ...devices['Pixel 5'] } },
+    { name: 'Mobile Safari', use: { ...devices['iPhone 12'] } },
+
+    // Smart TV simulation
+    {
+      name: 'Smart TV',
+      use: {
+        viewport: { width: 1920, height: 1080 },
+        userAgent: 'Mozilla/5.0 (SMART-TV; Linux; Tizen 6.0)',
+      },
+    },
+  ],
+})</div>
+            </div>
+
+            <h3>Smart TV Testing Implementation</h3>
+            <div class="code-block">test('Smart TV D-pad navigation', async ({ page }) => {
+  // Configure Smart TV environment
+  await page.setViewportSize({ width: 1920, height: 1080 })
+  await page.setExtraHTTPHeaders({
+    'User-Agent': 'Mozilla/5.0 (SMART-TV; Linux; Tizen)'
+  })
+
+  await page.goto('/demo/smart-tv')
+
+  // Test D-pad navigation
+  await page.keyboard.press('Tab') // Focus first element
+  await expect(page.locator('[aria-label="Play video"]')).toBeFocused()
+
+  await page.keyboard.press('ArrowRight') // Navigate right
+  await expect(page.locator('[aria-label="Volume control"]')).toBeFocused()
+
+  // Test activation with Enter key
+  await page.keyboard.press('Enter')
+  await expect(page.locator('video')).toHaveAttribute('paused', 'false')
+})</div>
+        </section>
+
+        <!-- Cross-Browser Testing Matrix -->
+        <section id="cross-browser" class="section">
+            <h2>🌐 Cross-Browser Testing Matrix</h2>
+
+            <div class="browser-matrix">
+                <div class="browser-card">
+                    <div class="browser-icon">🖥️</div>
+                    <h4>Desktop Chrome</h4>
+                    <div style="margin: 0.5rem 0;">
+                        <span class="status-badge critical">Primary</span>
+                    </div>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">
+                        Full test suite<br>
+                        HLS.js + all features
+                    </p>
+                </div>
+
+                <div class="browser-card">
+                    <div class="browser-icon">🍎</div>
+                    <h4>Desktop Safari</h4>
+                    <div style="margin: 0.5rem 0;">
+                        <span class="status-badge critical">Critical</span>
+                    </div>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">
+                        Native HLS support<br>
+                        Picture-in-Picture
+                    </p>
+                </div>
+
+                <div class="browser-card">
+                    <div class="browser-icon">🦊</div>
+                    <h4>Desktop Firefox</h4>
+                    <div style="margin: 0.5rem 0;">
+                        <span class="status-badge high">Secondary</span>
+                    </div>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">
+                        HLS.js fallback<br>
+                        Core functionality
+                    </p>
+                </div>
+
+                <div class="browser-card">
+                    <div class="browser-icon">📱</div>
+                    <h4>Mobile iOS</h4>
+                    <div style="margin: 0.5rem 0;">
+                        <span class="status-badge critical">Critical</span>
+                    </div>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">
+                        Touch controls<br>
+                        Native video APIs
+                    </p>
+                </div>
+
+                <div class="browser-card">
+                    <div class="browser-icon">🤖</div>
+                    <h4>Mobile Android</h4>
+                    <div style="margin: 0.5rem 0;">
+                        <span class="status-badge critical">Critical</span>
+                    </div>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">
+                        Touch controls<br>
+                        HLS.js streaming
+                    </p>
+                </div>
+
+                <div class="browser-card">
+                    <div class="browser-icon">📺</div>
+                    <h4>Smart TV</h4>
+                    <div style="margin: 0.5rem 0;">
+                        <span class="status-badge critical">Primary</span>
+                    </div>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">
+                        D-pad navigation<br>
+                        Performance testing
+                    </p>
+                </div>
+            </div>
+
+            <h3>Browser-Specific Feature Testing</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Browser</th>
+                            <th>HLS Support</th>
+                            <th>Picture-in-Picture</th>
+                            <th>Fullscreen API</th>
+                            <th>Touch Events</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Chrome</td>
+                            <td>HLS.js</td>
+                            <td>✅ Supported</td>
+                            <td>✅ Supported</td>
+                            <td>✅ Desktop + Mobile</td>
+                        </tr>
+                        <tr>
+                            <td>Safari</td>
+                            <td>Native HLS</td>
+                            <td>✅ Supported</td>
+                            <td>✅ Supported</td>
+                            <td>✅ Mobile only</td>
+                        </tr>
+                        <tr>
+                            <td>Firefox</td>
+                            <td>HLS.js</td>
+                            <td>❌ Not supported</td>
+                            <td>✅ Supported</td>
+                            <td>✅ Mobile only</td>
+                        </tr>
+                        <tr>
+                            <td>Edge</td>
+                            <td>HLS.js</td>
+                            <td>✅ Supported</td>
+                            <td>✅ Supported</td>
+                            <td>✅ Touch devices</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Test Automation Pipeline -->
+        <section id="automation" class="section">
+            <h2>🚀 Test Automation Pipeline</h2>
+
+            <div class="pipeline-flow">
+                <div class="pipeline-step">
+                    <h4 style="color: var(--success);">Unit Tests</h4>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">Every commit</p>
+                    <p style="color: var(--text-muted); font-size: 0.8rem;">< 2 minutes</p>
+                </div>
+                <div class="pipeline-arrow">→</div>
+                <div class="pipeline-step">
+                    <h4 style="color: var(--warning);">Integration</h4>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">Pull requests</p>
+                    <p style="color: var(--text-muted); font-size: 0.8rem;">< 5 minutes</p>
+                </div>
+                <div class="pipeline-arrow">→</div>
+                <div class="pipeline-step">
+                    <h4 style="color: var(--info);">E2E Tests</h4>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">Deployments</p>
+                    <p style="color: var(--text-muted); font-size: 0.8rem;">< 15 minutes</p>
+                </div>
+                <div class="pipeline-arrow">→</div>
+                <div class="pipeline-step">
+                    <h4 style="color: var(--accent);">Production</h4>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">Monitoring</p>
+                    <p style="color: var(--text-muted); font-size: 0.8rem;">Continuous</p>
+                </div>
+            </div>
+
+            <h3>GitHub Actions Integration</h3>
+            <div class="code-block">name: Comprehensive Testing Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - run: npm ci
+      - run: npm run test:unit -- --coverage
+      - uses: codecov/codecov-action@v3
+
+  e2e-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        browser: [chromium, firefox, webkit]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+      - run: npm ci
+      - run: npx playwright install ${{ matrix.browser }}
+      - run: npm run test:e2e:${{ matrix.browser }}</div>
+
+            <h3>Quality Gates</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Stage</th>
+                            <th>Quality Gate</th>
+                            <th>Threshold</th>
+                            <th>Action on Failure</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Pre-commit</td>
+                            <td>Lint + TypeScript</td>
+                            <td>0 errors</td>
+                            <td>Block commit</td>
+                        </tr>
+                        <tr>
+                            <td>Every commit</td>
+                            <td>Unit tests</td>
+                            <td>100% passing</td>
+                            <td>Block merge</td>
+                        </tr>
+                        <tr>
+                            <td>Pull request</td>
+                            <td>Coverage</td>
+                            <td>90% minimum</td>
+                            <td>Block merge</td>
+                        </tr>
+                        <tr>
+                            <td>Pull request</td>
+                            <td>Accessibility</td>
+                            <td>0 violations</td>
+                            <td>Block merge</td>
+                        </tr>
+                        <tr>
+                            <td>Deployment</td>
+                            <td>E2E tests</td>
+                            <td>95% passing</td>
+                            <td>Block deployment</td>
+                        </tr>
+                        <tr>
+                            <td>Production</td>
+                            <td>Performance</td>
+                            <td>Lighthouse > 95</td>
+                            <td>Warning + investigation</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Configuration Details -->
+        <section id="configuration" class="section">
+            <h2>⚙️ Detailed Configuration</h2>
+
+            <h3>Package.json Test Scripts</h3>
+            <div class="code-block">{
+  "scripts": {
+    // Unit testing
+    "test": "jest",
+    "test:unit": "jest --testPathPattern=src/",
+    "test:unit:watch": "jest --watch",
+    "test:unit:coverage": "jest --coverage",
+
+    // Integration testing
+    "test:integration": "jest --testPathPattern=integration/",
+
+    // E2E testing
+    "test:e2e": "playwright test",
+    "test:e2e:chromium": "playwright test --project=chromium",
+    "test:e2e:firefox": "playwright test --project=firefox",
+    "test:e2e:webkit": "playwright test --project=webkit",
+    "test:e2e:mobile": "playwright test --project='Mobile Chrome'",
+    "test:e2e:tv": "playwright test --project='Smart TV'",
+
+    // Accessibility testing
+    "test:a11y": "jest --testPathPattern=accessibility/",
+    "test:a11y:axe": "npm run build && axe http://localhost:3000",
+
+    // Performance testing
+    "test:performance": "lighthouse http://localhost:3000 --view",
+    "test:lighthouse": "lhci autorun",
+
+    // All tests
+    "test:all": "npm run test:unit && npm run test:integration && npm run test:e2e"
+  }
+}</div>
+
+            <h3>Accessibility Testing Configuration</h3>
+            <div class="code-block">// axe.config.js
+export const axeConfig = {
+  rules: {
+    // WCAG 2.1 AA compliance rules
+    'color-contrast': { enabled: true },
+    'keyboard-navigation': { enabled: true },
+    'focus-management': { enabled: true },
+    'aria-labels': { enabled: true },
+    'semantic-markup': { enabled: true },
+
+    // Video-specific accessibility rules
+    'video-caption': { enabled: true },
+    'audio-description': { enabled: true },
+    'media-controls': { enabled: true },
+  },
+
+  tags: ['wcag2a', 'wcag2aa', 'wcag21aa', 'best-practice'],
+  exclude: [], // No exclusions - full compliance required
+}</div>
+
+            <h3>Performance Testing Budgets</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th>Target</th>
+                            <th>Platform</th>
+                            <th>Tool</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Initial Load Time</td>
+                            <td>< 3 seconds</td>
+                            <td>All</td>
+                            <td>Lighthouse</td>
+                        </tr>
+                        <tr>
+                            <td>Time to First Frame</td>
+                            <td>< 1 second</td>
+                            <td>All</td>
+                            <td>Custom metrics</td>
+                        </tr>
+                        <tr>
+                            <td>Memory Usage</td>
+                            <td>< 150MB</td>
+                            <td>Smart TV</td>
+                            <td>Performance API</td>
+                        </tr>
+                        <tr>
+                            <td>Input Response</td>
+                            <td>< 200ms</td>
+                            <td>Smart TV</td>
+                            <td>Custom timing</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <div style="text-align: center; margin-top: 3rem; padding: 2rem; color: var(--text-muted); border-top: 1px solid var(--border);">
+            <p><strong>Sam (QA Engineer)</strong> - Testing Suite Specifications</p>
+            <p style="margin-top: 0.5rem;">
+                Enterprise-level testing strategy demonstrating professional QA practices for FOX Corporation standards
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Smooth scrolling for navigation
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                target.scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+
+        // Code block syntax highlighting simulation
+        document.querySelectorAll('.code-block').forEach(block => {
+            const content = block.innerHTML;
+            // Simple syntax highlighting
+            block.innerHTML = content
+                .replace(/\/\/ (.*)/g, '<span style="color: #666; font-style: italic;">// $1</span>')
+                .replace(/(export|import|const|let|var|function|async|await|return)/g, '<span style="color: #8b5cf6;">$1</span>')
+                .replace(/(['"])(.*?)\1/g, '<span style="color: #22c55e;">$1$2$1</span>');
+        });
+    </script>
+</body>
+</html>

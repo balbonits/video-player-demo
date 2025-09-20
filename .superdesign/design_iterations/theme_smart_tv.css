@@ -1,0 +1,222 @@
+:root {
+  /* Smart TV Optimized Theme */
+  --background: oklch(0.0901 0 0);
+  --foreground: oklch(0.9851 0 0);
+  --card: oklch(0.1098 0 0);
+  --card-foreground: oklch(0.9851 0 0);
+  --popover: oklch(0.0901 0 0);
+  --popover-foreground: oklch(0.9851 0 0);
+  --primary: oklch(0.6545 0.2133 260.8178);
+  --primary-foreground: oklch(0.9851 0 0);
+  --secondary: oklch(0.1647 0 0);
+  --secondary-foreground: oklch(0.9851 0 0);
+  --muted: oklch(0.1647 0 0);
+  --muted-foreground: oklch(0.7090 0 0);
+  --accent: oklch(0.6545 0.2133 260.8178);
+  --accent-foreground: oklch(0.9851 0 0);
+  --destructive: oklch(0.5830 0.2387 28.4765);
+  --destructive-foreground: oklch(0.9851 0 0);
+  --border: oklch(0.2046 0 0);
+  --input: oklch(0.1647 0 0);
+  --ring: oklch(0.6545 0.2133 260.8178);
+  --chart-1: oklch(0.6545 0.2133 260.8178);
+  --chart-2: oklch(0.5830 0.2387 28.4765);
+  --chart-3: oklch(0.7271 0.2408 142.4953);
+  --chart-4: oklch(0.5931 0.2726 328.3634);
+  --chart-5: oklch(0.8100 0.1000 252);
+  --sidebar: oklch(0.0901 0 0);
+  --sidebar-foreground: oklch(0.9851 0 0);
+  --sidebar-primary: oklch(0.6545 0.2133 260.8178);
+  --sidebar-primary-foreground: oklch(0.9851 0 0);
+  --sidebar-accent: oklch(0.1647 0 0);
+  --sidebar-accent-foreground: oklch(0.9851 0 0);
+  --sidebar-border: oklch(0.2046 0 0);
+  --sidebar-ring: oklch(0.6545 0.2133 260.8178);
+
+  /* Typography optimized for Smart TV viewing */
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-serif: ui-serif, Georgia, serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Smart TV Specific Variables */
+  --tv-safe-horizontal: 48px;
+  --tv-safe-vertical: 27px;
+  --tv-button-size: 80px;
+  --tv-play-button-size: 96px;
+  --tv-font-size-base: 24px;
+  --tv-font-size-large: 32px;
+  --tv-focus-width: 4px;
+  --tv-focus-scale: 1.15;
+
+  /* Corner radius - minimal for TV displays */
+  --radius: 8px;
+
+  /* Shadows optimized for TV contrast */
+  --shadow-2xs: 0px 2px 8px 0px hsl(0 0% 0% / 0.80);
+  --shadow-xs: 0px 2px 8px 0px hsl(0 0% 0% / 0.80);
+  --shadow-sm: 0px 4px 12px 0px hsl(0 0% 0% / 0.80), 0px 2px 4px -1px hsl(0 0% 0% / 0.80);
+  --shadow: 0px 4px 12px 0px hsl(0 0% 0% / 0.80), 0px 2px 4px -1px hsl(0 0% 0% / 0.80);
+  --shadow-md: 0px 6px 16px 0px hsl(0 0% 0% / 0.80), 0px 4px 8px -1px hsl(0 0% 0% / 0.80);
+  --shadow-lg: 0px 8px 24px 0px hsl(0 0% 0% / 0.80), 0px 6px 12px -1px hsl(0 0% 0% / 0.80);
+  --shadow-xl: 0px 12px 32px 0px hsl(0 0% 0% / 0.80), 0px 8px 16px -1px hsl(0 0% 0% / 0.80);
+  --shadow-2xl: 0px 24px 48px 0px hsl(0 0% 0% / 0.90);
+
+  /* Letter spacing for TV readability */
+  --tracking-normal: 0.02em;
+  --tracking-wide: 0.05em;
+
+  /* Spacing optimized for D-pad navigation */
+  --spacing-unit: 8px;
+  --spacing-sm: 16px;
+  --spacing-md: 24px;
+  --spacing-lg: 32px;
+  --spacing-xl: 48px;
+
+  /* Color variants for different states */
+  --focus-color: oklch(0.6545 0.2133 260.8178);
+  --hover-color: oklch(0.7271 0.2408 260.8178);
+  --active-color: oklch(0.5830 0.2133 260.8178);
+
+  /* TV-specific gradients */
+  --gradient-overlay: linear-gradient(
+    transparent 0%,
+    rgba(0, 0, 0, 0.2) 30%,
+    rgba(0, 0, 0, 0.8) 100%
+  );
+
+  /* High contrast ratios for accessibility */
+  --contrast-aa: 4.5;
+  --contrast-aaa: 7.0;
+}
+
+/* TV Platform Detection */
+@media (min-width: 1920px) and (device-type: tv),
+       (min-width: 1920px) and (-webkit-device-pixel-ratio: 1) {
+  :root {
+    --platform: 'smart-tv';
+    --interaction-mode: 'remote';
+    --navigation-type: 'spatial';
+  }
+}
+
+/* Focus Management for TV Remote Navigation */
+.tv-focus {
+  outline: none !important;
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tv-focus:focus {
+  transform: scale(var(--tv-focus-scale));
+  box-shadow: 0 0 0 var(--tv-focus-width) var(--focus-color), var(--shadow-lg);
+  z-index: 100;
+}
+
+/* TV Safe Area Layout */
+.tv-safe-area {
+  margin: var(--tv-safe-vertical) var(--tv-safe-horizontal);
+  max-width: calc(100vw - calc(var(--tv-safe-horizontal) * 2));
+  max-height: calc(100vh - calc(var(--tv-safe-vertical) * 2));
+}
+
+/* TV Typography Scale */
+.tv-text-base { font-size: var(--tv-font-size-base); }
+.tv-text-large { font-size: var(--tv-font-size-large); }
+.tv-text-button {
+  font-size: var(--tv-font-size-base);
+  font-weight: 600;
+  letter-spacing: var(--tracking-normal);
+}
+
+/* Button Sizing for TV Remote */
+.tv-button {
+  min-width: var(--tv-button-size);
+  min-height: var(--tv-button-size);
+  padding: var(--spacing-md);
+  border-radius: var(--radius);
+  font-size: var(--tv-font-size-base);
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.tv-button-large {
+  min-width: var(--tv-play-button-size);
+  min-height: var(--tv-play-button-size);
+  padding: var(--spacing-lg);
+}
+
+/* Video Player TV Optimizations */
+.tv-video-container {
+  aspect-ratio: 16 / 9;
+  background: black;
+  border-radius: var(--radius);
+  overflow: hidden;
+  position: relative;
+}
+
+.tv-controls-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--gradient-overlay);
+  padding: var(--spacing-lg);
+  display: grid;
+  grid-template-columns: repeat(5, auto);
+  gap: var(--spacing-md);
+  justify-content: center;
+  align-items: center;
+}
+
+/* Progress Bar for TV */
+.tv-progress-bar {
+  height: 12px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  position: relative;
+  margin: var(--spacing-md) 0;
+}
+
+.tv-progress-fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: inherit;
+  transition: width 0.1s ease;
+}
+
+.tv-progress-handle {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  background: var(--primary);
+  border: 3px solid white;
+  border-radius: 50%;
+  top: 50%;
+  transform: translateY(-50%);
+  box-shadow: var(--shadow-md);
+}
+
+/* Status Information */
+.tv-status-text {
+  font-size: var(--tv-font-size-base);
+  color: var(--foreground);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  letter-spacing: var(--tracking-normal);
+}
+
+/* Caption Styling for TV */
+.tv-captions {
+  position: absolute;
+  bottom: 120px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 90%;
+  text-align: center;
+  font-size: var(--tv-font-size-large);
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9);
+  background: rgba(0, 0, 0, 0.6);
+  padding: var(--spacing-md);
+  border-radius: var(--radius);
+  letter-spacing: var(--tracking-normal);
+}

@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Player Wireframes & User Flows | Video Player Demo</title>
+    <link rel="stylesheet" href="../shared-style.css">
+    <style>
+        /* Professional dark theme with accessibility focus */
+        :root {
+            --primary-bg: #0f1419;
+            --secondary-bg: #1a1f2e;
+            --accent-bg: #2a3441;
+            --primary-text: #e0e0e0;
+            --secondary-text: #b0b0b0;
+            --accent-color: #64b5f6;
+            --success-color: #4caf50;
+            --warning-color: #ff9800;
+            --border-color: #3a4553;
+            --focus-color: #90caf9;
+            --code-bg: #1e2329;
+            --wireframe-bg: #0a0e14;
+            --wireframe-border: #3a4553;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary-bg) 0%, var(--secondary-bg) 100%);
+            color: var(--primary-text);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            padding: 3rem 0;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--accent-color), var(--success-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header .meta {
+            color: var(--secondary-text);
+            font-size: 1.1rem;
+        }
+
+        .section {
+            background: var(--secondary-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .section h2 {
+            color: var(--accent-color);
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .section h3 {
+            color: var(--success-color);
+            font-size: 1.4rem;
+            margin: 2rem 0 1rem 0;
+        }
+
+        .section h4 {
+            color: var(--warning-color);
+            font-size: 1.2rem;
+            margin: 1.5rem 0 1rem 0;
+        }
+
+        /* Wireframe display styles */
+        .wireframe {
+            background: var(--wireframe-bg);
+            border: 2px solid var(--wireframe-border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            overflow-x: auto;
+            white-space: pre;
+            color: var(--primary-text);
+            position: relative;
+        }
+
+        .wireframe::before {
+            content: attr(data-platform);
+            position: absolute;
+            top: -1px;
+            right: 1rem;
+            background: var(--accent-color);
+            color: var(--primary-bg);
+            padding: 0.25rem 0.75rem;
+            border-radius: 0 0 6px 6px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .wireframe-interactive {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .wireframe-interactive:hover {
+            border-color: var(--accent-color);
+            box-shadow: 0 4px 16px rgba(100, 181, 246, 0.2);
+        }
+
+        .accessibility-principles {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .principle-card {
+            background: var(--accent-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            border-left: 4px solid var(--success-color);
+        }
+
+        .principle-card h4 {
+            margin-top: 0;
+            color: var(--success-color);
+        }
+
+        .platform-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .platform-wireframe {
+            background: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .platform-header {
+            background: var(--accent-bg);
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        .platform-content {
+            padding: 1.5rem;
+        }
+
+        .user-flow {
+            background: var(--code-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            font-family: monospace;
+            line-height: 1.8;
+        }
+
+        .interaction-list {
+            background: var(--accent-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .interaction-list h5 {
+            color: var(--accent-color);
+            margin-top: 0;
+        }
+
+        .interaction-list ul {
+            margin: 0;
+            padding-left: 1.5rem;
+        }
+
+        .touch-gestures {
+            background: var(--accent-bg);
+            border-left: 4px solid var(--warning-color);
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .responsive-showcase {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .breakpoint-card {
+            background: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .breakpoint-header {
+            background: var(--accent-color);
+            color: var(--primary-bg);
+            padding: 0.75rem 1rem;
+            font-weight: bold;
+        }
+
+        .breakpoint-wireframe {
+            padding: 1rem;
+            background: var(--wireframe-bg);
+            font-family: monospace;
+            font-size: 0.8rem;
+            line-height: 1.3;
+            white-space: pre;
+            overflow-x: auto;
+        }
+
+        /* Focus indicators for accessibility */
+        *:focus {
+            outline: 2px solid var(--focus-color);
+            outline-offset: 2px;
+        }
+
+        /* High contrast support */
+        @media (prefers-contrast: high) {
+            :root {
+                --primary-text: #ffffff;
+                --secondary-text: #cccccc;
+                --border-color: #666666;
+            }
+        }
+
+        /* Reduced motion support */
+        @media (prefers-reduced-motion: reduce) {
+            .wireframe-interactive {
+                transition: none;
+            }
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .section {
+                padding: 1.5rem;
+            }
+
+            .wireframe {
+                font-size: 0.7rem;
+                padding: 1rem;
+            }
+
+            .platform-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .responsive-showcase {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🎨 Video Player Wireframes & User Flows</h1>
+            <div class="meta">
+                <strong>Designer:</strong> Riley (UX) |
+                <strong>Created:</strong> 2024-09-18 |
+                <strong>Collaboration:</strong> Jordan (Product) for user flows and requirements
+            </div>
+        </header>
+
+        <section class="section">
+            <h2>🎯 Design Philosophy & Approach</h2>
+
+            <h3>Accessibility-First Design Principles</h3>
+            <div class="accessibility-principles">
+                <div class="principle-card">
+                    <h4>Keyboard Navigation</h4>
+                    <p>Every interactive element reachable via Tab/arrow keys</p>
+                </div>
+                <div class="principle-card">
+                    <h4>Screen Reader Support</h4>
+                    <p>Proper ARIA labels and semantic markup</p>
+                </div>
+                <div class="principle-card">
+                    <h4>High Contrast</h4>
+                    <p>4.5:1 minimum color contrast ratio</p>
+                </div>
+                <div class="principle-card">
+                    <h4>Touch Targets</h4>
+                    <p>44px minimum for mobile, 64px for Smart TV</p>
+                </div>
+                <div class="principle-card">
+                    <h4>Focus Indicators</h4>
+                    <p>3px minimum outline width, clearly visible</p>
+                </div>
+            </div>
+
+            <h3>Cross-Platform Considerations</h3>
+            <ul>
+                <li><strong>Desktop:</strong> Mouse + keyboard interaction, standard web patterns</li>
+                <li><strong>Mobile:</strong> Touch-first design, larger targets, thumb-friendly zones</li>
+                <li><strong>Smart TV:</strong> D-pad navigation, larger UI elements, couch viewing distance</li>
+                <li><strong>Accessibility:</strong> Screen reader optimized, keyboard-only operation</li>
+            </ul>
+        </section>
+
+        <section class="section">
+            <h2>🎬 Core Video Player Interface</h2>
+
+            <div class="platform-grid">
+                <div class="platform-wireframe">
+                    <div class="platform-header">Desktop/Web Player Layout</div>
+                    <div class="platform-content">
+                        <div class="wireframe wireframe-interactive" data-platform="DESKTOP">┌─────────────────────────────────────────────────────────────┐
+│ 🎬 FOX Video Player Demo                    [🌙] [⚙️] [?] │ ← Header
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │                                                     │   │
+│  │                 VIDEO CONTENT                       │   │ ← 16:9 Aspect
+│  │                                                     │   │   Ratio
+│  │                [▶️ PLAY BUTTON]                     │   │
+│  │                                                     │   │
+│  │  [CC] Captions Available          [HD] 1080p       │   │ ← Overlays
+│  └─────────────────────────────────────────────────────┘   │
+│                                                             │
+│  ┌─ Video Controls ──────────────────────────────────┐     │
+│  │ [▶️] [⏸️] [🔇] [▮▮▮▮▮░░░] [⚙️] [📺] [⛶]      │     │ ← Control Bar
+│  │  1    2    3       4        5    6    7           │     │   Tab Order
+│  └────────────────────────────────────────────────────┘     │
+│                                                             │
+│  Progress: ████████████░░░░░░░░░ 12:34 / 25:46             │ ← Progress Info
+│  Quality: Auto (1080p) • Buffered: 15s ahead               │
+│                                                             │
+│  ┌─ Demo Information ─────────────────────────────────┐     │
+│  │ 🎯 This demo showcases:                            │     │
+│  │ • HLS adaptive streaming with quality selection    │     │ ← Educational
+│  │ • Smart TV-optimized keyboard navigation          │     │   Context
+│  │ • WCAG 2.1 AA accessibility compliance           │     │
+│  │ • Cross-platform performance optimization         │     │
+│  └────────────────────────────────────────────────────┘     │
+└─────────────────────────────────────────────────────────────┘</div>
+
+                        <div class="interaction-list">
+                            <h5>Interaction Annotations:</h5>
+                            <ul>
+                                <li><strong>1.</strong> Play/Pause Toggle (Spacebar, Enter)</li>
+                                <li><strong>2.</strong> Volume Control (Up/Down arrows when focused)</li>
+                                <li><strong>3.</strong> Progress Bar (Click to seek, Left/Right arrows for scrub)</li>
+                                <li><strong>4.</strong> Settings Menu (Enter to open, Escape to close)</li>
+                                <li><strong>5.</strong> Picture-in-Picture (Enter to toggle)</li>
+                                <li><strong>6.</strong> Fullscreen Toggle (F key, Enter when focused)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="platform-wireframe">
+                    <div class="platform-header">Mobile Interface (Portrait)</div>
+                    <div class="platform-content">
+                        <div class="wireframe wireframe-interactive" data-platform="MOBILE">┌─────────────────────────┐
+│ ●●● 🔋100% 📶 ⏰12:34  │ ← Status Bar
+├─────────────────────────┤
+│ ← Video Demo      [⚙️] │ ← App Header
+├─────────────────────────┤
+│                         │
+│ ┌─────────────────────┐ │
+│ │                     │ │
+│ │   VIDEO CONTENT     │ │ ← Video Container
+│ │                     │ │   (Landscape crop)
+│ │    [LARGE PLAY]     │ │
+│ │                     │ │
+│ │  [CC] Available     │ │ ← Video Overlays
+│ └─────────────────────┘ │
+│                         │
+│ ┌─ Touch Controls ───┐  │
+│ │ [▶️] [🔊] [⛶]     │  │ ← Large Touch
+│ │  56px 56px 56px    │  │   Targets
+│ └─────────────────────┘  │
+│                         │
+│ ┌─ Progress ─────────┐  │
+│ │ ████████░░░░░░░     │  │ ← Progress Bar
+│ │ 12:34 / 25:46      │  │   (Larger for touch)
+│ └─────────────────────┘  │
+│                         │
+│ Quality: Auto (720p)    │ ← Status Info
+│ Tap screen for controls │
+│                         │
+│ ┌─ Accessibility ────┐  │
+│ │ [🔤] Caption Style │  │ ← Quick Access
+│ │ [🎧] Audio Description │  │   A11y Features
+│ └─────────────────────┘  │
+└─────────────────────────┘</div>
+
+                        <div class="touch-gestures">
+                            <h5>Touch Gestures:</h5>
+                            <ul>
+                                <li>Single tap: Play/pause toggle</li>
+                                <li>Double tap: Fullscreen toggle</li>
+                                <li>Swipe left/right: Seek 10s backward/forward</li>
+                                <li>Pinch: Zoom (if supported)</li>
+                                <li>Two-finger tap: Show/hide controls</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="platform-wireframe">
+                    <div class="platform-header">Smart TV Interface (10-foot Experience)</div>
+                    <div class="platform-content">
+                        <div class="wireframe wireframe-interactive" data-platform="SMART TV">┌─────────────────────────────────────────────────────────────┐
+│                    🔵 FOCUSED ELEMENT                       │ ← Focus Indicator
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │                                                     │   │
+│  │                 VIDEO CONTENT                       │   │ ← Large Video
+│  │                                                     │   │   (TV Optimized)
+│  │            [🔵 PLAY BUTTON]                         │   │
+│  │              ▲ FOCUSED                              │   │
+│  │         Use ENTER to play                           │   │ ← Instruction Text
+│  └─────────────────────────────────────────────────────┘   │
+│                                                             │
+│  ┌─ TV Remote Controls ─────────────────────────────────┐   │
+│  │ [▶️] [⏸️] [🔇] [🔵▮▮▮▮░░░] [⚙️] [📺]           │   │ ← TV Controls
+│  │   1     2    3        4         5    6              │   │   (Larger)
+│  │   🔵    ○    ○        ○         ○    ○              │   │
+│  │        ← D-pad navigation →                          │   │
+│  └──────────────────────────────────────────────────────┘   │
+│                                                             │
+│  Instructions: ↑↓←→ Navigate • ⏎ Select • Menu Settings    │ ← Help Text
+│                                                             │
+│  ┌─ TV Safe Area ──────────────────────────────────────┐   │
+│  │ Progress: ██████████░░░░░░ 12:34 / 25:46           │   │ ← Large Text
+│  │ Quality: Auto (1080p) • Network: Excellent          │   │   (48px margins)
+│  └──────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘</div>
+
+                        <div class="interaction-list">
+                            <h5>D-pad Navigation Pattern:</h5>
+                            <ul>
+                                <li><strong>UP:</strong> Video area ↔ Menu/Settings</li>
+                                <li><strong>DOWN:</strong> Video area ↔ Progress bar</li>
+                                <li><strong>LEFT/RIGHT:</strong> Between controls (logical spatial order)</li>
+                                <li><strong>ENTER:</strong> Activate focused control</li>
+                                <li><strong>BACK/ESC:</strong> Previous menu level</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>⚙️ Settings Panel Interface</h2>
+
+            <div class="platform-grid">
+                <div class="platform-wireframe">
+                    <div class="platform-header">Desktop Settings Panel</div>
+                    <div class="platform-content">
+                        <div class="wireframe" data-platform="SETTINGS">┌─ Player Settings ─────────────────────────────────────────┐
+│                                                   [✕] Close │
+├───────────────────────────────────────────────────────────┤
+│                                                           │
+│ ┌─ Playback ─────────────────────────────────────────┐   │
+│ │ Speed:        [0.5x] [0.75x] [🔵1x] [1.25x] [1.5x] │   │ ← Speed Control
+│ │ Quality:      [🔵Auto] [1080p] [720p] [480p]       │   │ ← Quality Select
+│ │ Audio:        [🔵English] [Spanish] [French]        │   │ ← Audio Track
+│ └─────────────────────────────────────────────────────┘   │
+│                                                           │
+│ ┌─ Captions ────────────────────────────────────────┐    │
+│ │ Enable:       [🔵On] [Off]                        │    │ ← Caption Toggle
+│ │ Language:     [🔵English] [Spanish] [Off]         │    │ ← Caption Language
+│ │ Size:         [Small] [🔵Medium] [Large] [XL]     │    │ ← Font Size
+│ │ Color:        [🔵White] [Yellow] [Cyan] [Green]   │    │ ← Text Color
+│ │ Background:   [🔵None] [Black] [Semi] [Full]      │    │ ← Background
+│ │ Position:     [🔵Bottom] [Top] [Center]           │    │ ← Position
+│ │                                                   │    │
+│ │ Preview: "Sample caption text"                    │    │ ← Live Preview
+│ │          with current settings                    │    │
+│ └─────────────────────────────────────────────────────┘    │
+│                                                           │
+│ ┌─ Accessibility ───────────────────────────────────┐     │
+│ │ High Contrast:    [🔵Off] [On]                    │     │ ← A11y Options
+│ │ Reduced Motion:   [🔵Off] [On]                    │     │
+│ │ Screen Reader:    [🔵Auto] [Force On] [Off]       │     │
+│ │ Keyboard Nav:     [🔵Enhanced] [Standard]         │     │
+│ └─────────────────────────────────────────────────────┘     │
+│                                                           │
+│ ┌─ Advanced ────────────────────────────────────────┐      │
+│ │ Analytics:        [🔵Anonymous] [Off]             │      │ ← Privacy
+│ │ Debug Mode:       [🔵Off] [On]                    │      │ ← Development
+│ │ Performance:      [🔵Auto] [Power Save] [Quality] │      │ ← Performance
+│ └─────────────────────────────────────────────────────┘      │
+│                                                           │
+│                          [Reset] [Apply] [Save]           │ ← Action Buttons
+└───────────────────────────────────────────────────────────┘</div>
+
+                        <div class="interaction-list">
+                            <h5>Settings Navigation (Keyboard):</h5>
+                            <ul>
+                                <li><strong>Tab:</strong> Move between setting groups</li>
+                                <li><strong>Arrow keys:</strong> Navigate within group</li>
+                                <li><strong>Space/Enter:</strong> Toggle or select option</li>
+                                <li><strong>Escape:</strong> Close panel without saving</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="platform-wireframe">
+                    <div class="platform-header">Mobile Settings Panel (Bottom Sheet)</div>
+                    <div class="platform-content">
+                        <div class="wireframe" data-platform="MOBILE SETTINGS">┌─────────────────────────┐
+│ ●●● 🔋95% 📶 ⏰12:34   │
+├─────────────────────────┤
+│ [Video continues above] │ ← Video stays visible
+│ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ ← Overlay
+├─ Settings ──────── [✕] ┤
+│                         │
+│ ┌─ Quick Settings ────┐ │
+│ │ 🎵 Audio: English   │ │ ← Large Touch
+│ │ 🎞️ Quality: Auto    │ │   Targets
+│ │ 📝 Captions: On     │ │   (56px min)
+│ │ ⚡ Speed: 1x        │ │
+│ └─────────────────────┘ │
+│                         │
+│ ┌─ Caption Style ─────┐ │
+│ │ Size: [S] [🔵M] [L] │ │ ← Quick Toggles
+│ │ Color: ⚪ 🟡 🔵 🟢  │ │
+│ │ "Sample text"       │ │ ← Preview
+│ └─────────────────────┘ │
+│                         │
+│ ┌─ Accessibility ─────┐ │
+│ │ [🔵] High Contrast  │ │ ← Toggle Switches
+│ │ [○] Screen Reader   │ │
+│ │ [🔵] Large Buttons  │ │
+│ └─────────────────────┘ │
+│                         │
+│      [Save Changes]     │ ← Primary Action
+└─────────────────────────┘</div>
+
+                        <div class="touch-gestures">
+                            <h5>Mobile Interactions:</h5>
+                            <ul>
+                                <li>Swipe up: Open settings</li>
+                                <li>Swipe down: Close settings</li>
+                                <li>Tap outside: Close settings</li>
+                                <li>Hold setting: Show help tooltip</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🔄 User Flow Diagrams</h2>
+
+            <h3>Core Video Playback Flow</h3>
+            <div class="user-flow">
+User arrives at demo page
+        ↓
+Video player loads
+        ↓
+HLS stream available? → Yes → Load HLS with quality options
+        ↓                      ↓
+        No                Show play button
+        ↓                      ↓
+Fallback to MP4      ←────────┘
+        ↓
+User clicks play
+        ↓
+Video starts playing
+        ↓
+Controls auto-hide after 3s
+        ↓
+User hovers/focuses → Controls show
+        ↓
+User action?
+├─ Volume → Adjust volume ─────┐
+├─ Seek → Scrub timeline ──────┤
+├─ Settings → Open settings ───┤  ← Back to auto-hide
+├─ Fullscreen → Enter fullscreen  │
+└─ Settings → Modify → Apply ──┘
+            </div>
+
+            <h3>Smart TV Navigation Flow</h3>
+            <div class="user-flow">
+TV user opens demo
+        ↓
+Focus on play button
+        ↓
+D-pad input?
+├─ Right Arrow → Focus volume control
+├─ Left Arrow → Focus to last control
+├─ Down Arrow → Focus progress bar
+├─ Up Arrow → Focus settings menu
+└─ Enter → Play video
+        ↓
+Volume control focused?
+├─ Up/Down → Adjust volume
+├─ Right → Next control
+└─ Left → Previous control
+        ↓
+Progress bar focused?
+├─ Left/Right → Seek video
+└─ Up/Down → Return to controls
+        ↓
+Settings → Open with D-pad → Navigate spatially → Apply with Enter
+            </div>
+
+            <h3>Accessibility User Journey</h3>
+            <div class="user-flow">
+Screen reader user arrives
+        ↓
+Page announced properly
+        ↓
+Navigate with Tab key
+        ↓
+Reach video player region
+        ↓
+ARIA labels present? → Yes → Controls announced clearly
+        ↓                     ↓
+        No              User activates play
+        ↓                     ↓
+Fallback descriptions   Playback state announced
+        ↓                     ↓
+Continue with controls  ←─────┘
+        ↓
+Setting changes? → Yes → Open settings → Navigate with arrows → Apply
+        ↓                                      ↓
+        No                                Changes announced
+        ↓                                      ↓
+Continue playback ←────────────────────────────┘
+        ↓
+Video completion announced
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>📱 Responsive Breakpoint Wireframes</h2>
+
+            <div class="responsive-showcase">
+                <div class="breakpoint-card">
+                    <div class="breakpoint-header">Tablet Landscape (1024px)</div>
+                    <div class="breakpoint-wireframe">┌─────────────────────────────────────────────────────┐
+│ Video Player Demo                         [Menu] │
+├─────────────────────────────────────────────────────┤
+│                                                 │
+│ ┌─────────────────────────────────────────────┐ │ ← Larger video
+│ │            VIDEO CONTENT                    │ │   maintains
+│ │                                             │ │   16:9 ratio
+│ │           [PLAY BUTTON]                     │ │
+│ └─────────────────────────────────────────────┘ │
+│                                                 │
+│ ┌─ Controls ──────────────────────────────────┐ │ ← Full control
+│ │ [▶️] [🔊] [▮▮▮▮▮░░░] [⚙️] [📺] [⛶]      │ │   bar visible
+│ └─────────────────────────────────────────────┘ │
+│                                                 │
+│ Progress: ████████░░░░░ 12:34 / 25:46          │
+└─────────────────────────────────────────────────┘</div>
+                </div>
+
+                <div class="breakpoint-card">
+                    <div class="breakpoint-header">Mobile Landscape (768px)</div>
+                    <div class="breakpoint-wireframe">┌─────────────────────────────────────────────────────┐
+│ ← Demo                                    [⚙️] [⛶] │ ← Compact header
+├─────────────────────────────────────────────────────┤
+│ ┌─────────────────────────────────────────────────┐ │
+│ │              VIDEO CONTENT                      │ │ ← Full width
+│ │                                                 │ │   video
+│ │              [PLAY BUTTON]                      │ │
+│ │                                                 │ │
+│ │ [▶️] [🔊] ████████░░░░ [⚙️] 12:34/25:46       │ │ ← Overlay
+│ └─────────────────────────────────────────────────┘ │   controls
+└─────────────────────────────────────────────────────┘</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>♿ Accessibility Wireframes</h2>
+
+            <div class="platform-grid">
+                <div class="platform-wireframe">
+                    <div class="platform-header">High Contrast Mode</div>
+                    <div class="platform-content">
+                        <div class="wireframe" data-platform="HIGH CONTRAST">┌─────────────────────────────────────────────────────────────┐
+│ Video Player Demo (High Contrast)              [⚫⚪] Toggle │ ← High contrast
+├─────────────────────────────────────────────────────────────┤   indicator
+│                                                             │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  ║                                                     ║   │ ← Thick borders
+│  ║                 VIDEO CONTENT                       ║   │   for definition
+│  ║                                                     ║   │
+│  ║              [⚫ PLAY BUTTON]                        ║   │ ← High contrast
+│  ║                                                     ║   │   colors
+│  └─────────────────────────────────────────────────────┘   │
+│                                                             │
+│  ┌─ Video Controls ──────────────────────────────────┐     │
+│  ║ [⚫] [⚫] [⚫] [⚫⚫⚫⚫⚫⚪⚪⚪] [⚫] [⚫] [⚫]   ║     │ ← Clear visual
+│  └────────────────────────────────────────────────────┘     │   separation
+│                                                             │
+│  Progress: ⚫⚫⚫⚫⚫⚫⚫⚫⚪⚪⚪⚪ 12:34 / 25:46          │ ← High contrast
+│  Quality: Auto (1080p) • Status: Playing                   │   text
+└─────────────────────────────────────────────────────────────┘</div>
+                    </div>
+                </div>
+
+                <div class="platform-wireframe">
+                    <div class="platform-header">Focus State Indicators</div>
+                    <div class="platform-content">
+                        <div class="wireframe" data-platform="FOCUS STATES">┌─ Focus Indicators Example ───────────────────────────────┐
+│                                                          │
+│ ┌─ Normal State ─────┐    ┌─ Focused State ──────────┐  │
+│ │ [▶️ Play Video]    │    │ ┏━━━━━━━━━━━━━━━━━━━━━━━┓ │  │ ← 3px outline
+│ └────────────────────┘    │ ┃ ▶️ Play Video        ┃ │  │   minimum
+│                           │ ┗━━━━━━━━━━━━━━━━━━━━━━━┛ │  │
+│ ┌─ Volume Control ───┐    └───────────────────────────┘  │
+│ │ [🔊] [▮▮▮▮▮░░░]   │    ┌─ Keyboard Hint ─────────┐  │
+│ └────────────────────┘    │ "Press Enter to activate" │  │ ← Helpful hints
+│                           │ "Use arrows to adjust"    │  │
+│                           └───────────────────────────┘  │
+└──────────────────────────────────────────────────────────┘</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>📱 Platform-Specific Adaptations</h2>
+
+            <div class="platform-grid">
+                <div class="platform-wireframe">
+                    <div class="platform-header">iOS Native Interface</div>
+                    <div class="platform-content">
+                        <div class="wireframe" data-platform="iOS">┌─────────────────────────┐
+│ ●●● 🔋100% 📶 ⏰12:34  │ ← iOS Status Bar
+├─────────────────────────┤
+│ ← Video Demo       Share │ ← iOS Navigation
+├─────────────────────────┤
+│                         │
+│ ┌─────────────────────┐ │
+│ │                     │ │
+│ │   VIDEO CONTENT     │ │ ← Native video
+│ │                     │ │   player integration
+│ │    [▶️ Native]      │ │
+│ │                     │ │
+│ └─────────────────────┘ │
+│                         │
+│ ┌─ iOS Controls ─────┐  │
+│ │ ◀◀ ▶️ ▷▷  ⭗       │  │ ← Native iOS
+│ │ 15s    15s AirPlay │  │   player controls
+│ └─────────────────────┘  │
+│                         │
+│ ████████░░░░░░░░         │ ← iOS progress
+│ 12:34                    │   bar style
+│                         │
+│ [⚙️ Settings] [📺 PiP]  │ ← iOS buttons
+└─────────────────────────┘</div>
+                    </div>
+                </div>
+
+                <div class="platform-wireframe">
+                    <div class="platform-header">Android Material Design</div>
+                    <div class="platform-content">
+                        <div class="wireframe" data-platform="ANDROID">┌─────────────────────────┐
+│ 📶 🔋 ⏰ ⚙️           │ ← Android Status
+├─────────────────────────┤
+│ ← Video Player Demo     │ ← Material Toolbar
+├─────────────────────────┤
+│                         │
+│ ┌─────────────────────┐ │
+│ │                     │ │
+│ │   VIDEO CONTENT     │ │ ← Material video
+│ │                     │ │   surface
+│ │    [● Material]     │ │
+│ │                     │ │
+│ └─────────────────────┘ │
+│                         │
+│ ┌─ Material Controls ─┐ │
+│ │ [●] [⏸] [⏭] [╎╎]   │ │ ← Material Design
+│ │ 10s     10s  Cast   │ │   icons & spacing
+│ └─────────────────────┘ │
+│                         │
+│ ▮▮▮▮▮▮▮▮░░░░░           │ ← Material progress
+│ 12:34                   │   indicator
+│                         │
+│      ┌─ FAB ─┐          │ ← Floating Action
+│      │   +   │          │   Button (settings)
+│      └───────┘          │
+└─────────────────────────┘</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🎯 Design System Integration</h2>
+
+            <p><strong>Design System Integration:</strong> These wireframes serve as the foundation for implementing a comprehensive design system that prioritizes accessibility, performance, and cross-platform consistency while demonstrating professional UX design capabilities for the FOX Corporation application.</p>
+
+            <p><strong>Next Steps:</strong> Implementation of these wireframes with Tailwind CSS and component library, ensuring pixel-perfect translation from design to code while maintaining accessibility and performance standards.</p>
+        </section>
+    </div>
+
+    <script>
+        // Add interactive wireframe viewing
+        document.querySelectorAll('.wireframe-interactive').forEach(wireframe => {
+            wireframe.addEventListener('click', function() {
+                // Toggle expanded view
+                this.classList.toggle('expanded');
+
+                // Announce to screen readers
+                const platform = this.getAttribute('data-platform');
+                const announcement = `${platform} wireframe ${this.classList.contains('expanded') ? 'expanded' : 'collapsed'}`;
+
+                // Create temporary announcement element
+                const announcer = document.createElement('div');
+                announcer.setAttribute('aria-live', 'polite');
+                announcer.setAttribute('aria-atomic', 'true');
+                announcer.style.position = 'absolute';
+                announcer.style.left = '-10000px';
+                announcer.textContent = announcement;
+
+                document.body.appendChild(announcer);
+                setTimeout(() => document.body.removeChild(announcer), 1000);
+            });
+        });
+
+        // Keyboard navigation for wireframes
+        document.querySelectorAll('.wireframe-interactive').forEach(wireframe => {
+            wireframe.setAttribute('tabindex', '0');
+            wireframe.setAttribute('role', 'button');
+            wireframe.setAttribute('aria-label', `View ${wireframe.getAttribute('data-platform')} wireframe details`);
+
+            wireframe.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    this.click();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

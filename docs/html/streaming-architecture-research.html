@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Video Streaming Architecture Research</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --background: #0a0a0a;
+            --foreground: #fafafa;
+            --card: #111111;
+            --card-foreground: #fafafa;
+            --primary: #6366f1;
+            --primary-foreground: #fafafa;
+            --secondary: #1f1f1f;
+            --secondary-foreground: #a1a1aa;
+            --muted: #1f1f1f;
+            --muted-foreground: #71717a;
+            --accent: #18181b;
+            --accent-foreground: #fafafa;
+            --border: #27272a;
+            --input: #27272a;
+            --ring: #6366f1;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --netflix: #e50914;
+            --disney: #113ccf;
+            --amazon: #ff9900;
+            --hulu: #66aa33;
+            --fox: #ff6600;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+            background: var(--background) !important;
+            color: var(--foreground) !important;
+            line-height: 1.6 !important;
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace !important;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .card {
+            background: var(--card) !important;
+            border: 1px solid var(--border) !important;
+            border-radius: 12px !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .card:hover {
+            border-color: var(--primary) !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 20px 25px -5px rgba(99, 102, 241, 0.1) !important;
+        }
+
+        .code-block {
+            background: #1a1a1a !important;
+            border: 1px solid var(--border) !important;
+            border-radius: 8px !important;
+            padding: 16px !important;
+            font-family: 'JetBrains Mono', monospace !important;
+            font-size: 14px !important;
+            overflow-x: auto !important;
+            position: relative;
+        }
+
+        .code-block::before {
+            content: attr(data-language);
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            font-size: 12px;
+            color: var(--muted-foreground);
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        .architecture-diagram {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05));
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 12px;
+            padding: 24px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            line-height: 1.4;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .service-comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .service-card {
+            background: var(--card);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--service-color, var(--primary));
+        }
+
+        .service-card:hover {
+            transform: translateY(-4px) scale(1.02);
+            border-color: var(--service-color, var(--primary));
+            box-shadow: 0 20px 25px -5px rgba(99, 102, 241, 0.2);
+        }
+
+        .service-netflix { --service-color: var(--netflix); }
+        .service-disney { --service-color: var(--disney); }
+        .service-amazon { --service-color: var(--amazon); }
+        .service-hulu { --service-color: var(--hulu); }
+        .service-fox { --service-color: var(--fox); }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .metric-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .metric-label {
+            color: var(--muted-foreground);
+            font-size: 14px;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            margin: 20px 0;
+        }
+
+        .comparison-table th {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .comparison-table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .comparison-table tr:hover {
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .interactive-diagram {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            position: relative;
+            margin: 20px 0;
+        }
+
+        .diagram-node {
+            background: rgba(99, 102, 241, 0.1);
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin: 8px;
+            position: relative;
+        }
+
+        .diagram-node:hover {
+            background: rgba(99, 102, 241, 0.2);
+            border-color: #8b5cf6;
+            transform: scale(1.05);
+        }
+
+        .diagram-connection {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), #8b5cf6);
+            border-radius: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+            color: var(--muted-foreground);
+            font-size: 14px;
+        }
+
+        .nav-breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .nav-breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .quality-ladder {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 12px 0;
+        }
+
+        .quality-rung {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: rgba(99, 102, 241, 0.05);
+            border: 1px solid rgba(99, 102, 241, 0.1);
+            border-radius: 6px;
+            margin: 4px 0;
+            transition: all 0.2s ease;
+        }
+
+        .quality-rung:hover {
+            background: rgba(99, 102, 241, 0.1);
+            border-color: var(--primary);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 20px 0;
+        }
+
+        .recommendation-card {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.05), rgba(16, 185, 129, 0.05));
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 16px 0;
+        }
+
+        .warning-card {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.05), rgba(251, 191, 36, 0.05));
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 16px 0;
+        }
+
+        .info-card {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05));
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 16px 0;
+        }
+
+        @media (max-width: 768px) {
+            .service-comparison {
+                grid-template-columns: 1fr;
+            }
+
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .comparison-table {
+                font-size: 12px;
+            }
+
+            .comparison-table th,
+            .comparison-table td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Header -->
+    <header class="border-b border-gray-800 bg-black/50 backdrop-blur-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <a href="index.html" class="flex items-center space-x-4">
+                        <div class="w-10 h-10 rounded-lg bg-indigo-600/10 border border-indigo-600/20 flex items-center justify-center">
+                            <i data-lucide="server" class="w-5 h-5 text-indigo-400"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-lg font-bold gradient-text">Streaming Architecture</h1>
+                            <p class="text-sm text-gray-400">Enterprise Research & Analysis</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="text-sm bg-purple-600/10 text-purple-400 px-3 py-1 rounded-full border border-purple-600/20">
+                        Dakota - Principal Video Engineer
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-6 py-8">
+        <!-- Breadcrumb -->
+        <div class="nav-breadcrumb">
+            <a href="index.html">Documentation</a>
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            <span>Streaming Architecture Research</span>
+        </div>
+
+        <!-- Header Section -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold gradient-text mb-4">Enterprise Video Streaming Architecture Research</h1>
+            <p class="text-xl text-gray-300 mb-6">
+                Comprehensive analysis of how leading streaming services achieve global scale and optimal performance
+            </p>
+            <div class="flex items-center justify-center space-x-8 text-sm text-gray-400">
+                <div class="flex items-center space-x-2">
+                    <i data-lucide="user" class="w-4 h-4"></i>
+                    <span>By Dakota - Principal Video Streaming Engineer</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <i data-lucide="target" class="w-4 h-4"></i>
+                    <span>Netflix, Disney+, Hulu, Amazon Prime, FOX</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Executive Summary -->
+        <section class="mb-12">
+            <div class="info-card">
+                <h2 class="text-2xl font-bold mb-4 flex items-center">
+                    <i data-lucide="file-text" class="w-6 h-6 text-blue-400 mr-3"></i>
+                    Executive Summary
+                </h2>
+                <p class="text-gray-300">
+                    This document analyzes how leading streaming services (Netflix, Disney+, Hulu, Amazon Prime Video, FOX)
+                    architect their video content distribution systems to achieve global scale, optimal performance,
+                    and exceptional quality of experience (QoE).
+                </p>
+            </div>
+        </section>
+
+        <!-- CDN Architecture Patterns -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold mb-6">CDN Architecture Patterns</h2>
+
+            <!-- Multi-CDN Strategy -->
+            <div class="card p-6 mb-8">
+                <h3 class="text-xl font-semibold mb-4 flex items-center">
+                    <i data-lucide="globe" class="w-5 h-5 text-green-400 mr-2"></i>
+                    Multi-CDN Strategy (Netflix Model)
+                </h3>
+
+                <div class="interactive-diagram">
+                    <div class="text-center mb-6 text-gray-400">Netflix Multi-CDN Architecture</div>
+
+                    <!-- Origin Servers -->
+                    <div class="diagram-node mx-auto max-w-md mb-6" style="background: rgba(34, 197, 94, 0.1); border-color: var(--success);">
+                        <h4 class="font-semibold text-green-400">Origin Servers</h4>
+                        <p class="text-xs text-gray-400 mt-1">AWS S3 / Google Cloud Storage</p>
+                    </div>
+
+                    <!-- CDN Layer -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                        <div class="diagram-node service-netflix">
+                            <h4 class="font-semibold text-sm">Akamai CDN</h4>
+                            <p class="text-xs text-gray-400 mt-1">Global Edge</p>
+                        </div>
+                        <div class="diagram-node service-disney">
+                            <h4 class="font-semibold text-sm">CloudFlare CDN</h4>
+                            <p class="text-xs text-gray-400 mt-1">Edge Computing</p>
+                        </div>
+                        <div class="diagram-node service-amazon">
+                            <h4 class="font-semibold text-sm">Fastly CDN</h4>
+                            <p class="text-xs text-gray-400 mt-1">Real-time</p>
+                        </div>
+                        <div class="diagram-node service-netflix" style="background: rgba(229, 9, 20, 0.1); border-color: var(--netflix);">
+                            <h4 class="font-semibold text-sm">Netflix Open Connect</h4>
+                            <p class="text-xs text-gray-400 mt-1">ISP Appliances</p>
+                        </div>
+                    </div>
+
+                    <!-- ISP Layer -->
+                    <div class="grid grid-cols-3 gap-4">
+                        <div class="diagram-node" style="background: rgba(99, 102, 241, 0.1);">
+                            <h4 class="font-semibold text-sm">ISP 1</h4>
+                            <p class="text-xs text-gray-400 mt-1">Regional Coverage</p>
+                        </div>
+                        <div class="diagram-node" style="background: rgba(99, 102, 241, 0.1);">
+                            <h4 class="font-semibold text-sm">ISP 2</h4>
+                            <p class="text-xs text-gray-400 mt-1">Metro Areas</p>
+                        </div>
+                        <div class="diagram-node" style="background: rgba(99, 102, 241, 0.1);">
+                            <h4 class="font-semibold text-sm">ISP 3</h4>
+                            <p class="text-xs text-gray-400 mt-1">Rural Access</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Key Findings -->
+                <div class="recommendation-card mt-6">
+                    <h4 class="font-semibold text-green-400 mb-3 flex items-center">
+                        <i data-lucide="lightbulb" class="w-4 h-4 mr-2"></i>
+                        Key Findings
+                    </h4>
+                    <div class="grid md:grid-cols-2 gap-4 text-sm">
+                        <ul class="space-y-2 text-gray-300">
+                            <li class="flex items-start space-x-2">
+                                <i data-lucide="check" class="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0"></i>
+                                <span><strong>Netflix Open Connect:</strong> Places caching appliances directly in ISP networks</span>
+                            </li>
+                            <li class="flex items-start space-x-2">
+                                <i data-lucide="check" class="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0"></i>
+                                <span><strong>Disney+ (BAMTech):</strong> Uses Akamai + AWS CloudFront hybrid</span>
+                            </li>
+                            <li class="flex items-start space-x-2">
+                                <i data-lucide="check" class="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0"></i>
+                                <span><strong>FOX Sports:</strong> Akamai primary with Fastly failover</span>
+                            </li>
+                        </ul>
+                        <ul class="space-y-2 text-gray-300">
+                            <li class="flex items-start space-x-2">
+                                <i data-lucide="check" class="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0"></i>
+                                <span><strong>Amazon Prime:</strong> Leverages AWS CloudFront exclusively</span>
+                            </li>
+                            <li class="flex items-start space-x-2">
+                                <i data-lucide="check" class="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0"></i>
+                                <span><strong>Hulu:</strong> Multi-CDN with Akamai, Level3, and Limelight</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Edge Caching Strategy -->
+                <div class="mt-6">
+                    <h4 class="font-semibold mb-3">Edge Caching Strategy</h4>
+                    <div class="code-block" data-language="javascript">
+const edgeCacheRules = {
+  manifest: {
+    ttl: 2,  // seconds - very short for live
+    staleWhileRevalidate: true
+  },
+  segments: {
+    ttl: 86400,  // 24 hours for VOD
+    immutable: true  // segments never change
+  },
+  thumbnails: {
+    ttl: 604800,  // 7 days
+    compression: 'webp'
+  }
+}</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Adaptive Bitrate Streaming -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold mb-6">Adaptive Bitrate Streaming (ABR)</h2>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Quality Ladders -->
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center">
+                        <i data-lucide="layers" class="w-5 h-5 text-purple-400 mr-2"></i>
+                        Netflix Per-Title Encoding
+                    </h3>
+
+                    <div class="quality-ladder">
+                        <h4 class="font-semibold text-green-400 mb-3">Simple Content (Animation)</h4>
+                        <div class="quality-rung">
+                            <span class="text-sm">320x240</span>
+                            <span class="text-sm mono text-green-400">235 kbps</span>
+                        </div>
+                        <div class="quality-rung">
+                            <span class="text-sm">640x480</span>
+                            <span class="text-sm mono text-green-400">1050 kbps</span>
+                        </div>
+                        <div class="quality-rung">
+                            <span class="text-sm">1280x720</span>
+                            <span class="text-sm mono text-green-400">2350 kbps</span>
+                        </div>
+                        <div class="quality-rung">
+                            <span class="text-sm">1920x1080</span>
+                            <span class="text-sm mono text-green-400">5800 kbps</span>
+                        </div>
+                    </div>
+
+                    <div class="quality-ladder">
+                        <h4 class="font-semibold text-red-400 mb-3">Complex Content (Action)</h4>
+                        <div class="quality-rung">
+                            <span class="text-sm">320x240</span>
+                            <span class="text-sm mono text-red-400">235 kbps</span>
+                        </div>
+                        <div class="quality-rung">
+                            <span class="text-sm">1280x720</span>
+                            <span class="text-sm mono text-red-400">4300 kbps</span>
+                        </div>
+                        <div class="quality-rung">
+                            <span class="text-sm">1920x1080</span>
+                            <span class="text-sm mono text-red-400">12000 kbps</span>
+                        </div>
+                        <div class="quality-rung">
+                            <span class="text-sm">3840x2160</span>
+                            <span class="text-sm mono text-red-400">16000 kbps</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ABR Algorithm Comparison -->
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center">
+                        <i data-lucide="cpu" class="w-5 h-5 text-blue-400 mr-2"></i>
+                        ABR Algorithm Comparison
+                    </h3>
+
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Service</th>
+                                <th>Algorithm</th>
+                                <th>Key Features</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="font-semibold text-red-400">Netflix</span></td>
+                                <td>Buffer-based (BBA)</td>
+                                <td>Focuses on buffer health over bandwidth</td>
+                            </tr>
+                            <tr>
+                                <td><span class="font-semibold text-red-400">YouTube</span></td>
+                                <td>MPC (Model Predictive Control)</td>
+                                <td>Predicts future bandwidth</td>
+                            </tr>
+                            <tr>
+                                <td><span class="font-semibold text-orange-400">Amazon</span></td>
+                                <td>Hybrid</td>
+                                <td>Combines throughput + buffer</td>
+                            </tr>
+                            <tr>
+                                <td><span class="font-semibold text-green-400">Hulu</span></td>
+                                <td>Conservative</td>
+                                <td>Prioritizes stability over quality</td>
+                            </tr>
+                            <tr>
+                                <td><span class="font-semibold text-orange-500">FOX</span></td>
+                                <td>Aggressive</td>
+                                <td>Quick quality upgrades for sports</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="mt-4">
+                        <div class="chart-container">
+                            <canvas id="abrChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Performance Monitoring -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold mb-6">Performance Monitoring & QoE Metrics</h2>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Netflix QoE Formula -->
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center">
+                        <i data-lucide="activity" class="w-5 h-5 text-green-400 mr-2"></i>
+                        Netflix QoE Score Formula
+                    </h3>
+
+                    <div class="code-block" data-language="javascript">
+const calculateQoE = (metrics) => {
+  const weights = {
+    startupTime: -0.3,
+    rebufferRatio: -0.5,
+    bitrateAverage: 0.2,
+    bitrateVariability: -0.1,
+    resolution: 0.3
+  };
+
+  let qoe = 5.0;  // Perfect score
+
+  // Startup time penalty (exponential decay)
+  qoe += weights.startupTime * Math.log(metrics.startupTime / 1000);
+
+  // Rebuffering penalty (severe)
+  qoe += weights.rebufferRatio * (metrics.rebufferTime / metrics.watchTime) * 100;
+
+  // Quality bonus
+  qoe += weights.bitrateAverage * (metrics.avgBitrate / 5000000);
+
+  return Math.max(0, Math.min(5, qoe));
+};</div>
+                </div>
+
+                <!-- Key Metrics -->
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center">
+                        <i data-lucide="bar-chart-3" class="w-5 h-5 text-blue-400 mr-2"></i>
+                        Industry Standard Metrics
+                    </h3>
+
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <div class="metric-value">&lt;2s</div>
+                            <div class="metric-label">Startup Time</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">&lt;1%</div>
+                            <div class="metric-label">Rebuffer Ratio</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">99.5%</div>
+                            <div class="metric-label">Success Rate</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">4.5+</div>
+                            <div class="metric-label">QoE Score</div>
+                        </div>
+                    </div>
+
+                    <div class="info-card mt-4">
+                        <h4 class="font-semibold text-blue-400 mb-2">Real-time Analytics</h4>
+                        <p class="text-sm text-gray-300">
+                            Leading services process millions of events per second to optimize
+                            delivery in real-time and predict potential issues before they impact users.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Live vs VOD Comparison -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold mb-6">Live vs VOD Architecture Differences</h2>
+
+            <div class="card p-6">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Aspect</th>
+                            <th>VOD</th>
+                            <th>Live</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Latency Target</strong></td>
+                            <td>Not critical</td>
+                            <td>&lt;5 seconds (ultra-low: &lt;1s)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Manifest Updates</strong></td>
+                            <td>Static</td>
+                            <td>Dynamic (every segment)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Caching</strong></td>
+                            <td>Aggressive (immutable)</td>
+                            <td>Limited (2-10 seconds)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>ABR Algorithm</strong></td>
+                            <td>Conservative</td>
+                            <td>Aggressive</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Segment Duration</strong></td>
+                            <td>6-10 seconds</td>
+                            <td>1-2 seconds</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Error Recovery</strong></td>
+                            <td>Can retry</td>
+                            <td>Must skip forward</td>
+                        </tr>
+                        <tr>
+                            <td><strong>DVR Support</strong></td>
+                            <td>N/A</td>
+                            <td>Sliding window</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="grid md:grid-cols-2 gap-6 mt-6">
+                    <div class="info-card">
+                        <h4 class="font-semibold text-blue-400 mb-2">VOD Optimization</h4>
+                        <ul class="text-sm text-gray-300 space-y-1">
+                            <li>• Aggressive caching with long TTLs</li>
+                            <li>• Per-title encoding optimization</li>
+                            <li>• Predictive prefetching</li>
+                            <li>• Conservative quality adaptation</li>
+                        </ul>
+                    </div>
+                    <div class="warning-card">
+                        <h4 class="font-semibold text-yellow-400 mb-2">Live Challenges</h4>
+                        <ul class="text-sm text-gray-300 space-y-1">
+                            <li>• Ultra-low latency requirements</li>
+                            <li>• Limited caching opportunities</li>
+                            <li>• Real-time error handling</li>
+                            <li>• Dynamic manifest generation</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- DRM & Content Protection -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold mb-6">DRM & Content Protection</h2>
+
+            <div class="card p-6">
+                <h3 class="text-lg font-semibold mb-4 flex items-center">
+                    <i data-lucide="shield" class="w-5 h-5 text-yellow-400 mr-2"></i>
+                    Multi-DRM Workflow
+                </h3>
+
+                <div class="interactive-diagram">
+                    <div class="text-center mb-6 text-gray-400">Industry Standard Multi-DRM Architecture</div>
+
+                    <!-- Content Origin -->
+                    <div class="diagram-node mx-auto max-w-md mb-6" style="background: rgba(245, 158, 11, 0.1); border-color: var(--warning);">
+                        <h4 class="font-semibold text-yellow-400">Content Origin</h4>
+                        <p class="text-xs text-gray-400 mt-1">Unencrypted Master</p>
+                    </div>
+
+                    <!-- Packaging & Encryption -->
+                    <div class="diagram-node mx-auto max-w-md mb-6" style="background: rgba(139, 92, 246, 0.1); border-color: #8b5cf6;">
+                        <h4 class="font-semibold text-purple-400">Packaging & Encryption</h4>
+                        <p class="text-xs text-gray-400 mt-1">CENC with Multiple Key Systems</p>
+                    </div>
+
+                    <!-- DRM Systems -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="diagram-node">
+                            <h4 class="font-semibold text-sm">Widevine</h4>
+                            <p class="text-xs text-gray-400 mt-1">(L1-L3)</p>
+                            <div class="text-xs text-green-400 mt-2">Android/Chrome</div>
+                        </div>
+                        <div class="diagram-node">
+                            <h4 class="font-semibold text-sm">FairPlay</h4>
+                            <p class="text-xs text-gray-400 mt-1">(iOS)</p>
+                            <div class="text-xs text-blue-400 mt-2">Safari/iOS</div>
+                        </div>
+                        <div class="diagram-node">
+                            <h4 class="font-semibold text-sm">PlayReady</h4>
+                            <p class="text-xs text-gray-400 mt-1">(Windows)</p>
+                            <div class="text-xs text-cyan-400 mt-2">Edge/Xbox</div>
+                        </div>
+                        <div class="diagram-node">
+                            <h4 class="font-semibold text-sm">ClearKey</h4>
+                            <p class="text-xs text-gray-400 mt-1">(Fallback)</p>
+                            <div class="text-xs text-gray-400 mt-2">Testing Only</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="recommendation-card mt-6">
+                    <h4 class="font-semibold text-green-400 mb-2">Implementation Strategy</h4>
+                    <p class="text-sm text-gray-300 mb-3">
+                        Modern streaming services implement Common Encryption (CENC) to encrypt content once
+                        and serve multiple DRM systems, reducing storage costs and complexity.
+                    </p>
+                    <div class="code-block text-xs" data-language="javascript">
+class DRMManager {
+  async requestLicense(keyId, device) {
+    const licenseRequest = {
+      keyId,
+      deviceId: device.id,
+      deviceType: device.type,
+      securityLevel: this.getSecurityLevel(device),
+      contentRights: await this.getUserRights(device.userId)
+    };
+
+    const endpoints = {
+      widevine: 'https://license.service.com/widevine',
+      fairplay: 'https://license.service.com/fairplay',
+      playready: 'https://license.service.com/playready'
+    };
+
+    return fetch(endpoints[device.drmSystem], {
+      method: 'POST',
+      body: JSON.stringify(licenseRequest)
+    });
+  }
+}</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Implementation Recommendations -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold mb-6">Implementation Recommendations for FOX</h2>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Smart TV Optimization -->
+                <div class="recommendation-card">
+                    <h3 class="text-lg font-semibold text-green-400 mb-4 flex items-center">
+                        <i data-lucide="tv" class="w-5 h-5 mr-2"></i>
+                        Smart TV Optimization Priority
+                    </h3>
+                    <ul class="space-y-2 text-sm text-gray-300">
+                        <li class="flex items-start space-x-2">
+                            <i data-lucide="check" class="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0"></i>
+                            <span>Implement device-specific manifests</span>
+                        </li>
+                        <li class="flex items-start space-x-2">
+                            <i data-lucide="check" class="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0"></i>
+                            <span>Reduce segment size for constrained devices</span>
+                        </li>
+                        <li class="flex items-start space-x-2">
+                            <i data-lucide="check" class="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0"></i>
+                            <span>Use hardware decoder detection</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Sports-Specific Features -->
+                <div class="recommendation-card">
+                    <h3 class="text-lg font-semibold text-green-400 mb-4 flex items-center">
+                        <i data-lucide="zap" class="w-5 h-5 mr-2"></i>
+                        Sports-Specific Features
+                    </h3>
+                    <ul class="space-y-2 text-sm text-gray-300">
+                        <li class="flex items-start space-x-2">
+                            <i data-lucide="check" class="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0"></i>
+                            <span>Ultra-low latency for live games (&lt;3 seconds)</span>
+                        </li>
+                        <li class="flex items-start space-x-2">
+                            <i data-lucide="check" class="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0"></i>
+                            <span>Instant replay with I-frame playlists</span>
+                        </li>
+                        <li class="flex items-start space-x-2">
+                            <i data-lucide="check" class="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0"></i>
+                            <span>Multi-angle streaming support</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Cost Optimization -->
+                <div class="recommendation-card">
+                    <h3 class="text-lg font-semibold text-green-400 mb-4 flex items-center">
+                        <i data-lucide="dollar-sign" class="w-5 h-5 mr-2"></i>
+                        Cost Optimization
+                    </h3>
+                    <ul class="space-y-2 text-sm text-gray-300">
+                        <li class="flex items-start space-x-2">
+                            <i data-lucide="check" class="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0"></i>
+                            <span>Implement per-title encoding to reduce bandwidth 30%</span>
+                        </li>
+                        <li class="flex items-start space-x-2">
+                            <i data-lucide="check" class="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0"></i>
+                            <span>Use predictive prefetching to improve cache hit ratio</span>
+                        </li>
+                        <li class="flex items-start space-x-2">
+                            <i data-lucide="check" class="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0"></i>
+                            <span>Deploy edge compute for manifest generation</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Monitoring & Analytics -->
+                <div class="recommendation-card">
+                    <h3 class="text-lg font-semibold text-green-400 mb-4 flex items-center">
+                        <i data-lucide="activity" class="w-5 h-5 mr-2"></i>
+                        Monitoring & Analytics
+                    </h3>
+                    <ul class="space-y-2 text-sm text-gray-300">
+                        <li class="flex items-start space-x-2">
+                            <i data-lucide="check" class="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0"></i>
+                            <span>Real-time QoE scoring</span>
+                        </li>
+                        <li class="flex items-start space-x-2">
+                            <i data-lucide="check" class="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0"></i>
+                            <span>Predictive failure detection</span>
+                        </li>
+                        <li class="flex items-start space-x-2">
+                            <i data-lucide="check" class="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0"></i>
+                            <span>A/B testing framework for algorithm improvements</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Conclusion -->
+        <section class="mb-12">
+            <div class="info-card">
+                <h2 class="text-2xl font-bold mb-4 flex items-center">
+                    <i data-lucide="award" class="w-6 h-6 text-blue-400 mr-3"></i>
+                    Conclusion
+                </h2>
+                <p class="text-gray-300 mb-4">
+                    The streaming landscape has converged on several best practices:
+                </p>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="font-semibold text-blue-400 mb-3">Industry Standards</h3>
+                        <ul class="space-y-2 text-sm text-gray-300">
+                            <li class="flex items-start space-x-2">
+                                <i data-lucide="check" class="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0"></i>
+                                <span><strong>Multi-CDN is essential</strong> for redundancy and performance</span>
+                            </li>
+                            <li class="flex items-start space-x-2">
+                                <i data-lucide="check" class="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0"></i>
+                                <span><strong>Per-title encoding</strong> reduces costs while maintaining quality</span>
+                            </li>
+                            <li class="flex items-start space-x-2">
+                                <i data-lucide="check" class="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0"></i>
+                                <span><strong>Device-aware adaptation</strong> is crucial for heterogeneous ecosystems</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-blue-400 mb-3">Future Directions</h3>
+                        <ul class="space-y-2 text-sm text-gray-300">
+                            <li class="flex items-start space-x-2">
+                                <i data-lucide="check" class="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0"></i>
+                                <span><strong>Real-time analytics</strong> drive continuous optimization</span>
+                            </li>
+                            <li class="flex items-start space-x-2">
+                                <i data-lucide="check" class="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0"></i>
+                                <span><strong>Edge computing</strong> reduces latency and origin load</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="recommendation-card mt-6">
+                    <h3 class="font-semibold text-green-400 mb-2">FOX-Specific Recommendations</h3>
+                    <p class="text-sm text-gray-300">
+                        For FOX's specific needs around sports and Smart TV, focusing on low-latency delivery,
+                        aggressive ABR algorithms, and device-specific optimizations will provide competitive advantage.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Call to Action -->
+        <section class="text-center bg-gradient-to-r from-indigo-600/10 to-purple-600/10 border border-indigo-600/20 rounded-16 p-8">
+            <h2 class="text-2xl font-bold gradient-text mb-4">Explore More Technical Specifications</h2>
+            <p class="text-gray-300 mb-6 max-w-2xl mx-auto">
+                Dive deeper into our comprehensive technical research and implementation guides
+                for enterprise video streaming architectures.
+            </p>
+            <div class="flex flex-wrap justify-center gap-4">
+                <a href="ott-platforms-guide.html"
+                   class="px-6 py-3 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors flex items-center space-x-2">
+                    <i data-lucide="smartphone" class="w-4 h-4"></i>
+                    <span>OTT Platforms Guide</span>
+                </a>
+                <a href="shared-player-embed-strategy.html"
+                   class="px-6 py-3 border border-indigo-600 text-indigo-400 rounded-lg font-medium hover:bg-indigo-600/10 transition-colors flex items-center space-x-2">
+                    <i data-lucide="share-2" class="w-4 h-4"></i>
+                    <span>Shared Player Strategy</span>
+                </a>
+                <a href="index.html"
+                   class="px-6 py-3 border border-gray-600 text-gray-400 rounded-lg font-medium hover:bg-gray-600/10 transition-colors flex items-center space-x-2">
+                    <i data-lucide="home" class="w-4 h-4"></i>
+                    <span>Documentation Hub</span>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-800 mt-16">
+        <div class="max-w-7xl mx-auto px-6 py-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="text-sm text-gray-400 mb-4 md:mb-0">
+                    <p>&copy; 2025 John Dilig - Video Player Demo Project</p>
+                    <p class="mono">Research compiled from public documentation, engineering blogs, and industry conferences (2023-2024)</p>
+                </div>
+                <div class="flex items-center space-x-6">
+                    <div class="text-sm text-gray-400">
+                        <span>By Dakota - Principal Video Streaming Engineer</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Initialize ABR Algorithm Chart
+        function initABRChart() {
+            const ctx = document.getElementById('abrChart').getContext('2d');
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['0s', '10s', '20s', '30s', '40s', '50s', '60s'],
+                    datasets: [{
+                        label: 'Netflix (BBA)',
+                        data: [1000, 1200, 1400, 1600, 1800, 2000, 2200],
+                        borderColor: '#e50914',
+                        backgroundColor: 'rgba(229, 9, 20, 0.1)',
+                        tension: 0.4
+                    }, {
+                        label: 'YouTube (MPC)',
+                        data: [800, 1400, 1800, 2200, 2600, 3000, 3200],
+                        borderColor: '#ff0000',
+                        backgroundColor: 'rgba(255, 0, 0, 0.1)',
+                        tension: 0.4
+                    }, {
+                        label: 'Amazon (Hybrid)',
+                        data: [1200, 1300, 1500, 1700, 1900, 2100, 2300],
+                        borderColor: '#ff9900',
+                        backgroundColor: 'rgba(255, 153, 0, 0.1)',
+                        tension: 0.4
+                    }, {
+                        label: 'FOX (Aggressive)',
+                        data: [600, 1800, 2400, 2800, 3200, 3600, 4000],
+                        borderColor: '#ff6600',
+                        backgroundColor: 'rgba(255, 102, 0, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#fafafa'
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'ABR Algorithm Comparison - Quality Adaptation Over Time',
+                            color: '#fafafa'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Time',
+                                color: '#a1a1aa'
+                            },
+                            ticks: {
+                                color: '#71717a'
+                            },
+                            grid: {
+                                color: '#27272a'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Bitrate (kbps)',
+                                color: '#a1a1aa'
+                            },
+                            ticks: {
+                                color: '#71717a'
+                            },
+                            grid: {
+                                color: '#27272a'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Add hover effects for diagram nodes
+        document.querySelectorAll('.diagram-node').forEach(node => {
+            node.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.05)';
+                this.style.zIndex = '10';
+            });
+
+            node.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+                this.style.zIndex = '1';
+            });
+        });
+
+        // Add hover effects for service cards
+        document.querySelectorAll('.service-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-8px) scale(1.02)';
+            });
+
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+
+        // Animate metrics on scroll
+        function animateMetrics() {
+            const metrics = document.querySelectorAll('.metric-value');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const targetText = entry.target.textContent;
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'scale(1)';
+                    }
+                });
+            }, { threshold: 0.5 });
+
+            metrics.forEach(metric => {
+                metric.style.opacity = '0';
+                metric.style.transform = 'scale(0.8)';
+                metric.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(metric);
+            });
+        }
+
+        // Initialize everything
+        setTimeout(() => {
+            initABRChart();
+            animateMetrics();
+        }, 1000);
+
+        // Add click effects for interactive elements
+        document.querySelectorAll('.quality-rung').forEach(rung => {
+            rung.addEventListener('click', function() {
+                this.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 150);
+            });
+        });
+    </script>
+</body>
+</html>

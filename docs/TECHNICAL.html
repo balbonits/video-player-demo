@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Technical Architecture - Video Player Demo Documentation</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #000000;
+            --bg-secondary: #111111;
+            --bg-tertiary: #1a1a1a;
+            --accent-primary: #00ff88;
+            --accent-secondary: #00cc6a;
+            --text-primary: #ffffff;
+            --text-secondary: #cccccc;
+            --text-muted: #888888;
+            --border-color: #333333;
+            --shadow: 0 4px 12px rgba(0, 255, 136, 0.1);
+            --font-mono: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Courier New', monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .header {
+            background: var(--bg-secondary);
+            padding: 1rem 2rem;
+            border-bottom: 2px solid var(--accent-primary);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header h1 {
+            color: var(--accent-primary);
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .header nav {
+            margin-top: 1rem;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .breadcrumb a {
+            color: var(--accent-primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .content-layout {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .toc {
+            background: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: 12px;
+            height: fit-content;
+            position: sticky;
+            top: 120px;
+        }
+
+        .toc h3 {
+            color: var(--accent-primary);
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-item {
+            margin-bottom: 0.25rem;
+        }
+
+        .toc-link {
+            display: block;
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+        }
+
+        .toc-link:hover,
+        .toc-link.active {
+            background: var(--bg-tertiary);
+            color: var(--accent-primary);
+        }
+
+        .main-content {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 2rem;
+            min-height: 600px;
+        }
+
+        .page-title {
+            color: var(--accent-primary);
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .section {
+            margin-bottom: 3rem;
+        }
+
+        .section-header {
+            cursor: pointer;
+            padding: 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .section-header:hover {
+            border-color: var(--accent-primary);
+            background: var(--bg-primary);
+        }
+
+        .section-title {
+            color: var(--accent-primary);
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-toggle {
+            margin-left: auto;
+            transition: transform 0.2s ease;
+            color: var(--text-muted);
+        }
+
+        .section-content {
+            padding-left: 1rem;
+            border-left: 2px solid var(--accent-primary);
+            margin-left: 0.5rem;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .section-content.collapsed {
+            max-height: 0;
+            padding: 0;
+            margin: 0;
+        }
+
+        .section-content.expanded {
+            max-height: none;
+            padding-left: 1rem;
+            margin-left: 0.5rem;
+        }
+
+        h2 {
+            color: var(--accent-primary);
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin: 2rem 0 1rem 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--accent-primary);
+        }
+
+        h3 {
+            color: var(--text-primary);
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin: 1.5rem 0 0.75rem 0;
+        }
+
+        h4 {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 1rem 0 0.5rem 0;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+        }
+
+        code {
+            font-family: var(--font-mono);
+            background: var(--bg-tertiary);
+            color: var(--accent-primary);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            border-radius: 0;
+            color: var(--text-primary);
+        }
+
+        .code-block {
+            position: relative;
+            margin: 1rem 0;
+        }
+
+        .code-header {
+            background: var(--bg-tertiary);
+            padding: 0.5rem 1rem;
+            border-radius: 8px 8px 0 0;
+            border: 1px solid var(--border-color);
+            border-bottom: none;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .copy-btn {
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+            border: none;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .copy-btn:hover {
+            background: var(--accent-secondary);
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background: var(--bg-primary);
+            color: var(--accent-primary);
+            font-weight: 600;
+        }
+
+        td {
+            color: var(--text-secondary);
+        }
+
+        .info-box {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--accent-primary);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .info-box.warning {
+            border-left-color: #ffa500;
+        }
+
+        .info-box.error {
+            border-left-color: #ff5555;
+        }
+
+        .info-box.success {
+            border-left-color: var(--accent-primary);
+        }
+
+        .performance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .performance-card {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .performance-metric {
+            color: var(--accent-primary);
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .performance-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .tech-stack {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .tech-item {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .tech-icon {
+            font-size: 2rem;
+            color: var(--accent-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            box-shadow: var(--shadow);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .content-layout {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .toc {
+                position: static;
+                order: 2;
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1><i class="fas fa-cog"></i> Technical Architecture</h1>
+            <nav>
+                <div class="breadcrumb">
+                    <a href="index.html"><i class="fas fa-home"></i> Documentation</a>
+                    <i class="fas fa-chevron-right"></i>
+                    <span>Technical Architecture</span>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="content-layout">
+            <aside class="toc">
+                <h3><i class="fas fa-list"></i> Contents</h3>
+                <ul class="toc-list">
+                    <li class="toc-item"><a href="#overview" class="toc-link">Architecture Overview</a></li>
+                    <li class="toc-item"><a href="#technology-stack" class="toc-link">Technology Stack</a></li>
+                    <li class="toc-item"><a href="#performance" class="toc-link">Performance Architecture</a></li>
+                    <li class="toc-item"><a href="#state-management" class="toc-link">State Management</a></li>
+                    <li class="toc-item"><a href="#api-data" class="toc-link">API & Data Architecture</a></li>
+                    <li class="toc-item"><a href="#testing" class="toc-link">Testing Architecture</a></li>
+                    <li class="toc-item"><a href="#security" class="toc-link">Security Architecture</a></li>
+                    <li class="toc-item"><a href="#deployment" class="toc-link">Deployment Architecture</a></li>
+                    <li class="toc-item"><a href="#monitoring" class="toc-link">Monitoring & Observability</a></li>
+                </ul>
+            </aside>
+
+            <main class="main-content">
+                <h1 class="page-title">
+                    <i class="fas fa-cog"></i>
+                    Technical Documentation
+                </h1>
+                <p class="page-subtitle">Comprehensive technical architecture for video player demonstration showcasing modern React/Next.js patterns</p>
+
+                <section id="overview" class="section">
+                    <div class="section-header" onclick="toggleSection('overview')">
+                        <h2 class="section-title">
+                            <i class="fas fa-sitemap"></i>
+                            Architecture Overview
+                            <i class="fas fa-chevron-down section-toggle"></i>
+                        </h2>
+                    </div>
+                    <div class="section-content expanded">
+                        <h3>Dual Implementation Strategy</h3>
+                        <p>This project implements two parallel Next.js applications to demonstrate both proven delivery capabilities and cutting-edge expertise:</p>
+
+                        <div class="performance-grid">
+                            <div class="performance-card">
+                                <span class="performance-metric">Primary</span>
+                                <div class="performance-label">Pages Router</div>
+                                <p style="margin-top: 0.5rem; font-size: 0.8rem;">Fast development, proven performance, working demo</p>
+                            </div>
+                            <div class="performance-card">
+                                <span class="performance-metric">Secondary</span>
+                                <div class="performance-label">App Router</div>
+                                <p style="margin-top: 0.5rem; font-size: 0.8rem;">Next.js mastery showcase, modern patterns</p>
+                            </div>
+                        </div>
+
+                        <div class="info-box">
+                            <strong>Path Structure:</strong><br>
+                            • Primary: <code>apps/web-player-pages/</code> - 14ms TTFB, fast hot reload<br>
+                            • Secondary: <code>apps/web-player-app/</code> - Streaming, Server Components
+                        </div>
+                    </div>
+                </section>
+
+                <section id="technology-stack" class="section">
+                    <div class="section-header" onclick="toggleSection('technology-stack')">
+                        <h2 class="section-title">
+                            <i class="fas fa-layer-group"></i>
+                            Technology Stack
+                            <i class="fas fa-chevron-down section-toggle"></i>
+                        </h2>
+                    </div>
+                    <div class="section-content collapsed">
+                        <h3>Core Web Technologies</h3>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span>Frontend Framework Configuration</span>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <pre><code class="language-typescript">// Frontend Framework
+Next.js 14.x (Pages + App Router)
+React 18.x
+TypeScript 5.x (strict mode)
+
+// State Management
+Redux Toolkit 2.x
+Redux Persist 6.x
+React-Redux 9.x
+
+// Video Streaming
+HLS.js 1.5.x
+Video.js (fallback)
+MSE/EME APIs
+
+// Styling & UI
+Tailwind CSS 3.x
+Headless UI
+Radix UI (accessible components)
+
+// Testing
+Jest 29.x
+Testing Library (React/DOM)
+Playwright (E2E)
+Axe-core (accessibility)</code></pre>
+                        </div>
+
+                        <h3>Mobile Technologies</h3>
+                        <div class="tech-stack">
+                            <div class="tech-item">
+                                <div class="tech-icon"><i class="fab fa-apple"></i></div>
+                                <h4>iOS Stack</h4>
+                                <p>SwiftUI (iOS 16+), AVFoundation, Combine, XCTest</p>
+                            </div>
+                            <div class="tech-item">
+                                <div class="tech-icon"><i class="fab fa-android"></i></div>
+                                <h4>Android Stack</h4>
+                                <p>Kotlin 1.9.x, Jetpack Compose, ExoPlayer, Coroutines</p>
+                            </div>
+                        </div>
+
+                        <h3>Smart TV Technologies</h3>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span>Smart TV Platform Support</span>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <pre><code class="language-javascript">// Roku Platform
+BrightScript
+SceneGraph XML
+Roku Video Node
+
+// Samsung Tizen
+Tizen Web API 7.0+
+HTML5 Video + MSE
+Tizen TV Extensions
+
+// Vizio SmartCast
+SmartCast SDK 3.0+
+HTML5/JavaScript
+DIAL Protocol</code></pre>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="performance" class="section">
+                    <div class="section-header" onclick="toggleSection('performance')">
+                        <h2 class="section-title">
+                            <i class="fas fa-tachometer-alt"></i>
+                            Performance Architecture
+                            <i class="fas fa-chevron-down section-toggle"></i>
+                        </h2>
+                    </div>
+                    <div class="section-content collapsed">
+                        <h3>Performance Targets</h3>
+                        <div class="performance-grid">
+                            <div class="performance-card">
+                                <span class="performance-metric">&lt; 3s</span>
+                                <div class="performance-label">Initial Load (Smart TV)</div>
+                            </div>
+                            <div class="performance-card">
+                                <span class="performance-metric">&lt; 1s</span>
+                                <div class="performance-label">Video Start Time</div>
+                            </div>
+                            <div class="performance-card">
+                                <span class="performance-metric">&lt; 150MB</span>
+                                <div class="performance-label">Memory Usage (TV)</div>
+                            </div>
+                            <div class="performance-card">
+                                <span class="performance-metric">&lt; 500KB</span>
+                                <div class="performance-label">Initial Bundle</div>
+                            </div>
+                        </div>
+
+                        <h3>Bundle Optimization</h3>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span>Code Splitting Strategy</span>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <pre><code class="language-typescript">// Code Splitting Strategy
+const LazyVideoPlayer = lazy(() => import('./VideoPlayer'))
+const LazyAdvancedControls = lazy(() => import('./AdvancedControls'))
+
+// Next.js Optimization
+export const config = {
+  runtime: 'edge',              // Edge runtime for API routes
+  regions: ['iad1', 'sfo1'],   // Geographic distribution
+}
+
+// Bundle Analysis
+import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer'</code></pre>
+                        </div>
+
+                        <h3>Video Optimization</h3>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span>HLS Configuration for Performance</span>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <pre><code class="language-typescript">const hlsConfig = {
+  enableWorker: true,           // Offload processing
+  lowLatencyMode: true,         // Reduce delay
+  backBufferLength: 90,         // Smart buffering
+  maxBufferLength: 300,         // Maximum buffer
+  maxMaxBufferLength: 600,      // Peak buffer size
+  startLevel: -1,               // Auto quality start
+  capLevelToPlayerSize: true    // Match player resolution
+}</code></pre>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="state-management" class="section">
+                    <div class="section-header" onclick="toggleSection('state-management')">
+                        <h2 class="section-title">
+                            <i class="fas fa-database"></i>
+                            State Management Architecture
+                            <i class="fas fa-chevron-down section-toggle"></i>
+                        </h2>
+                    </div>
+                    <div class="section-content collapsed">
+                        <h3>Redux Store Structure</h3>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span>Root State Interface</span>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <pre><code class="language-typescript">interface RootState {
+  player: PlayerState          // Video playback state
+  video: VideoState           // Content and metadata
+  ui: UIState                 // Interface and navigation
+  accessibility: A11yState   // Accessibility preferences
+  analytics: AnalyticsState   // Performance tracking
+  platform: PlatformState    // Device-specific state
+}</code></pre>
+                        </div>
+
+                        <h3>Action Creators Pattern</h3>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span>Async Action Creators (Thunks)</span>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <pre><code class="language-typescript">export const playVideo = createAsyncThunk(
+  'player/play',
+  async (_, { getState, dispatch }) => {
+    const state = getState() as RootState
+    const videoElement = getVideoElement()
+
+    try {
+      await videoElement.play()
+      dispatch(trackVideoEvent({ event: 'play', timestamp: Date.now() }))
+      return { currentTime: videoElement.currentTime }
+    } catch (error) {
+      throw new Error(`Playback failed: ${error.message}`)
+    }
+  }
+)
+
+// Synchronous Action Creators
+export const { setVolume, toggleMute, updateProgress } = playerSlice.actions</code></pre>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="api-data" class="section">
+                    <div class="section-header" onclick="toggleSection('api-data')">
+                        <h2 class="section-title">
+                            <i class="fas fa-exchange-alt"></i>
+                            API & Data Architecture
+                            <i class="fas fa-chevron-down section-toggle"></i>
+                        </h2>
+                    </div>
+                    <div class="section-content collapsed">
+                        <h3>API Routes Structure</h3>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span>Pages Router API Structure</span>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <pre><code class="language-typescript">// Pages Router API
+pages/api/
+├── videos/
+│   ├── [id].ts              // GET /api/videos/:id
+│   └── stream/[id].ts       // GET /api/videos/stream/:id
+├── analytics/
+│   └── events.ts            // POST /api/analytics/events
+└── health.ts                // GET /api/health
+
+// App Router API
+app/api/
+├── videos/
+│   ├── [id]/route.ts        // RESTful video endpoints
+│   └── stream/[id]/route.ts // Streaming endpoints
+├── analytics/
+│   └── route.ts             // Analytics collection
+└── health/route.ts          // Health check</code></pre>
+                        </div>
+
+                        <h3>Data Flow Architecture</h3>
+                        <div class="info-box">
+                            <strong>Data Flow Pattern:</strong><br>
+                            User Interaction → Action Creator → Reducer → State Update → Component Re-render<br><br>
+                            <strong>Example:</strong> onClick() → dispatch(playVideo()) → playerSlice → state.isPlaying: true → &lt;PlayButton /&gt;
+                        </div>
+                    </div>
+                </section>
+
+                <section id="testing" class="section">
+                    <div class="section-header" onclick="toggleSection('testing')">
+                        <h2 class="section-title">
+                            <i class="fas fa-vial"></i>
+                            Testing Architecture
+                            <i class="fas fa-chevron-down section-toggle"></i>
+                        </h2>
+                    </div>
+                    <div class="section-content collapsed">
+                        <h3>Testing Strategy Pyramid</h3>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span>Test Distribution</span>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <pre><code>┌─────────────────┐
+│   E2E Tests     │ ← 10% (Critical user journeys)
+│  (Playwright)   │
+├─────────────────┤
+│ Integration     │ ← 20% (Component interaction)
+│ Tests (RTL)     │
+├─────────────────┤
+│  Unit Tests     │ ← 70% (Pure functions, hooks)
+│   (Jest)        │
+└─────────────────┘</code></pre>
+                        </div>
+
+                        <h3>Test Configuration</h3>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span>Jest Configuration</span>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <pre><code class="language-typescript">export default {
+  testEnvironment: 'jsdom',
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
+  moduleNameMapping: {
+    '^@/(.*)$': '<rootDir>/src/$1',
+  },
+  collectCoverageFrom: [
+    'src/**/*.{ts,tsx}',
+    '!src/**/*.d.ts',
+    '!src/types/**/*',
+  ],
+  coverageThreshold: {
+    global: {
+      branches: 80,
+      functions: 80,
+      lines: 80,
+      statements: 80,
+    },
+  },
+}</code></pre>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="security" class="section">
+                    <div class="section-header" onclick="toggleSection('security')">
+                        <h2 class="section-title">
+                            <i class="fas fa-shield-alt"></i>
+                            Security Architecture
+                            <i class="fas fa-chevron-down section-toggle"></i>
+                        </h2>
+                    </div>
+                    <div class="section-content collapsed">
+                        <h3>Content Security Policy</h3>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span>CSP Configuration</span>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <pre><code class="language-typescript">const cspDirectives = {
+  'default-src': ["'self'"],
+  'script-src': ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+  'style-src': ["'self'", "'unsafe-inline'"],
+  'img-src': ["'self'", 'data:', 'https:'],
+  'media-src': ["'self'", 'blob:', 'https:'],
+  'connect-src': ["'self'", 'https:', 'wss:'],
+  'frame-src': ["'self'"],
+  'worker-src': ["'self'", 'blob:'],
+}</code></pre>
+                        </div>
+
+                        <h3>DRM & Content Protection</h3>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span>EME (Encrypted Media Extensions) Setup</span>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <pre><code class="language-typescript">const drmConfig = {
+  widevine: {
+    licenseUrl: 'https://license.example.com/widevine',
+    certificateUrl: 'https://cert.example.com/widevine'
+  },
+  playready: {
+    licenseUrl: 'https://license.example.com/playready'
+  },
+  fairplay: {
+    licenseUrl: 'https://license.example.com/fairplay',
+    certificateUrl: 'https://cert.example.com/fairplay'
+  }
+}</code></pre>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="deployment" class="section">
+                    <div class="section-header" onclick="toggleSection('deployment')">
+                        <h2 class="section-title">
+                            <i class="fas fa-rocket"></i>
+                            Deployment Architecture
+                            <i class="fas fa-chevron-down section-toggle"></i>
+                        </h2>
+                    </div>
+                    <div class="section-content collapsed">
+                        <h3>Build Pipeline</h3>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span>GitHub Actions Workflow</span>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <pre><code class="language-yaml">name: Deploy Video Player Demo
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+      - run: npm ci
+      - run: npm run test:unit
+      - run: npm run test:e2e
+      - run: npm run test:a11y
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        app: [web-player-pages, web-player-app]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+      - run: npm ci
+      - run: npm run build --workspace=${{ matrix.app }}
+      - uses: actions/upload-artifact@v4
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: vercel/action@v1</code></pre>
+                        </div>
+
+                        <h3>Environment Configuration</h3>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span>Environment Variables</span>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <pre><code class="language-typescript">interface EnvironmentConfig {
+  // Application
+  NODE_ENV: 'development' | 'staging' | 'production'
+  NEXT_PUBLIC_APP_VERSION: string
+  NEXT_PUBLIC_BUILD_ID: string
+
+  // Analytics
+  NEXT_PUBLIC_GA_ID: string
+  NEXT_PUBLIC_ANALYTICS_ENDPOINT: string
+
+  // Video Streaming
+  NEXT_PUBLIC_HLS_BASE_URL: string
+  NEXT_PUBLIC_CDN_URL: string
+
+  // Feature Flags
+  NEXT_PUBLIC_ENABLE_APP_ROUTER: boolean
+  NEXT_PUBLIC_ENABLE_LIVE_TRANSCRIPTION: boolean
+  NEXT_PUBLIC_ENABLE_SMART_TV_MODE: boolean
+}</code></pre>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="monitoring" class="section">
+                    <div class="section-header" onclick="toggleSection('monitoring')">
+                        <h2 class="section-title">
+                            <i class="fas fa-chart-line"></i>
+                            Monitoring & Observability
+                            <i class="fas fa-chevron-down section-toggle"></i>
+                        </h2>
+                    </div>
+                    <div class="section-content collapsed">
+                        <h3>Performance Monitoring</h3>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span>Core Web Vitals Tracking</span>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <pre><code class="language-typescript">import { getCLS, getFID, getFCP, getLCP, getTTFB } from 'web-vitals'
+
+function sendToAnalytics(metric: Metric) {
+  // Send to Google Analytics
+  gtag('event', metric.name, {
+    value: Math.round(metric.value),
+    metric_id: metric.id,
+    metric_value: metric.value,
+    metric_delta: metric.delta,
+  })
+
+  // Send to custom analytics
+  fetch('/api/analytics/vitals', {
+    method: 'POST',
+    body: JSON.stringify(metric),
+  })
+}
+
+// Track all Core Web Vitals
+getCLS(sendToAnalytics)
+getFID(sendToAnalytics)
+getFCP(sendToAnalytics)
+getLCP(sendToAnalytics)
+getTTFB(sendToAnalytics)</code></pre>
+                        </div>
+
+                        <h3>Error Tracking</h3>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span>Error Boundary with Reporting</span>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <pre><code class="language-typescript">class VideoPlayerErrorBoundary extends Component {
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    // Log to console for development
+    console.error('VideoPlayer Error:', error, errorInfo)
+
+    // Report to error tracking service
+    reportError({
+      error: error.message,
+      stack: error.stack,
+      componentStack: errorInfo.componentStack,
+      userAgent: navigator.userAgent,
+      url: window.location.href,
+      timestamp: new Date().toISOString(),
+    })
+  }
+}</code></pre>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="info-box success">
+                    <strong>Next.js Mastery Learning Journey:</strong> This technical documentation serves as both implementation reference and educational material for understanding modern React/Next.js patterns in enterprise video streaming applications.
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <button class="back-to-top" onclick="scrollToTop()">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+
+    <script>
+        // Section toggle functionality
+        function toggleSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            const content = section.querySelector('.section-content');
+            const toggle = section.querySelector('.section-toggle');
+
+            if (content.classList.contains('collapsed')) {
+                content.classList.remove('collapsed');
+                content.classList.add('expanded');
+                toggle.style.transform = 'rotate(180deg)';
+            } else {
+                content.classList.remove('expanded');
+                content.classList.add('collapsed');
+                toggle.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        // Copy code functionality
+        function copyCode(button) {
+            const codeBlock = button.closest('.code-block').querySelector('code');
+            const text = codeBlock.textContent;
+
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.style.background = 'var(--accent-secondary)';
+
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = 'var(--accent-primary)';
+                }, 2000);
+            });
+        }
+
+        // Back to top functionality
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Show/hide back to top button
+        window.addEventListener('scroll', () => {
+            const backToTop = document.querySelector('.back-to-top');
+            if (window.scrollY > 300) {
+                backToTop.classList.add('visible');
+            } else {
+                backToTop.classList.remove('visible');
+            }
+        });
+
+        // Table of contents active highlighting
+        const tocLinks = document.querySelectorAll('.toc-link');
+        const sections = document.querySelectorAll('.section');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 150;
+                if (window.scrollY >= sectionTop) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            tocLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Smooth scroll for TOC links
+        tocLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href').slice(1);
+                const targetSection = document.getElementById(targetId);
+                if (targetSection) {
+                    targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Initialize - expand first section
+        document.addEventListener('DOMContentLoaded', () => {
+            const firstSection = document.querySelector('.section-content');
+            if (firstSection && firstSection.classList.contains('expanded')) {
+                const toggle = firstSection.closest('.section').querySelector('.section-toggle');
+                toggle.style.transform = 'rotate(180deg)';
+            }
+        });
+    </script>
+</body>
+</html>

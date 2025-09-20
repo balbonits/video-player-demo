@@ -1,0 +1,369 @@
+{
+  "streamingProfiles": {
+    "foxSports": {
+      "id": "fox-sports-profile-001",
+      "provider": "FOX Digital Media",
+      "type": "live",
+      "drm": {
+        "widevine": {
+          "licenseUrl": "https://license.foxdigital.com/widevine",
+          "certificateUrl": "https://certificate.foxdigital.com/cert.der"
+        },
+        "fairplay": {
+          "licenseUrl": "https://license.foxdigital.com/fairplay",
+          "certificateUrl": "https://certificate.foxdigital.com/fairplay.cer"
+        }
+      },
+      "analytics": {
+        "beaconUrl": "https://analytics.foxdigital.com/beacon",
+        "heartbeatInterval": 10000,
+        "bufferTrackingInterval": 2000
+      }
+    },
+    "vodContent": {
+      "id": "vod-profile-001",
+      "provider": "FOX Entertainment",
+      "type": "vod",
+      "adInsertion": {
+        "preroll": true,
+        "midroll": [300, 600, 900],
+        "postroll": true,
+        "vastUrl": "https://ads.foxdigital.com/vast"
+      }
+    }
+  },
+  "cdnConfiguration": {
+    "primary": {
+      "provider": "Akamai",
+      "baseUrl": "https://fox-live.akamaized.net",
+      "geoRegions": ["us-east", "us-west", "us-central"],
+      "failoverUrl": "https://fox-backup.akamaized.net",
+      "tokenAuth": true,
+      "ssl": true
+    },
+    "secondary": {
+      "provider": "CloudFront",
+      "baseUrl": "https://d2zihajmogu5jn.cloudfront.net",
+      "geoRegions": ["global"],
+      "failoverUrl": "https://d3zihajmogu5jn.cloudfront.net"
+    },
+    "edgeServers": [
+      {
+        "location": "Los Angeles",
+        "url": "https://la-edge.foxdigital.com",
+        "capacity": "10Gbps",
+        "latency": 5
+      },
+      {
+        "location": "New York",
+        "url": "https://ny-edge.foxdigital.com",
+        "capacity": "10Gbps",
+        "latency": 8
+      },
+      {
+        "location": "Dallas",
+        "url": "https://tx-edge.foxdigital.com",
+        "capacity": "8Gbps",
+        "latency": 12
+      }
+    ]
+  },
+  "adaptiveBitrateProfiles": {
+    "smartTV": {
+      "name": "Smart TV Optimized",
+      "device": ["roku", "samsung-tizen", "lg-webos", "vizio-smartcast"],
+      "ladder": [
+        {
+          "bandwidth": 400000,
+          "resolution": "320x180",
+          "framerate": 24,
+          "codec": "avc1.42001e",
+          "profile": "baseline",
+          "level": "3.0"
+        },
+        {
+          "bandwidth": 800000,
+          "resolution": "480x270",
+          "framerate": 24,
+          "codec": "avc1.42001e",
+          "profile": "baseline",
+          "level": "3.0"
+        },
+        {
+          "bandwidth": 1200000,
+          "resolution": "640x360",
+          "framerate": 24,
+          "codec": "avc1.42001f",
+          "profile": "baseline",
+          "level": "3.1"
+        },
+        {
+          "bandwidth": 2000000,
+          "resolution": "960x540",
+          "framerate": 30,
+          "codec": "avc1.4d001f",
+          "profile": "main",
+          "level": "3.1"
+        },
+        {
+          "bandwidth": 3000000,
+          "resolution": "1280x720",
+          "framerate": 30,
+          "codec": "avc1.640028",
+          "profile": "high",
+          "level": "4.0"
+        },
+        {
+          "bandwidth": 4500000,
+          "resolution": "1920x1080",
+          "framerate": 30,
+          "codec": "avc1.640028",
+          "profile": "high",
+          "level": "4.0"
+        },
+        {
+          "bandwidth": 6000000,
+          "resolution": "1920x1080",
+          "framerate": 60,
+          "codec": "avc1.640028",
+          "profile": "high",
+          "level": "4.2"
+        },
+        {
+          "bandwidth": 15000000,
+          "resolution": "3840x2160",
+          "framerate": 60,
+          "codec": "hev1.1.6.L150.90",
+          "profile": "main10",
+          "level": "5.0",
+          "hdr": true
+        }
+      ]
+    },
+    "mobile": {
+      "name": "Mobile Optimized",
+      "device": ["ios", "android"],
+      "ladder": [
+        {
+          "bandwidth": 200000,
+          "resolution": "256x144",
+          "framerate": 15,
+          "codec": "avc1.42001e",
+          "profile": "baseline",
+          "level": "3.0"
+        },
+        {
+          "bandwidth": 400000,
+          "resolution": "320x180",
+          "framerate": 24,
+          "codec": "avc1.42001e",
+          "profile": "baseline",
+          "level": "3.0"
+        },
+        {
+          "bandwidth": 600000,
+          "resolution": "480x270",
+          "framerate": 24,
+          "codec": "avc1.42001e",
+          "profile": "baseline",
+          "level": "3.0"
+        },
+        {
+          "bandwidth": 1000000,
+          "resolution": "640x360",
+          "framerate": 30,
+          "codec": "avc1.42001f",
+          "profile": "baseline",
+          "level": "3.1"
+        },
+        {
+          "bandwidth": 1500000,
+          "resolution": "960x540",
+          "framerate": 30,
+          "codec": "avc1.4d001f",
+          "profile": "main",
+          "level": "3.1"
+        },
+        {
+          "bandwidth": 2500000,
+          "resolution": "1280x720",
+          "framerate": 30,
+          "codec": "avc1.4d001f",
+          "profile": "main",
+          "level": "3.1"
+        }
+      ]
+    },
+    "desktop": {
+      "name": "Desktop Optimized",
+      "device": ["desktop-chrome", "desktop-firefox", "desktop-safari", "desktop-edge"],
+      "ladder": [
+        {
+          "bandwidth": 600000,
+          "resolution": "480x270",
+          "framerate": 24,
+          "codec": "avc1.42001e",
+          "profile": "baseline",
+          "level": "3.0"
+        },
+        {
+          "bandwidth": 1000000,
+          "resolution": "640x360",
+          "framerate": 30,
+          "codec": "avc1.42001f",
+          "profile": "baseline",
+          "level": "3.1"
+        },
+        {
+          "bandwidth": 2000000,
+          "resolution": "960x540",
+          "framerate": 30,
+          "codec": "avc1.4d001f",
+          "profile": "main",
+          "level": "3.1"
+        },
+        {
+          "bandwidth": 3500000,
+          "resolution": "1280x720",
+          "framerate": 30,
+          "codec": "avc1.640028",
+          "profile": "high",
+          "level": "4.0"
+        },
+        {
+          "bandwidth": 5000000,
+          "resolution": "1920x1080",
+          "framerate": 30,
+          "codec": "avc1.640028",
+          "profile": "high",
+          "level": "4.0"
+        },
+        {
+          "bandwidth": 8000000,
+          "resolution": "1920x1080",
+          "framerate": 60,
+          "codec": "avc1.640028",
+          "profile": "high",
+          "level": "4.2"
+        },
+        {
+          "bandwidth": 12000000,
+          "resolution": "2560x1440",
+          "framerate": 60,
+          "codec": "avc1.640032",
+          "profile": "high",
+          "level": "5.1"
+        },
+        {
+          "bandwidth": 20000000,
+          "resolution": "3840x2160",
+          "framerate": 60,
+          "codec": "hev1.1.6.L150.90",
+          "profile": "main10",
+          "level": "5.1",
+          "hdr": true
+        }
+      ]
+    }
+  },
+  "streamingMetrics": {
+    "qualityOfExperience": {
+      "targetStartupTime": 1000,
+      "targetRebufferRate": 0.004,
+      "targetBitrateVariance": 0.1,
+      "minBufferHealth": 10000,
+      "optimalBufferHealth": 30000
+    },
+    "performanceThresholds": {
+      "smartTV": {
+        "maxMemoryUsage": 100,
+        "maxCpuUsage": 30,
+        "maxDecoderLoad": 80,
+        "minFrameRate": 24
+      },
+      "mobile": {
+        "maxMemoryUsage": 200,
+        "maxCpuUsage": 50,
+        "maxBatteryDrain": 15,
+        "dataSaverMode": true
+      },
+      "desktop": {
+        "maxMemoryUsage": 500,
+        "maxCpuUsage": 60,
+        "enableGpuAcceleration": true
+      }
+    }
+  },
+  "contentDeliveryPolicy": {
+    "segmentDuration": 6,
+    "playlistUpdateInterval": 3000,
+    "liveEdgeBuffer": 18,
+    "dvr": {
+      "enabled": true,
+      "windowLength": 7200,
+      "seekableRange": true
+    },
+    "cache": {
+      "manifestTTL": 1,
+      "segmentTTL": 3600,
+      "subtitleTTL": 86400
+    },
+    "security": {
+      "tokenExpiry": 3600,
+      "geoBlocking": ["US", "CA"],
+      "ipWhitelist": [],
+      "userAgent": "FOXDigital/1.0"
+    }
+  },
+  "availableStreams": [
+    {
+      "id": "fox-sports-live-001",
+      "title": "FOX Sports Live Stream",
+      "type": "live",
+      "manifestUrl": "https://fox-live.akamaized.net/live/foxsports/master.m3u8",
+      "backupUrl": "https://fox-backup.akamaized.net/live/foxsports/master.m3u8",
+      "thumbnailUrl": "https://static.foxsports.com/thumbnails/live.jpg",
+      "duration": null,
+      "isLive": true,
+      "isDvr": true,
+      "metadata": {
+        "title": "NFL Sunday",
+        "description": "Live NFL Coverage",
+        "sport": "Football",
+        "league": "NFL"
+      }
+    },
+    {
+      "id": "big-buck-bunny-demo",
+      "title": "Big Buck Bunny (Demo)",
+      "type": "vod",
+      "manifestUrl": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
+      "thumbnailUrl": "https://test-streams.mux.dev/x36xhzz/thumbnail.jpg",
+      "duration": 634,
+      "isLive": false,
+      "isDvr": false,
+      "metadata": {
+        "title": "Big Buck Bunny",
+        "description": "Open source animated short film",
+        "genre": "Animation",
+        "year": 2008
+      }
+    },
+    {
+      "id": "tears-of-steel-demo",
+      "title": "Tears of Steel (Demo)",
+      "type": "vod",
+      "manifestUrl": "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8",
+      "thumbnailUrl": "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.jpg",
+      "duration": 734,
+      "isLive": false,
+      "isDvr": false,
+      "metadata": {
+        "title": "Tears of Steel",
+        "description": "Blender Foundation short film",
+        "genre": "Sci-Fi",
+        "year": 2012
+      }
+    }
+  ]
+}

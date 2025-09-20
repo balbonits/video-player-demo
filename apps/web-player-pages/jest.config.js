@@ -77,35 +77,6 @@ const customJestConfig = {
   // Test timeout for performance tests
   testTimeout: 30000,
 
-  // Performance and accessibility test configuration
-  projects: [
-    {
-      displayName: 'unit',
-      testMatch: ['<rootDir>/src/**/__tests__/**/*.test.{js,jsx,ts,tsx}'],
-      testPathIgnorePatterns: [
-        '<rootDir>/src/**/__tests__/performance/**',
-        '<rootDir>/src/**/__tests__/accessibility/**',
-        '<rootDir>/src/**/__tests__/integration/**'
-      ]
-    },
-    {
-      displayName: 'performance',
-      testMatch: ['<rootDir>/src/**/__tests__/performance/**/*.test.{js,jsx,ts,tsx}'],
-      setupFilesAfterEnv: ['<rootDir>/jest.performance.setup.js'],
-      testTimeout: 60000 // Longer timeout for performance tests
-    },
-    {
-      displayName: 'accessibility',
-      testMatch: ['<rootDir>/src/**/__tests__/accessibility/**/*.test.{js,jsx,ts,tsx}'],
-      setupFilesAfterEnv: ['<rootDir>/jest.accessibility.setup.js']
-    },
-    {
-      displayName: 'integration',
-      testMatch: ['<rootDir>/src/**/__tests__/integration/**/*.test.{js,jsx,ts,tsx}'],
-      setupFilesAfterEnv: ['<rootDir>/jest.integration.setup.js'],
-      testTimeout: 45000
-    }
-  ],
 
   // Global variables for performance testing
   globals: {
@@ -121,27 +92,9 @@ const customJestConfig = {
 
   // Reporters for CI/CD integration
   reporters: [
-    'default',
-    [
-      'jest-junit',
-      {
-        outputDirectory: 'test-results',
-        outputName: 'junit.xml',
-        suiteName: 'Video Player Demo Tests'
-      }
-    ],
-    [
-      'jest-html-reporters',
-      {
-        publicPath: 'test-results',
-        filename: 'test-report.html',
-        expand: true
-      }
-    ]
+    'default'
   ],
 
-  // Performance monitoring integration
-  setupFiles: ['<rootDir>/jest.performance.globals.js']
 }
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async

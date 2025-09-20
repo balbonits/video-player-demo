@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Player Demo - Executive Product Documentation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="theme_executive.css">
+    <style>
+        /* Additional executive-specific styles */
+        .bg-gradient-executive {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        }
+
+        .text-gradient-primary {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .metric-large {
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .metric-medium {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .priority-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .priority-p1 { background-color: #ef4444; }
+        .priority-p2 { background-color: #f59e0b; }
+        .priority-p3 { background-color: #10b981; }
+
+        .fox-critical {
+            background: linear-gradient(90deg, #ef4444, #f97316);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+
+        .fox-moderate {
+            background: linear-gradient(90deg, #f59e0b, #eab308);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 600;
+        }
+
+        .fox-low {
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .complexity-low { color: #10b981; }
+        .complexity-medium { color: #f59e0b; }
+        .complexity-high { color: #ef4444; }
+
+        .nav-item {
+            transition: all 0.3s ease;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            margin: 0.25rem 0;
+        }
+
+        .nav-item:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+            transform: translateX(4px);
+        }
+
+        .nav-item.active {
+            background-color: rgba(59, 130, 246, 0.2);
+            border-left: 4px solid #3b82f6;
+        }
+
+        .chart-container {
+            height: 300px;
+        }
+
+        .timeline-item {
+            border-left: 2px solid #374151;
+            padding-left: 1rem;
+            margin-left: 1rem;
+            position: relative;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -6px;
+            top: 0.25rem;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #3b82f6;
+        }
+
+        .timeline-item.completed::before {
+            background-color: #10b981;
+        }
+
+        .timeline-item.in-progress::before {
+            background-color: #f59e0b;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 font-sans">
+    <!-- Header -->
+    <header class="executive-header fade-in">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="executive-title">Video Player Demo Project</h1>
+                    <p class="text-lg opacity-90 mt-2">Executive Product Documentation & Strategic Analysis</p>
+                    <div class="flex items-center mt-4 space-x-6">
+                        <div class="flex items-center space-x-2">
+                            <i data-lucide="target" class="w-5 h-5"></i>
+                            <span class="font-medium">FOX Corporation Application</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i data-lucide="calendar" class="w-5 h-5"></i>
+                            <span>5-7 Day Timeline</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i data-lucide="trending-up" class="w-5 h-5"></i>
+                            <span>Performance Optimization Focus</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="text-2xl font-bold">John Dilig</div>
+                    <div class="text-sm opacity-75">Senior Frontend Developer</div>
+                    <div class="text-sm opacity-75">18+ Years Experience</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-6 py-8">
+        <div class="grid grid-cols-12 gap-8">
+            <!-- Sidebar Navigation -->
+            <aside class="col-span-3 sidebar-nav slide-up p-6">
+                <nav class="space-y-2">
+                    <div class="nav-item active" onclick="showSection('dashboard')">
+                        <i data-lucide="layout-dashboard" class="w-5 h-5 inline mr-3"></i>
+                        Executive Dashboard
+                    </div>
+                    <div class="nav-item" onclick="showSection('product')">
+                        <i data-lucide="package" class="w-5 h-5 inline mr-3"></i>
+                        Product Strategy
+                    </div>
+                    <div class="nav-item" onclick="showSection('features')">
+                        <i data-lucide="grid-3x3" class="w-5 h-5 inline mr-3"></i>
+                        Feature Matrix
+                    </div>
+                    <div class="nav-item" onclick="showSection('content')">
+                        <i data-lucide="video" class="w-5 h-5 inline mr-3"></i>
+                        Content Strategy
+                    </div>
+                    <div class="nav-item" onclick="showSection('timeline')">
+                        <i data-lucide="gantt-chart" class="w-5 h-5 inline mr-3"></i>
+                        Implementation Timeline
+                    </div>
+                    <div class="nav-item" onclick="showSection('analysis')">
+                        <i data-lucide="bar-chart-3" class="w-5 h-5 inline mr-3"></i>
+                        Market Analysis
+                    </div>
+                    <div class="nav-item" onclick="showSection('performance')">
+                        <i data-lucide="zap" class="w-5 h-5 inline mr-3"></i>
+                        Performance Metrics
+                    </div>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="col-span-9">
+                <!-- Dashboard Section -->
+                <section id="dashboard" class="content-section">
+                    <h2 class="section-title mb-6">Executive Dashboard</h2>
+
+                    <!-- Key Metrics Grid -->
+                    <div class="grid grid-cols-4 gap-6 mb-8">
+                        <div class="metric-card p-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <div class="text-sm text-slate-400">Total Features</div>
+                                    <div class="metric-large text-blue-400">47</div>
+                                </div>
+                                <i data-lucide="layers" class="w-8 h-8 text-blue-400"></i>
+                            </div>
+                        </div>
+
+                        <div class="metric-card p-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <div class="text-sm text-slate-400">FOX Critical</div>
+                                    <div class="metric-large fox-critical">23</div>
+                                </div>
+                                <i data-lucide="star" class="w-8 h-8 text-orange-400"></i>
+                            </div>
+                        </div>
+
+                        <div class="metric-card p-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <div class="text-sm text-slate-400">Platforms</div>
+                                    <div class="metric-large text-green-400">5</div>
+                                </div>
+                                <i data-lucide="monitor" class="w-8 h-8 text-green-400"></i>
+                            </div>
+                        </div>
+
+                        <div class="metric-card p-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <div class="text-sm text-slate-400">Timeline</div>
+                                    <div class="metric-large text-purple-400">7d</div>
+                                </div>
+                                <i data-lucide="clock" class="w-8 h-8 text-purple-400"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Grid -->
+                    <div class="grid grid-cols-2 gap-8 mb-8">
+                        <!-- Feature Priority Distribution -->
+                        <div class="chart-container">
+                            <h3 class="text-lg font-semibold mb-4">Feature Priority Distribution</h3>
+                            <canvas id="priorityChart"></canvas>
+                        </div>
+
+                        <!-- FOX Relevance Analysis -->
+                        <div class="chart-container">
+                            <h3 class="text-lg font-semibold mb-4">FOX Corporation Relevance</h3>
+                            <canvas id="foxRelevanceChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Platform Support Matrix -->
+                    <div class="metric-card p-6">
+                        <h3 class="text-lg font-semibold mb-4">Platform Support Overview</h3>
+                        <div class="grid grid-cols-5 gap-4">
+                            <div class="text-center">
+                                <div class="w-16 h-16 bg-blue-500 rounded-lg flex items-center justify-center mx-auto mb-2">
+                                    <i data-lucide="monitor" class="w-8 h-8 text-white"></i>
+                                </div>
+                                <div class="font-medium">Web</div>
+                                <div class="text-sm text-slate-400">38 features</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="w-16 h-16 bg-purple-500 rounded-lg flex items-center justify-center mx-auto mb-2">
+                                    <i data-lucide="tv" class="w-8 h-8 text-white"></i>
+                                </div>
+                                <div class="font-medium">Smart TV</div>
+                                <div class="text-sm text-slate-400">30 features</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="w-16 h-16 bg-green-500 rounded-lg flex items-center justify-center mx-auto mb-2">
+                                    <i data-lucide="smartphone" class="w-8 h-8 text-white"></i>
+                                </div>
+                                <div class="font-medium">Mobile</div>
+                                <div class="text-sm text-slate-400">23 features</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="w-16 h-16 bg-orange-500 rounded-lg flex items-center justify-center mx-auto mb-2">
+                                    <i data-lucide="gamepad-2" class="w-8 h-8 text-white"></i>
+                                </div>
+                                <div class="font-medium">Gaming</div>
+                                <div class="text-sm text-slate-400">23 features</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="w-16 h-16 bg-red-500 rounded-lg flex items-center justify-center mx-auto mb-2">
+                                    <i data-lucide="globe" class="w-8 h-8 text-white"></i>
+                                </div>
+                                <div class="font-medium">Web PWA</div>
+                                <div class="text-sm text-slate-400">22 features</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Product Strategy Section -->
+                <section id="product" class="content-section hidden">
+                    <h2 class="section-title mb-6">📋 Product Documentation</h2>
+
+                    <!-- Mission Statement -->
+                    <div class="metric-card p-6 mb-6">
+                        <h3 class="text-xl font-semibold mb-4 text-gradient-primary">Mission Statement</h3>
+                        <p class="text-lg leading-relaxed">
+                            Create a comprehensive video streaming player that demonstrates enterprise-level development capabilities
+                            while showcasing modern accessibility, performance optimization, and cross-platform expertise for
+                            streaming media applications.
+                        </p>
+                        <div class="mt-4 grid grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div class="text-center">
+                                <div class="fox-critical text-2xl font-bold">Career</div>
+                                <div class="text-sm text-slate-400">FOX Corporation</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-blue-400">Technical</div>
+                                <div class="text-sm text-slate-400">Next.js Mastery</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-green-400">Portfolio</div>
+                                <div class="text-sm text-slate-400">Showcase Quality</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-purple-400">Learning</div>
+                                <div class="text-sm text-slate-400">React Patterns</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Target Audience Analysis -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                        <div class="metric-card p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-semibold text-lg">FOX Corporation Hiring Team</h3>
+                                <div class="px-3 py-1 rounded-full text-xs font-medium fox-critical" style="background: rgba(239,68,68,0.2);">PRIMARY</div>
+                            </div>
+                            <div class="space-y-4">
+                                <div>
+                                    <h4 class="font-medium mb-2" style="color: var(--chart-1);">Role & Needs</h4>
+                                    <p style="color: var(--muted-foreground); font-size: 0.875rem;">Senior Web/JavaScript Engineer hiring manager seeking evidence of Smart TV platform experience, HLS streaming expertise, and performance optimization skills.</p>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium mb-2" style="color: var(--chart-2);">Success Metrics</h4>
+                                    <ul class="text-sm space-y-1" style="color: var(--muted-foreground);">
+                                        <li>• Technical competency demonstration</li>
+                                        <li>• Architectural decision-making</li>
+                                        <li>• Enterprise development practices</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="metric-card p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-semibold text-lg">Technical Community</h3>
+                                <div class="px-3 py-1 rounded-full text-xs font-medium" style="background: rgba(139,92,246,0.2); color: var(--accent);">SECONDARY</div>
+                            </div>
+                            <div class="space-y-4">
+                                <div>
+                                    <h4 class="font-medium mb-2" style="color: var(--chart-1);">Role & Needs</h4>
+                                    <p style="color: var(--muted-foreground); font-size: 0.875rem;">Potential employers, collaborators, and open-source contributors seeking clean, well-documented code examples and modern development patterns.</p>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium mb-2" style="color: var(--chart-2);">Success Metrics</h4>
+                                    <ul class="text-sm space-y-1" style="color: var(--muted-foreground);">
+                                        <li>• GitHub stars and contributions</li>
+                                        <li>• Portfolio engagement</li>
+                                        <li>• Professional network growth</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Functional Requirements Grid -->
+                    <div class="mb-8">
+                        <h3 class="font-semibold text-lg mb-4" style="color: var(--chart-1);">Functional Requirements Overview</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div class="metric-card p-4">
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold priority-high">5</div>
+                                    <div class="text-sm" style="color: var(--muted-foreground);">Core Video Playback</div>
+                                    <div class="text-xs mt-1 priority-high">Priority 1</div>
+                                </div>
+                            </div>
+                            <div class="metric-card p-4">
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold priority-medium">5</div>
+                                    <div class="text-sm" style="color: var(--muted-foreground);">Smart TV Navigation</div>
+                                    <div class="text-xs mt-1 priority-medium">Priority 2</div>
+                                </div>
+                            </div>
+                            <div class="metric-card p-4">
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold priority-medium">6</div>
+                                    <div class="text-sm" style="color: var(--muted-foreground);">Accessibility</div>
+                                    <div class="text-xs mt-1 priority-medium">Priority 3</div>
+                                </div>
+                            </div>
+                            <div class="metric-card p-4">
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold priority-low">5</div>
+                                    <div class="text-sm" style="color: var(--muted-foreground);">Cross-Platform</div>
+                                    <div class="text-xs mt-1 priority-low">Priority 4</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Strategic Objectives -->
+                    <div class="grid grid-cols-2 gap-6 mb-8">
+                        <div class="metric-card p-6">
+                            <h4 class="font-semibold mb-4 flex items-center">
+                                <i data-lucide="target" class="w-5 h-5 mr-2 text-blue-400"></i>
+                                Primary Objectives
+                            </h4>
+                            <ul class="space-y-3">
+                                <li class="flex items-center">
+                                    <span class="priority-indicator priority-p1"></span>
+                                    <span class="fox-critical">FOX Corporation Position</span>
+                                </li>
+                                <li class="flex items-center">
+                                    <span class="priority-indicator priority-p1"></span>
+                                    <span class="fox-critical">Technical Demonstration</span>
+                                </li>
+                                <li class="flex items-center">
+                                    <span class="priority-indicator priority-p2"></span>
+                                    <span class="fox-moderate">Portfolio Enhancement</span>
+                                </li>
+                                <li class="flex items-center">
+                                    <span class="priority-indicator priority-p2"></span>
+                                    <span class="fox-moderate">Next.js Mastery</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="metric-card p-6">
+                            <h4 class="font-semibold mb-4 flex items-center">
+                                <i data-lucide="users" class="w-5 h-5 mr-2 text-green-400"></i>
+                                Target Audience
+                            </h4>
+                            <div class="space-y-4">
+                                <div>
+                                    <div class="font-medium text-green-400">Primary: FOX Corporation</div>
+                                    <div class="text-sm text-slate-400">Hiring managers, technical leads</div>
+                                </div>
+                                <div>
+                                    <div class="font-medium text-blue-400">Secondary: Tech Community</div>
+                                    <div class="text-sm text-slate-400">Portfolio visitors, potential employers</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Requirements Overview -->
+                    <div class="metric-card p-6">
+                        <h3 class="text-lg font-semibold mb-4">Requirements Summary</h3>
+                        <div class="grid grid-cols-4 gap-6">
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-blue-400">13</div>
+                                <div class="text-sm text-slate-400">Core Features</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-green-400">16</div>
+                                <div class="text-sm text-slate-400">Accessibility</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-purple-400">9</div>
+                                <div class="text-sm text-slate-400">Performance</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-orange-400">20</div>
+                                <div class="text-sm text-slate-400">Cross-Platform</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Feature Matrix Section -->
+                <section id="features" class="content-section hidden">
+                    <h2 class="section-title mb-6">Feature Implementation Matrix</h2>
+
+                    <!-- Priority Features Table -->
+                    <div class="metric-card p-6 mb-6">
+                        <h3 class="text-lg font-semibold mb-4">Must Have Features (Day 2 Implementation)</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead class="border-b border-slate-700">
+                                    <tr>
+                                        <th class="text-left py-3 px-2">Feature</th>
+                                        <th class="text-left py-3 px-2">Platform Support</th>
+                                        <th class="text-left py-3 px-2">Complexity</th>
+                                        <th class="text-left py-3 px-2">FOX Relevance</th>
+                                        <th class="text-left py-3 px-2">Order</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="space-y-2">
+                                    <tr class="border-b border-slate-800">
+                                        <td class="py-3 px-2 font-medium">HLS Streaming</td>
+                                        <td class="py-3 px-2">Web, Mobile</td>
+                                        <td class="py-3 px-2 complexity-medium">Medium</td>
+                                        <td class="py-3 px-2 fox-critical">Critical</td>
+                                        <td class="py-3 px-2">1</td>
+                                    </tr>
+                                    <tr class="border-b border-slate-800">
+                                        <td class="py-3 px-2 font-medium">Basic Controls</td>
+                                        <td class="py-3 px-2">All Platforms</td>
+                                        <td class="py-3 px-2 complexity-low">Low</td>
+                                        <td class="py-3 px-2 fox-critical">Critical</td>
+                                        <td class="py-3 px-2">2</td>
+                                    </tr>
+                                    <tr class="border-b border-slate-800">
+                                        <td class="py-3 px-2 font-medium">Smart TV D-pad</td>
+                                        <td class="py-3 px-2">Smart TV</td>
+                                        <td class="py-3 px-2 complexity-medium">Medium</td>
+                                        <td class="py-3 px-2 fox-critical">Critical</td>
+                                        <td class="py-3 px-2">3</td>
+                                    </tr>
+                                    <tr class="border-b border-slate-800">
+                                        <td class="py-3 px-2 font-medium">Quality Selection</td>
+                                        <td class="py-3 px-2">Web, Smart TV</td>
+                                        <td class="py-3 px-2 complexity-medium">Medium</td>
+                                        <td class="py-3 px-2 fox-critical">Critical</td>
+                                        <td class="py-3 px-2">4</td>
+                                    </tr>
+                                    <tr class="border-b border-slate-800">
+                                        <td class="py-3 px-2 font-medium">ARIA/Accessibility</td>
+                                        <td class="py-3 px-2">All Platforms</td>
+                                        <td class="py-3 px-2 complexity-medium">Medium</td>
+                                        <td class="py-3 px-2 fox-critical">Critical</td>
+                                        <td class="py-3 px-2">5</td>
+                                    </tr>
+                                    <tr class="border-b border-slate-800">
+                                        <td class="py-3 px-2 font-medium">Caption Display</td>
+                                        <td class="py-3 px-2">All Platforms</td>
+                                        <td class="py-3 px-2 complexity-medium">Medium</td>
+                                        <td class="py-3 px-2 fox-critical">Critical</td>
+                                        <td class="py-3 px-2">6</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Implementation Complexity Chart -->
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="chart-container">
+                            <h3 class="text-lg font-semibold mb-4">Implementation Complexity</h3>
+                            <canvas id="complexityChart"></canvas>
+                        </div>
+
+                        <div class="metric-card p-6">
+                            <h3 class="text-lg font-semibold mb-4">Platform Feature Distribution</h3>
+                            <div class="space-y-4">
+                                <div class="flex justify-between items-center">
+                                    <span>Web (General)</span>
+                                    <div class="flex items-center space-x-2">
+                                        <div class="w-24 h-2 bg-slate-700 rounded">
+                                            <div class="w-full h-full bg-blue-500 rounded"></div>
+                                        </div>
+                                        <span class="text-sm">38</span>
+                                    </div>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span>OTT/Smart TV</span>
+                                    <div class="flex items-center space-x-2">
+                                        <div class="w-24 h-2 bg-slate-700 rounded">
+                                            <div class="w-4/5 h-full bg-purple-500 rounded"></div>
+                                        </div>
+                                        <span class="text-sm">30</span>
+                                    </div>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span>Mobile Native</span>
+                                    <div class="flex items-center space-x-2">
+                                        <div class="w-24 h-2 bg-slate-700 rounded">
+                                            <div class="w-3/5 h-full bg-green-500 rounded"></div>
+                                        </div>
+                                        <span class="text-sm">23</span>
+                                    </div>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span>Gaming Consoles</span>
+                                    <div class="flex items-center space-x-2">
+                                        <div class="w-24 h-2 bg-slate-700 rounded">
+                                            <div class="w-3/5 h-full bg-orange-500 rounded"></div>
+                                        </div>
+                                        <span class="text-sm">23</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Content Strategy Section -->
+                <section id="content" class="content-section hidden">
+                    <h2 class="section-title mb-6">Video Content Strategy</h2>
+
+                    <!-- Primary Content Sources -->
+                    <div class="grid grid-cols-2 gap-6 mb-6">
+                        <div class="metric-card p-6">
+                            <h3 class="text-lg font-semibold mb-4 flex items-center">
+                                <i data-lucide="play-circle" class="w-5 h-5 mr-2 text-blue-400"></i>
+                                Primary HLS Streams
+                            </h3>
+                            <div class="space-y-4">
+                                <div class="border-l-4 border-blue-400 pl-4">
+                                    <div class="font-medium">Big Buck Bunny (Mux)</div>
+                                    <div class="text-sm text-slate-400">1080x1920, 11s segments</div>
+                                    <div class="text-xs text-green-400">Creative Commons</div>
+                                </div>
+                                <div class="border-l-4 border-purple-400 pl-4">
+                                    <div class="font-medium">Tears of Steel (JW Platform)</div>
+                                    <div class="text-sm text-slate-400">858x1920, 4s segments</div>
+                                    <div class="text-xs text-green-400">Creative Commons</div>
+                                </div>
+                                <div class="border-l-4 border-orange-400 pl-4">
+                                    <div class="font-medium">Skate Phantom Flex 4K</div>
+                                    <div class="text-sm text-slate-400">2160x3840, 4s segments</div>
+                                    <div class="text-xs text-green-400">Vodobox Test Content</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="metric-card p-6">
+                            <h3 class="text-lg font-semibold mb-4 flex items-center">
+                                <i data-lucide="closed-captioning" class="w-5 h-5 mr-2 text-green-400"></i>
+                                Caption Support
+                            </h3>
+                            <div class="space-y-4">
+                                <div class="border-l-4 border-green-400 pl-4">
+                                    <div class="font-medium">Sintel with WebVTT</div>
+                                    <div class="text-sm text-slate-400">14:48 duration</div>
+                                    <div class="text-xs text-blue-400">Multiple subtitle tracks</div>
+                                </div>
+                                <div class="border-l-4 border-yellow-400 pl-4">
+                                    <div class="font-medium">Apple HLS CEA-608</div>
+                                    <div class="text-sm text-slate-400">10:34 duration</div>
+                                    <div class="text-xs text-blue-400">Industry standard captions</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Content Validation -->
+                    <div class="metric-card p-6">
+                        <h3 class="text-lg font-semibold mb-4">Content Validation & Compliance</h3>
+                        <div class="grid grid-cols-3 gap-6">
+                            <div>
+                                <h4 class="font-medium mb-3 text-blue-400">Technical Validation</h4>
+                                <ul class="space-y-2 text-sm">
+                                    <li class="flex items-center">
+                                        <i data-lucide="check" class="w-4 h-4 mr-2 text-green-400"></i>
+                                        Cross-browser testing
+                                    </li>
+                                    <li class="flex items-center">
+                                        <i data-lucide="check" class="w-4 h-4 mr-2 text-green-400"></i>
+                                        Mobile compatibility
+                                    </li>
+                                    <li class="flex items-center">
+                                        <i data-lucide="check" class="w-4 h-4 mr-2 text-green-400"></i>
+                                        Smart TV simulation
+                                    </li>
+                                    <li class="flex items-center">
+                                        <i data-lucide="check" class="w-4 h-4 mr-2 text-green-400"></i>
+                                        Adaptive streaming
+                                    </li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-medium mb-3 text-green-400">Legal Compliance</h4>
+                                <ul class="space-y-2 text-sm">
+                                    <li class="flex items-center">
+                                        <i data-lucide="check" class="w-4 h-4 mr-2 text-green-400"></i>
+                                        Creative Commons verified
+                                    </li>
+                                    <li class="flex items-center">
+                                        <i data-lucide="check" class="w-4 h-4 mr-2 text-green-400"></i>
+                                        No copyright restrictions
+                                    </li>
+                                    <li class="flex items-center">
+                                        <i data-lucide="check" class="w-4 h-4 mr-2 text-green-400"></i>
+                                        Commercial presentation safe
+                                    </li>
+                                    <li class="flex items-center">
+                                        <i data-lucide="check" class="w-4 h-4 mr-2 text-green-400"></i>
+                                        Proper attribution
+                                    </li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-medium mb-3 text-purple-400">Professional Standards</h4>
+                                <ul class="space-y-2 text-sm">
+                                    <li class="flex items-center">
+                                        <i data-lucide="check" class="w-4 h-4 mr-2 text-green-400"></i>
+                                        Business appropriate
+                                    </li>
+                                    <li class="flex items-center">
+                                        <i data-lucide="check" class="w-4 h-4 mr-2 text-green-400"></i>
+                                        Technical capability showcase
+                                    </li>
+                                    <li class="flex items-center">
+                                        <i data-lucide="check" class="w-4 h-4 mr-2 text-green-400"></i>
+                                        Demo-appropriate duration
+                                    </li>
+                                    <li class="flex items-center">
+                                        <i data-lucide="check" class="w-4 h-4 mr-2 text-green-400"></i>
+                                        High quality encoding
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Timeline Section -->
+                <section id="timeline" class="content-section hidden">
+                    <h2 class="section-title mb-6">Implementation Timeline</h2>
+
+                    <div class="grid grid-cols-3 gap-6 mb-8">
+                        <!-- Day 2: Foundation -->
+                        <div class="metric-card p-6">
+                            <h3 class="text-lg font-semibold mb-4 text-blue-400">Day 2: Foundation (2 Hours)</h3>
+                            <div class="space-y-3">
+                                <div class="timeline-item completed">
+                                    <div class="font-medium">HLS Streaming Setup</div>
+                                    <div class="text-sm text-slate-400">HLS.js integration</div>
+                                </div>
+                                <div class="timeline-item completed">
+                                    <div class="font-medium">Basic Controls</div>
+                                    <div class="text-sm text-slate-400">Play, pause, seek, volume</div>
+                                </div>
+                                <div class="timeline-item in-progress">
+                                    <div class="font-medium">Smart TV Navigation</div>
+                                    <div class="text-sm text-slate-400">D-pad support</div>
+                                </div>
+                                <div class="timeline-item">
+                                    <div class="font-medium">Quality Selection</div>
+                                    <div class="text-sm text-slate-400">Manual/auto switching</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Day 3-4: Enhancement -->
+                        <div class="metric-card p-6">
+                            <h3 class="text-lg font-semibold mb-4 text-green-400">Day 3-4: Enhancement</h3>
+                            <div class="space-y-3">
+                                <div class="timeline-item">
+                                    <div class="font-medium">Accessibility Features</div>
+                                    <div class="text-sm text-slate-400">WCAG 2.1 AA compliance</div>
+                                </div>
+                                <div class="timeline-item">
+                                    <div class="font-medium">Caption Customization</div>
+                                    <div class="text-sm text-slate-400">Real-time styling</div>
+                                </div>
+                                <div class="timeline-item">
+                                    <div class="font-medium">Performance Monitoring</div>
+                                    <div class="text-sm text-slate-400">Metrics dashboard</div>
+                                </div>
+                                <div class="timeline-item">
+                                    <div class="font-medium">Error Handling</div>
+                                    <div class="text-sm text-slate-400">Graceful fallbacks</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Day 5-7: Polish -->
+                        <div class="metric-card p-6">
+                            <h3 class="text-lg font-semibold mb-4 text-purple-400">Day 5-7: Polish</h3>
+                            <div class="space-y-3">
+                                <div class="timeline-item">
+                                    <div class="font-medium">Advanced Features</div>
+                                    <div class="text-sm text-slate-400">PiP, seek thumbnails</div>
+                                </div>
+                                <div class="timeline-item">
+                                    <div class="font-medium">Cross-Platform Testing</div>
+                                    <div class="text-sm text-slate-400">All device validation</div>
+                                </div>
+                                <div class="timeline-item">
+                                    <div class="font-medium">Documentation</div>
+                                    <div class="text-sm text-slate-400">Demo preparation</div>
+                                </div>
+                                <div class="timeline-item">
+                                    <div class="font-medium">Portfolio Integration</div>
+                                    <div class="text-sm text-slate-400">jdilig.me showcase</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Progress Chart -->
+                    <div class="chart-container">
+                        <h3 class="text-lg font-semibold mb-4">Implementation Progress</h3>
+                        <canvas id="progressChart"></canvas>
+                    </div>
+                </section>
+
+                <!-- Market Analysis Section -->
+                <section id="analysis" class="content-section hidden">
+                    <h2 class="section-title mb-6">FOX Corporation Market Analysis</h2>
+
+                    <!-- Job Requirements Alignment -->
+                    <div class="metric-card p-6 mb-6">
+                        <h3 class="text-lg font-semibold mb-4">Job Requirements Alignment</h3>
+                        <div class="grid grid-cols-2 gap-6">
+                            <div>
+                                <h4 class="font-medium mb-3 text-green-400">Direct Matches</h4>
+                                <ul class="space-y-2">
+                                    <li class="flex items-center justify-between">
+                                        <span>JavaScript/React Expertise</span>
+                                        <span class="text-green-400 font-bold">100%</span>
+                                    </li>
+                                    <li class="flex items-center justify-between">
+                                        <span>Smart TV Platform Experience</span>
+                                        <span class="text-green-400 font-bold">95%</span>
+                                    </li>
+                                    <li class="flex items-center justify-between">
+                                        <span>Performance Optimization</span>
+                                        <span class="text-green-400 font-bold">90%</span>
+                                    </li>
+                                    <li class="flex items-center justify-between">
+                                        <span>Media Playback (HLS/DASH)</span>
+                                        <span class="text-green-400 font-bold">85%</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-medium mb-3 text-blue-400">Competitive Advantages</h4>
+                                <ul class="space-y-2">
+                                    <li class="flex items-center justify-between">
+                                        <span>FOX Insider Knowledge</span>
+                                        <span class="text-blue-400 font-bold">Unique</span>
+                                    </li>
+                                    <li class="flex items-center justify-between">
+                                        <span>Enterprise Development</span>
+                                        <span class="text-blue-400 font-bold">18+ Years</span>
+                                    </li>
+                                    <li class="flex items-center justify-between">
+                                        <span>Accessibility Expertise</span>
+                                        <span class="text-blue-400 font-bold">WCAG 2.1</span>
+                                    </li>
+                                    <li class="flex items-center justify-between">
+                                        <span>Shared Codebase Experience</span>
+                                        <span class="text-blue-400 font-bold">Proven</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Technology Stack Alignment -->
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="metric-card p-6">
+                            <h3 class="text-lg font-semibold mb-4">FOX Technology Stack Context</h3>
+                            <div class="space-y-4">
+                                <div class="border-l-4 border-blue-400 pl-4">
+                                    <div class="font-medium">Current: JW Player</div>
+                                    <div class="text-sm text-slate-400">HLS streaming protocol</div>
+                                </div>
+                                <div class="border-l-4 border-green-400 pl-4">
+                                    <div class="font-medium">Our Demo: HLS.js</div>
+                                    <div class="text-sm text-slate-400">Modern React/Next.js</div>
+                                </div>
+                                <div class="border-l-4 border-purple-400 pl-4">
+                                    <div class="font-medium">Strategic Value</div>
+                                    <div class="text-sm text-slate-400">Evolution from JW Player</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="metric-card p-6">
+                            <h3 class="text-lg font-semibold mb-4">Interview Talking Points</h3>
+                            <ul class="space-y-2">
+                                <li class="flex items-center">
+                                    <i data-lucide="check-circle" class="w-4 h-4 mr-2 text-green-400"></i>
+                                    Understanding of FOX's video architecture
+                                </li>
+                                <li class="flex items-center">
+                                    <i data-lucide="check-circle" class="w-4 h-4 mr-2 text-green-400"></i>
+                                    Performance optimization for TV apps
+                                </li>
+                                <li class="flex items-center">
+                                    <i data-lucide="check-circle" class="w-4 h-4 mr-2 text-green-400"></i>
+                                    Shared codebase improvements
+                                </li>
+                                <li class="flex items-center">
+                                    <i data-lucide="check-circle" class="w-4 h-4 mr-2 text-green-400"></i>
+                                    Modern streaming best practices
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Performance Metrics Section -->
+                <section id="performance" class="content-section hidden">
+                    <h2 class="section-title mb-6">Performance Optimization Strategy</h2>
+
+                    <!-- Performance Targets -->
+                    <div class="grid grid-cols-4 gap-6 mb-8">
+                        <div class="metric-card p-6 text-center">
+                            <div class="text-3xl font-bold text-green-400 mb-2">&lt;1s</div>
+                            <div class="text-sm text-slate-400">Video Start Time</div>
+                        </div>
+                        <div class="metric-card p-6 text-center">
+                            <div class="text-3xl font-bold text-blue-400 mb-2">&lt;3s</div>
+                            <div class="text-sm text-slate-400">Page Load (Smart TV)</div>
+                        </div>
+                        <div class="metric-card p-6 text-center">
+                            <div class="text-3xl font-bold text-purple-400 mb-2">95+</div>
+                            <div class="text-sm text-slate-400">Lighthouse Score</div>
+                        </div>
+                        <div class="metric-card p-6 text-center">
+                            <div class="text-3xl font-bold text-orange-400 mb-2">60fps</div>
+                            <div class="text-sm text-slate-400">Interface Animations</div>
+                        </div>
+                    </div>
+
+                    <!-- Performance Strategy -->
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="metric-card p-6">
+                            <h3 class="text-lg font-semibold mb-4">Smart TV Optimization</h3>
+                            <ul class="space-y-3">
+                                <li class="flex items-center justify-between">
+                                    <span>Memory Usage</span>
+                                    <span class="text-green-400">&lt;200MB</span>
+                                </li>
+                                <li class="flex items-center justify-between">
+                                    <span>Remote Response Time</span>
+                                    <span class="text-green-400">&lt;200ms</span>
+                                </li>
+                                <li class="flex items-center justify-between">
+                                    <span>Video Buffer Health</span>
+                                    <span class="text-green-400">&gt;30s</span>
+                                </li>
+                                <li class="flex items-center justify-between">
+                                    <span>Quality Switch Time</span>
+                                    <span class="text-green-400">&lt;2s</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="metric-card p-6">
+                            <h3 class="text-lg font-semibold mb-4">Business Value Metrics</h3>
+                            <ul class="space-y-3">
+                                <li class="flex items-center justify-between">
+                                    <span>User Engagement</span>
+                                    <span class="text-blue-400">+25%</span>
+                                </li>
+                                <li class="flex items-center justify-between">
+                                    <span>Bandwidth Efficiency</span>
+                                    <span class="text-blue-400">+30%</span>
+                                </li>
+                                <li class="flex items-center justify-between">
+                                    <span>Error Rate Reduction</span>
+                                    <span class="text-blue-400">-50%</span>
+                                </li>
+                                <li class="flex items-center justify-between">
+                                    <span>Development Velocity</span>
+                                    <span class="text-blue-400">+40%</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Navigation functionality
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.add('hidden');
+            });
+
+            // Show selected section
+            document.getElementById(sectionId).classList.remove('hidden');
+
+            // Update navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.closest('.nav-item').classList.add('active');
+        }
+
+        // Chart configurations
+        const chartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: '#e2e8f0'
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    ticks: {
+                        color: '#94a3b8'
+                    },
+                    grid: {
+                        color: '#374151'
+                    }
+                },
+                x: {
+                    ticks: {
+                        color: '#94a3b8'
+                    },
+                    grid: {
+                        color: '#374151'
+                    }
+                }
+            }
+        };
+
+        // Priority Distribution Chart
+        new Chart(document.getElementById('priorityChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Priority 1', 'Priority 2', 'Priority 3'],
+                datasets: [{
+                    data: [23, 16, 8],
+                    backgroundColor: ['#ef4444', '#f59e0b', '#10b981'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                ...chartOptions,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#e2e8f0',
+                            padding: 20
+                        }
+                    }
+                }
+            }
+        });
+
+        // FOX Relevance Chart
+        new Chart(document.getElementById('foxRelevanceChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Critical', 'Moderate', 'Low'],
+                datasets: [{
+                    label: 'Features',
+                    data: [23, 16, 8],
+                    backgroundColor: ['#ef4444', '#f59e0b', '#6b7280'],
+                    borderWidth: 0
+                }]
+            },
+            options: chartOptions
+        });
+
+        // Complexity Chart
+        new Chart(document.getElementById('complexityChart'), {
+            type: 'pie',
+            data: {
+                labels: ['Low Complexity', 'Medium Complexity', 'High Complexity'],
+                datasets: [{
+                    data: [18, 22, 7],
+                    backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                ...chartOptions,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#e2e8f0',
+                            padding: 20
+                        }
+                    }
+                }
+            }
+        });
+
+        // Progress Chart
+        new Chart(document.getElementById('progressChart'), {
+            type: 'line',
+            data: {
+                labels: ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'],
+                datasets: [{
+                    label: 'Features Completed',
+                    data: [0, 6, 12, 20, 28, 35, 40],
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }, {
+                    label: 'Planned Progress',
+                    data: [0, 8, 16, 24, 32, 38, 42],
+                    borderColor: '#6b7280',
+                    backgroundColor: 'transparent',
+                    borderDash: [5, 5],
+                    fill: false,
+                    tension: 0.4
+                }]
+            },
+            options: chartOptions
+        });
+
+        // Add smooth scrolling and animations
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate cards on scroll
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('fade-in');
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.metric-card').forEach(card => {
+                observer.observe(card);
+            });
+        });
+    </script>
+</body>
+</html>

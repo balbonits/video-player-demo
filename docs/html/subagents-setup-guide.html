@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subagents Setup Guide - Claude Code</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <style>
+        :root {
+            --background: #0a0a0a;
+            --foreground: #fafafa;
+            --card: #111111;
+            --card-foreground: #fafafa;
+            --primary: #6366f1;
+            --primary-foreground: #fafafa;
+            --secondary: #1f1f1f;
+            --secondary-foreground: #a1a1aa;
+            --muted: #1f1f1f;
+            --muted-foreground: #71717a;
+            --accent: #18181b;
+            --accent-foreground: #fafafa;
+            --border: #27272a;
+            --input: #27272a;
+            --ring: #6366f1;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --error: #ef4444;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+            background: var(--background) !important;
+            color: var(--foreground) !important;
+            line-height: 1.6 !important;
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace !important;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .card {
+            background: var(--card) !important;
+            border: 1px solid var(--border) !important;
+            border-radius: 12px !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .card:hover {
+            border-color: var(--primary) !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 20px 25px -5px rgba(99, 102, 241, 0.1) !important;
+        }
+
+        .code-block {
+            background: #1a1a1a !important;
+            border: 1px solid var(--border) !important;
+            border-radius: 8px !important;
+            padding: 16px !important;
+            font-family: 'JetBrains Mono', monospace !important;
+            font-size: 14px !important;
+            overflow-x: auto !important;
+            position: relative;
+        }
+
+        .code-block::before {
+            content: attr(data-language);
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            font-size: 12px;
+            color: var(--muted-foreground);
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        .step-container {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05));
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .step-number {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+            flex-shrink: 0;
+            border: 4px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .architecture-diagram {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            line-height: 1.4;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .diagram-node {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            margin: 8px 0;
+            transition: all 0.3s ease;
+        }
+
+        .diagram-node:hover {
+            background: rgba(99, 102, 241, 0.2);
+            border-color: var(--primary);
+            transform: scale(1.02);
+        }
+
+        .best-practice {
+            background: rgba(34, 197, 94, 0.05);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 12px 0;
+        }
+
+        .warning-box {
+            background: rgba(245, 158, 11, 0.05);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 12px 0;
+        }
+
+        .info-box {
+            background: rgba(99, 102, 241, 0.05);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 12px 0;
+        }
+
+        .pattern-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .pattern-card:hover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .copy-button {
+            position: absolute;
+            top: 8px;
+            right: 40px;
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            color: var(--primary);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .copy-button:hover {
+            background: rgba(99, 102, 241, 0.2);
+            border-color: var(--primary);
+        }
+
+        .nav-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+            color: var(--muted-foreground);
+            font-size: 14px;
+        }
+
+        .nav-breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .nav-breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .workflow-diagram {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            position: relative;
+        }
+
+        .workflow-step {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 12px 0;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .workflow-step:hover {
+            background: rgba(99, 102, 241, 0.2);
+            transform: translateX(4px);
+        }
+
+        .troubleshooting-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .troubleshooting-table th {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .troubleshooting-table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        .troubleshooting-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .troubleshooting-table tr:hover {
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        @media (max-width: 768px) {
+            .step-container {
+                padding: 16px;
+            }
+
+            .step-number {
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+            }
+
+            .code-block {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Header -->
+    <header class="border-b border-gray-800 bg-black/50 backdrop-blur-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <a href="index.html" class="flex items-center space-x-4">
+                        <div class="w-10 h-10 rounded-lg bg-indigo-600/10 border border-indigo-600/20 flex items-center justify-center">
+                            <i data-lucide="settings" class="w-5 h-5 text-indigo-400"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-lg font-bold gradient-text">Setup Guide</h1>
+                            <p class="text-sm text-gray-400">Claude Code Subagents Configuration</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="text-sm bg-green-600/10 text-green-400 px-3 py-1 rounded-full border border-green-600/20">
+                        Step-by-Step Guide
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto px-6 py-8">
+        <!-- Breadcrumb -->
+        <div class="nav-breadcrumb">
+            <a href="index.html">Documentation</a>
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            <a href="sub-agents-readme.html">Sub-Agents Guide</a>
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            <span>Setup Guide</span>
+        </div>
+
+        <!-- Header Section -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold gradient-text mb-4">Claude Code Subagents Setup Guide</h1>
+            <p class="text-xl text-gray-300 mb-6">
+                Complete step-by-step configuration for specialized AI personas and autonomous task execution
+            </p>
+        </div>
+
+        <!-- Quick Start -->
+        <section class="mb-12">
+            <div class="info-box">
+                <h2 class="text-xl font-bold mb-4 flex items-center">
+                    <i data-lucide="zap" class="w-5 h-5 text-blue-400 mr-2"></i>
+                    Quick Start Overview
+                </h2>
+                <p class="text-gray-300 mb-4">
+                    Subagents extend Claude Code with specialized personas for autonomous task execution.
+                </p>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <h3 class="font-semibold text-blue-400">Key Points:</h3>
+                        <ul class="text-sm text-gray-300 space-y-1">
+                            <li>• Located in <span class="mono bg-gray-800 px-2 py-1 rounded">.claude/agents/</span> directory</li>
+                            <li>• Use YAML frontmatter configuration</li>
+                            <li>• Named as "subagent" (one word, not "sub-agent")</li>
+                            <li>• Inherit Claude's base model with <span class="mono bg-gray-800 px-2 py-1 rounded">model: inherit</span></li>
+                        </ul>
+                    </div>
+                    <div class="space-y-2">
+                        <h3 class="font-semibold text-green-400">Benefits:</h3>
+                        <ul class="text-sm text-gray-300 space-y-1">
+                            <li>• Specialized expertise per domain</li>
+                            <li>• Autonomous task execution</li>
+                            <li>• Parallel processing capabilities</li>
+                            <li>• Consistent persona behavior</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Architecture Overview -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold mb-6">System Architecture</h2>
+            <div class="architecture-diagram">
+                <div class="text-center mb-4 text-gray-400">Claude Code Subagent Architecture</div>
+                <div class="diagram-node">
+                    <div class="text-center text-white font-semibold mb-2">┌─────────────────────────────────────────┐</div>
+                    <div class="text-center text-white font-semibold mb-2">│           Claude Code (You)              │</div>
+                    <div class="text-center text-white font-semibold mb-2">│         Primary Interface Layer          │</div>
+                    <div class="text-center text-white font-semibold">└────────────────┬────────────────────────┘</div>
+                </div>
+                <div class="text-center text-gray-400 my-2">│ Invokes via Task tool</div>
+                <div class="diagram-node">
+                    <div class="text-center text-white font-semibold mb-2">┌────────────────▼────────────────────────┐</div>
+                    <div class="text-center text-white font-semibold mb-2">│            Subagent Layer               │</div>
+                    <div class="text-center text-white font-semibold mb-2">│   ┌──────────────────────────────────┐  │</div>
+                    <div class="text-center text-white font-semibold mb-2">│   │    .claude/agents/*.md files     │  │</div>
+                    <div class="text-center text-white font-semibold mb-2">│   │  ┌────────┐  ┌────────────────┐ │  │</div>
+                    <div class="text-center text-white font-semibold mb-2">│   │  │  YAML  │  │   Instructions  │ │  │</div>
+                    <div class="text-center text-white font-semibold mb-2">│   │  │ Front- │  │   & Persona     │ │  │</div>
+                    <div class="text-center text-white font-semibold mb-2">│   │  │ matter │  │   Definition    │ │  │</div>
+                    <div class="text-center text-white font-semibold mb-2">│   │  └────────┘  └────────────────────┘ │</div>
+                    <div class="text-center text-white font-semibold mb-2">│   └──────────────────────────────────┘  │</div>
+                    <div class="text-center text-white font-semibold">└──────────────────────────────────────────┘</div>
+                </div>
+                <div class="text-center text-gray-400 my-2">│</div>
+                <div class="diagram-node">
+                    <div class="text-center text-white font-semibold mb-2">┌────────────────▼────────────────────────┐</div>
+                    <div class="text-center text-white font-semibold mb-2">│           Tool Access Layer             │</div>
+                    <div class="text-center text-white font-semibold mb-2">│  Write, Edit, Read, Bash, Grep, etc.    │</div>
+                    <div class="text-center text-white font-semibold">└──────────────────────────────────────────┘</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Step-by-Step Setup -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold mb-6">Step-by-Step Setup</h2>
+
+            <!-- Step 1 -->
+            <div class="step-container">
+                <div class="flex items-start space-x-6">
+                    <div class="step-number">1</div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-semibold mb-4">Create Directory Structure</h3>
+                        <p class="text-gray-300 mb-4">
+                            First, create the required directory structure for your subagents.
+                        </p>
+                        <div class="code-block" data-language="bash">
+# Create agents directory in your project
+mkdir -p .claude/agents
+
+# Verify the directory was created
+ls -la .claude/agents/</div>
+                        <div class="best-practice">
+                            <h4 class="font-semibold text-green-400 mb-2 flex items-center">
+                                <i data-lucide="check-circle" class="w-4 h-4 mr-2"></i>
+                                Best Practice
+                            </h4>
+                            <p class="text-sm text-gray-300">
+                                Place agents in the project's <span class="mono">.claude/agents/</span> directory for project-specific subagents.
+                                Use <span class="mono">~/.claude/agents/</span> for global agents available across all projects.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="step-container">
+                <div class="flex items-start space-x-6">
+                    <div class="step-number">2</div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-semibold mb-4">Understand File Structure</h3>
+                        <p class="text-gray-300 mb-4">
+                            Each subagent is defined in a Markdown file with YAML frontmatter configuration.
+                        </p>
+                        <div class="code-block" data-language="yaml">
+---
+name: subagent-name          # Identifier for Task tool
+description: Brief purpose   # What this subagent does
+tools: Write, Edit, Read     # Available tools (comma-separated)
+model: inherit               # Always use 'inherit'
+---
+
+# Subagent Name
+
+Role definition and detailed instructions...</div>
+                        <div class="info-box">
+                            <h4 class="font-semibold text-blue-400 mb-2 flex items-center">
+                                <i data-lucide="info" class="w-4 h-4 mr-2"></i>
+                                Configuration Fields
+                            </h4>
+                            <div class="grid md:grid-cols-2 gap-4 text-sm">
+                                <div>
+                                    <strong>name:</strong> Unique identifier (kebab-case)<br>
+                                    <strong>description:</strong> What the subagent specializes in
+                                </div>
+                                <div>
+                                    <strong>tools:</strong> Comma-separated list of available tools<br>
+                                    <strong>model:</strong> Always use "inherit" to use Claude's model
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="step-container">
+                <div class="flex items-start space-x-6">
+                    <div class="step-number">3</div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-semibold mb-4">Create Your First Subagent</h3>
+                        <p class="text-gray-300 mb-4">
+                            Let's create an example engineer subagent with complete configuration.
+                        </p>
+                        <div class="code-block" data-language="markdown">
+---
+name: alex-engineer
+description: Senior Software Engineer specializing in React, TypeScript, and performance optimization
+tools: Write, Edit, Read, MultiEdit, Bash, Glob, Grep, TodoWrite
+model: inherit
+---
+
+# Alex - Senior Software Engineer
+
+You are Alex, a Senior Software Engineer with expertise in JavaScript performance optimization...
+
+## Core Responsibilities
+- Implement technical solutions
+- Optimize performance
+- Maintain code quality
+
+## Technical Stack
+- React 18, Next.js 14
+- TypeScript (strict mode)
+- Performance optimization</div>
+                        <div class="best-practice">
+                            <h4 class="font-semibold text-green-400 mb-2 flex items-center">
+                                <i data-lucide="lightbulb" class="w-4 h-4 mr-2"></i>
+                                Pro Tip
+                            </h4>
+                            <p class="text-sm text-gray-300">
+                                Include specific technical context, preferred tools, and decision-making criteria
+                                to make your subagent more effective and consistent.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="step-container">
+                <div class="flex items-start space-x-6">
+                    <div class="step-number">4</div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-semibold mb-4">Test Your Subagent</h3>
+                        <p class="text-gray-300 mb-4">
+                            Invoke your subagent using the Task tool to verify it's working correctly.
+                        </p>
+                        <div class="code-block" data-language="typescript">
+// Invoke subagent using Task tool
+Task({
+  subagent_type: "alex-engineer",
+  description: "Implement video player",
+  prompt: "Create an HLS video player component with Smart TV optimizations"
+})</div>
+                        <div class="warning-box">
+                            <h4 class="font-semibold text-yellow-400 mb-2 flex items-center">
+                                <i data-lucide="alert-triangle" class="w-4 h-4 mr-2"></i>
+                                Troubleshooting
+                            </h4>
+                            <p class="text-sm text-gray-300">
+                                If your subagent isn't recognized, verify the file exists in <span class="mono">.claude/agents/</span>
+                                with a <span class="mono">.md</span> extension and correct YAML frontmatter format.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Common Patterns -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold mb-6">Common Subagent Patterns</h2>
+            <div class="grid md:grid-cols-3 gap-6">
+                <!-- Specialized Engineer -->
+                <div class="pattern-card">
+                    <h3 class="font-semibold text-blue-400 mb-3 flex items-center">
+                        <i data-lucide="code" class="w-5 h-5 mr-2"></i>
+                        Specialized Engineer
+                    </h3>
+                    <div class="code-block text-xs" data-language="yaml">
+name: dakota-video
+description: Video streaming engineer specializing in codecs and protocols
+tools: Write, Edit, Read, Bash, Grep
+model: inherit</div>
+                    <p class="text-sm text-gray-400 mt-3">
+                        Domain-specific technical expertise with focused tool access.
+                    </p>
+                </div>
+
+                <!-- QA/Testing Expert -->
+                <div class="pattern-card">
+                    <h3 class="font-semibold text-green-400 mb-3 flex items-center">
+                        <i data-lucide="check-square" class="w-5 h-5 mr-2"></i>
+                        QA/Testing Expert
+                    </h3>
+                    <div class="code-block text-xs" data-language="yaml">
+name: sam-qa
+description: QA Engineer focused on testing and accessibility
+tools: Write, Edit, Read, Bash, TodoWrite
+model: inherit</div>
+                    <p class="text-sm text-gray-400 mt-3">
+                        Quality assurance with testing tools and validation focus.
+                    </p>
+                </div>
+
+                <!-- Product Manager -->
+                <div class="pattern-card">
+                    <h3 class="font-semibold text-purple-400 mb-3 flex items-center">
+                        <i data-lucide="target" class="w-5 h-5 mr-2"></i>
+                        Product Manager
+                    </h3>
+                    <div class="code-block text-xs" data-language="yaml">
+name: jordan-product
+description: Product Manager for requirements and market research
+tools: Write, Edit, Read, WebSearch, WebFetch
+model: inherit</div>
+                    <p class="text-sm text-gray-400 mt-3">
+                        Strategic thinking with research capabilities and business focus.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Best Practices -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold mb-6">Best Practices</h2>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center">
+                        <i data-lucide="award" class="w-5 h-5 text-yellow-400 mr-2"></i>
+                        Configuration Best Practices
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="best-practice">
+                            <h4 class="font-semibold text-green-400 text-sm mb-1">Naming Convention</h4>
+                            <p class="text-xs text-gray-300">Use lowercase with hyphens (<span class="mono">alex-engineer</span>, not <span class="mono">Alex_Engineer</span>)</p>
+                        </div>
+                        <div class="best-practice">
+                            <h4 class="font-semibold text-green-400 text-sm mb-1">Tool Selection</h4>
+                            <p class="text-xs text-gray-300">Only include tools the subagent actually needs for their role</p>
+                        </div>
+                        <div class="best-practice">
+                            <h4 class="font-semibold text-green-400 text-sm mb-1">Clear Personas</h4>
+                            <p class="text-xs text-gray-300">Define specific expertise and responsibilities in detail</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center">
+                        <i data-lucide="target" class="w-5 h-5 text-blue-400 mr-2"></i>
+                        Design Principles
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="info-box">
+                            <h4 class="font-semibold text-blue-400 text-sm mb-1">Focused Scope</h4>
+                            <p class="text-xs text-gray-300">Each subagent should have a clear, bounded role and responsibility</p>
+                        </div>
+                        <div class="info-box">
+                            <h4 class="font-semibold text-blue-400 text-sm mb-1">Documentation</h4>
+                            <p class="text-xs text-gray-300">Include examples and technical context in instructions</p>
+                        </div>
+                        <div class="info-box">
+                            <h4 class="font-semibold text-blue-400 text-sm mb-1">Consistency</h4>
+                            <p class="text-xs text-gray-300">Maintain consistent behavior patterns across sessions</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Git Worktrees for Parallel Development -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold mb-6">Git Worktrees for Parallel Development</h2>
+            <p class="text-gray-300 mb-6">
+                Use git worktrees to run multiple Claude Code sessions simultaneously with different subagents.
+            </p>
+
+            <div class="workflow-diagram mb-6">
+                <h3 class="text-lg font-semibold mb-4 text-center">Parallel Development Architecture</h3>
+                <div class="architecture-diagram">
+                    <div class="text-center mb-4 text-gray-400">Git Worktrees for Parallel Subagent Sessions</div>
+                    <div class="diagram-node">
+                        <div class="text-center text-white font-semibold mb-2">┌─────────────────────────────────────────┐</div>
+                        <div class="text-center text-white font-semibold mb-2">│          Main Repository                 │</div>
+                        <div class="text-center text-white font-semibold mb-2">│         (main branch)                    │</div>
+                        <div class="text-center text-white font-semibold">└────────────┬────────────────────────────┘</div>
+                    </div>
+                    <div class="text-center text-gray-400 my-2">│</div>
+                    <div class="text-center text-gray-400 my-2">┌────────┼────────┬─────────┐</div>
+                    <div class="grid grid-cols-4 gap-2 mt-4">
+                        <div class="diagram-node text-center">
+                            <div class="text-white font-semibold">feature1</div>
+                            <div class="text-white font-semibold">worktree</div>
+                            <div class="text-xs text-gray-400 mt-2">[Session1]</div>
+                        </div>
+                        <div class="diagram-node text-center">
+                            <div class="text-white font-semibold">test</div>
+                            <div class="text-white font-semibold">tree</div>
+                            <div class="text-xs text-gray-400 mt-2">[Session2]</div>
+                        </div>
+                        <div class="diagram-node text-center">
+                            <div class="text-white font-semibold">docs</div>
+                            <div class="text-white font-semibold">tree</div>
+                            <div class="text-xs text-gray-400 mt-2">[Session3]</div>
+                        </div>
+                        <div class="diagram-node text-center">
+                            <div class="text-white font-semibold">ui</div>
+                            <div class="text-white font-semibold">tree</div>
+                            <div class="text-xs text-gray-400 mt-2">[Session4]</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center">
+                        <i data-lucide="git-branch" class="w-5 h-5 text-green-400 mr-2"></i>
+                        Setup Commands
+                    </h3>
+                    <div class="code-block" data-language="bash">
+# Create worktree for a feature branch
+git worktree add ../project-testing testing
+git worktree add ../project-storybook storybook
+
+# List all worktrees
+git worktree list
+
+# Each worktree can have its own Claude Code session
+cd ../project-testing
+claude code  # Session 1: Testing work
+
+cd ../project-storybook
+claude code  # Session 2: UI work</div>
+                </div>
+
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center">
+                        <i data-lucide="zap" class="w-5 h-5 text-blue-400 mr-2"></i>
+                        Benefits
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="workflow-step">
+                            <h4 class="font-semibold text-green-400 text-sm">Parallel Execution</h4>
+                            <p class="text-xs text-gray-300">Multiple subagents working simultaneously</p>
+                        </div>
+                        <div class="workflow-step">
+                            <h4 class="font-semibold text-blue-400 text-sm">Branch Isolation</h4>
+                            <p class="text-xs text-gray-300">Each worktree on separate branch</p>
+                        </div>
+                        <div class="workflow-step">
+                            <h4 class="font-semibold text-purple-400 text-sm">No Context Switching</h4>
+                            <p class="text-xs text-gray-300">Dedicated sessions per task</p>
+                        </div>
+                        <div class="workflow-step">
+                            <h4 class="font-semibold text-yellow-400 text-sm">Clean Commits</h4>
+                            <p class="text-xs text-gray-300">Focused changes per branch</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Troubleshooting -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold mb-6">Troubleshooting</h2>
+            <div class="card p-6">
+                <table class="troubleshooting-table">
+                    <thead>
+                        <tr>
+                            <th>Issue</th>
+                            <th>Solution</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Subagent not found</td>
+                            <td>Check file exists in <span class="mono">.claude/agents/</span> with <span class="mono">.md</span> extension</td>
+                        </tr>
+                        <tr>
+                            <td>Tools not working</td>
+                            <td>Verify tools are listed in YAML frontmatter</td>
+                        </tr>
+                        <tr>
+                            <td>Model errors</td>
+                            <td>Ensure <span class="mono">model: inherit</span> is set</td>
+                        </tr>
+                        <tr>
+                            <td>Name conflicts</td>
+                            <td>Use unique, descriptive names</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Quick Setup Script -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold mb-6">Quick Setup Script</h2>
+            <div class="card p-6">
+                <p class="text-gray-300 mb-4">
+                    Use this script to quickly set up a new subagent and parallel development environment:
+                </p>
+                <div class="code-block" data-language="bash">
+# Create agents directory
+mkdir -p .claude/agents
+
+# Create a new subagent
+cat > .claude/agents/my-subagent.md << 'EOF'
+---
+name: my-subagent
+description: Description here
+tools: Write, Edit, Read
+model: inherit
+---
+
+# My Subagent
+
+Instructions here...
+EOF
+
+# Set up worktrees for parallel work
+git worktree add ../project-feature feature-branch
+git worktree add ../project-testing testing-branch</div>
+                <button class="copy-button" onclick="copyToClipboard(this.previousElementSibling)">Copy</button>
+            </div>
+        </section>
+
+        <!-- Call to Action -->
+        <section class="text-center bg-gradient-to-r from-indigo-600/10 to-purple-600/10 border border-indigo-600/20 rounded-16 p-8">
+            <h2 class="text-2xl font-bold gradient-text mb-4">Ready to Create Your Subagents?</h2>
+            <p class="text-gray-300 mb-6 max-w-2xl mx-auto">
+                For complex multi-persona projects, explore our complete team architecture and specialized
+                coordination patterns.
+            </p>
+            <div class="flex flex-wrap justify-center gap-4">
+                <a href="sub-agent-personas.html"
+                   class="px-6 py-3 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors flex items-center space-x-2">
+                    <i data-lucide="users" class="w-4 h-4"></i>
+                    <span>View Team Personas</span>
+                </a>
+                <a href="sub-agents-readme.html"
+                   class="px-6 py-3 border border-indigo-600 text-indigo-400 rounded-lg font-medium hover:bg-indigo-600/10 transition-colors flex items-center space-x-2">
+                    <i data-lucide="book-open" class="w-4 h-4"></i>
+                    <span>Complete Guide</span>
+                </a>
+                <a href="index.html"
+                   class="px-6 py-3 border border-gray-600 text-gray-400 rounded-lg font-medium hover:bg-gray-600/10 transition-colors flex items-center space-x-2">
+                    <i data-lucide="home" class="w-4 h-4"></i>
+                    <span>Documentation Hub</span>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-800 mt-16">
+        <div class="max-w-7xl mx-auto px-6 py-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="text-sm text-gray-400 mb-4 md:mb-0">
+                    <p>&copy; 2025 John Dilig - Video Player Demo Project</p>
+                    <p class="mono">Step-by-step guide for Claude Code subagent configuration and parallel development</p>
+                </div>
+                <div class="flex items-center space-x-6">
+                    <div class="text-sm text-gray-400">
+                        <span>For complex multi-persona projects, see </span>
+                        <a href="sub-agent-personas.html" class="text-indigo-400 hover:underline">SUB-AGENT_PERSONAS.html</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Copy to clipboard functionality
+        function copyToClipboard(element) {
+            const text = element.textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                const button = element.nextElementSibling;
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.style.background = 'rgba(34, 197, 94, 0.1)';
+                button.style.borderColor = 'rgba(34, 197, 94, 0.2)';
+                button.style.color = '#22c55e';
+
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = 'rgba(99, 102, 241, 0.1)';
+                    button.style.borderColor = 'rgba(99, 102, 241, 0.2)';
+                    button.style.color = '#6366f1';
+                }, 2000);
+            });
+        }
+
+        // Add copy buttons to all code blocks
+        document.querySelectorAll('.code-block').forEach(block => {
+            if (!block.nextElementSibling || !block.nextElementSibling.classList.contains('copy-button')) {
+                const button = document.createElement('button');
+                button.className = 'copy-button';
+                button.textContent = 'Copy';
+                button.onclick = () => copyToClipboard(block);
+                block.parentNode.insertBefore(button, block.nextSibling);
+            }
+        });
+
+        // Animate steps on scroll
+        function animateSteps() {
+            const steps = document.querySelectorAll('.step-container');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.2 });
+
+            steps.forEach((step, index) => {
+                step.style.opacity = '0';
+                step.style.transform = 'translateY(20px)';
+                step.style.transition = `opacity 0.6s ease ${index * 0.1}s, transform 0.6s ease ${index * 0.1}s`;
+                observer.observe(step);
+            });
+        }
+
+        // Initialize animations
+        setTimeout(animateSteps, 500);
+
+        // Add hover effects for workflow steps
+        document.querySelectorAll('.workflow-step').forEach(step => {
+            step.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateX(8px) scale(1.02)';
+            });
+
+            step.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateX(0) scale(1)';
+            });
+        });
+    </script>
+</body>
+</html>

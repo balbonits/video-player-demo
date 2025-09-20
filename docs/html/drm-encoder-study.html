@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔐 DRM & Video Encoders Technical Study</title>
+    <link rel="stylesheet" href="../shared-style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/javascript.min.js"></script>
+    <style>
+        .codec-comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: var(--space-lg);
+            margin: var(--space-xl) 0;
+        }
+
+        .codec-card {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-secondary);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .codec-card:hover {
+            border-color: var(--accent-primary);
+            box-shadow: var(--shadow-accent);
+            transform: translateY(-4px);
+        }
+
+        .codec-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-md);
+        }
+
+        .codec-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+        }
+
+        .codec-year {
+            background: var(--bg-tertiary);
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .performance-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-sm);
+            margin: var(--space-md) 0;
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--space-xs);
+            border-bottom: 1px solid var(--border-primary);
+        }
+
+        .metric-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .metric-value {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .streaming-flow {
+            background: var(--bg-code);
+            border: 2px solid var(--accent-primary);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            margin: var(--space-xl) 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .streaming-flow::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary), var(--accent-primary));
+            animation: flow 3s ease-in-out infinite;
+        }
+
+        @keyframes flow {
+            0%, 100% { transform: translateX(-100%); }
+            50% { transform: translateX(100%); }
+        }
+
+        .drm-system {
+            background: var(--bg-tertiary);
+            border-left: 4px solid var(--accent-primary);
+            padding: var(--space-lg);
+            margin: var(--space-md) 0;
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+        }
+
+        .market-share {
+            display: inline-block;
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        .implementation-phase {
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+            border: 1px solid var(--border-secondary);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            margin: var(--space-xl) 0;
+            position: relative;
+        }
+
+        .phase-number {
+            position: absolute;
+            top: -10px;
+            left: var(--space-lg);
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: var(--radius-sm);
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+
+        .competitive-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--space-lg);
+            margin: var(--space-xl) 0;
+        }
+
+        .competitor-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-secondary);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg);
+            position: relative;
+        }
+
+        .competitor-card.our-framework {
+            border-color: var(--accent-primary);
+            box-shadow: var(--shadow-accent);
+        }
+
+        .competitor-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: var(--space-md);
+        }
+
+        .advantage-list {
+            list-style: none;
+            margin: 0;
+        }
+
+        .advantage-list li {
+            margin: var(--space-sm) 0;
+            padding-left: var(--space-lg);
+            position: relative;
+        }
+
+        .advantage-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--accent-primary);
+            font-weight: 700;
+        }
+
+        .interactive-diagram {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-secondary);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            margin: var(--space-xl) 0;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .interactive-diagram:hover {
+            border-color: var(--accent-primary);
+            box-shadow: var(--shadow-accent);
+        }
+
+        .diagram-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--accent-primary);
+            margin-bottom: var(--space-md);
+        }
+
+        .flow-step {
+            display: inline-block;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-md);
+            padding: var(--space-md);
+            margin: var(--space-sm);
+            min-width: 120px;
+            transition: all 0.3s ease;
+        }
+
+        .flow-step:hover {
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+            transform: scale(1.05);
+        }
+
+        .arrow {
+            color: var(--accent-primary);
+            font-size: 1.5rem;
+            margin: 0 var(--space-sm);
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>🔐 DRM & Video Encoders Technical Study</h1>
+            <p class="subtitle">Comprehensive analysis of DRM systems and video encoders for streaming applications</p>
+            <div style="text-align: center; margin-top: var(--space-md);">
+                <span class="badge">Technical Lead: Alex (Engineer)</span>
+                <span class="badge">Product Strategy: Jordan (Product)</span>
+                <span class="badge">Research Date: 2024-09-18</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- DRM Analysis Section -->
+        <section>
+            <h2>🛡️ Digital Rights Management (DRM) Analysis</h2>
+
+            <div class="interactive-diagram" onclick="toggleDRMFlow()">
+                <div class="diagram-title">DRM Technology Landscape 2024</div>
+                <div id="drm-flow">
+                    <div class="flow-step">Widevine<br><small>60% Market</small></div>
+                    <span class="arrow">→</span>
+                    <div class="flow-step">PlayReady<br><small>25% Market</small></div>
+                    <span class="arrow">→</span>
+                    <div class="flow-step">FairPlay<br><small>15% Market</small></div>
+                </div>
+            </div>
+
+            <div class="drm-system">
+                <h3>Widevine (Google) <span class="market-share">~60% Market Share</span></h3>
+                <div class="performance-metrics">
+                    <div class="metric">
+                        <span class="metric-label">Platforms:</span>
+                        <span class="metric-value">Chrome, Android, Smart TV</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Security Levels:</span>
+                        <span class="metric-value">L1 (HW), L2 (Hybrid), L3 (SW)</span>
+                    </div>
+                </div>
+                <p>Dominant DRM solution supporting HD/4K streaming for Netflix, Disney+, Prime Video. Hardware-based security (L1) provides highest content protection.</p>
+            </div>
+
+            <div class="drm-system">
+                <h3>PlayReady (Microsoft) <span class="market-share">~25% Market Share</span></h3>
+                <div class="performance-metrics">
+                    <div class="metric">
+                        <span class="metric-label">Platforms:</span>
+                        <span class="metric-value">Edge, Xbox, Windows</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Security:</span>
+                        <span class="metric-value">Hardware & Software-based</span>
+                    </div>
+                </div>
+                <p>Microsoft ecosystem DRM with strong enterprise integration. Popular for corporate streaming and Windows-based applications.</p>
+            </div>
+
+            <div class="drm-system">
+                <h3>FairPlay (Apple) <span class="market-share">~15% Market Share</span></h3>
+                <div class="performance-metrics">
+                    <div class="metric">
+                        <span class="metric-label">Platforms:</span>
+                        <span class="metric-value">Safari, iOS, macOS, Apple TV</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Security:</span>
+                        <span class="metric-value">Secure Enclave (Hardware)</span>
+                    </div>
+                </div>
+                <p>Apple's premium DRM solution with hardware-based security through Secure Enclave. Essential for iOS and macOS streaming applications.</p>
+            </div>
+
+            <div class="streaming-flow">
+                <h4>DRM Implementation Architecture</h4>
+                <pre><code class="language-typescript">interface DRMManager {
+  detectDRM(): Promise&lt;DRMSystem[]&gt;
+  initializeDRM(system: DRMSystem, licenseUrl: string): Promise&lt;void&gt;
+  handleLicenseRequest(request: Uint8Array): Promise&lt;Uint8Array&gt;
+  cleanup(): void
+}
+
+class VideoPlayerDRM {
+  private drmSystems = ['widevine', 'playready', 'fairplay']
+
+  async initializeContent(videoUrl: string, licenseUrl?: string) {
+    if (licenseUrl) {
+      const availableDRM = await this.detectDRM()
+      const selectedDRM = this.selectOptimalDRM(availableDRM)
+      await this.initializeDRM(selectedDRM, licenseUrl)
+    }
+
+    return this.loadVideo(videoUrl)
+  }
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- Video Encoder Analysis -->
+        <section>
+            <h2>🎞️ Video Encoder Analysis 2024</h2>
+
+            <div class="codec-comparison">
+                <div class="codec-card" onclick="highlightCodec('h264')">
+                    <div class="codec-header">
+                        <div class="codec-name">H.264 (AVC)</div>
+                        <div class="codec-year">2003</div>
+                    </div>
+                    <div class="performance-metrics">
+                        <div class="metric">
+                            <span class="metric-label">Compression:</span>
+                            <span class="metric-value">Baseline (100%)</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Encoding Speed:</span>
+                            <span class="metric-value">⭐⭐⭐ Fastest</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Hardware Support:</span>
+                            <span class="metric-value">⭐⭐⭐ Universal</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Browser Support:</span>
+                            <span class="metric-value">⭐⭐⭐ Universal</span>
+                        </div>
+                    </div>
+                    <p><strong>Use Case:</strong> Legacy compatibility, real-time encoding, universal device support</p>
+                    <p><strong>2024 Status:</strong> Still dominant due to universal support</p>
+                </div>
+
+                <div class="codec-card" onclick="highlightCodec('hevc')">
+                    <div class="codec-header">
+                        <div class="codec-name">HEVC (H.265)</div>
+                        <div class="codec-year">2013</div>
+                    </div>
+                    <div class="performance-metrics">
+                        <div class="metric">
+                            <span class="metric-label">Compression:</span>
+                            <span class="metric-value">150% better than H.264</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Encoding Speed:</span>
+                            <span class="metric-value">⭐⭐ Moderate</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Hardware Support:</span>
+                            <span class="metric-value">⭐⭐ Good (modern)</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Browser Support:</span>
+                            <span class="metric-value">⭐ Limited (Safari, Edge)</span>
+                        </div>
+                    </div>
+                    <p><strong>Use Case:</strong> 4K streaming, bandwidth-limited scenarios</p>
+                    <p><strong>2024 Status:</strong> Strong for premium content, licensing concerns</p>
+                </div>
+
+                <div class="codec-card" onclick="highlightCodec('av1')">
+                    <div class="codec-header">
+                        <div class="codec-name">AV1</div>
+                        <div class="codec-year">2018</div>
+                    </div>
+                    <div class="performance-metrics">
+                        <div class="metric">
+                            <span class="metric-label">Compression:</span>
+                            <span class="metric-value">200% better than H.264</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Encoding Speed:</span>
+                            <span class="metric-value">⭐ Slow (3x longer)</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Hardware Support:</span>
+                            <span class="metric-value">⭐⭐ Growing rapidly</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Licensing:</span>
+                            <span class="metric-value">✅ Royalty-free</span>
+                        </div>
+                    </div>
+                    <p><strong>Use Case:</strong> Bandwidth optimization, future-proofing</p>
+                    <p><strong>2024 Status:</strong> Rapidly growing adoption, Netflix/YouTube migration</p>
+                </div>
+            </div>
+
+            <div class="streaming-flow">
+                <h4>Netflix Encoding Strategy (2024)</h4>
+                <pre><code class="language-typescript">interface NetflixEncodingStrategy {
+  codecMigration: {
+    current: 'H.264 High Profile + VP9 Profile 0',
+    future: 'Aggressive AV1 adoption across all platforms',
+    results: '35% bandwidth savings with VP9, 40% with AV1'
+  },
+
+  qualityLadder: {
+    mobile: 'Multiple bitrates from 100kbps to 4Mbps',
+    desktop: 'Range from 500kbps to 16Mbps',
+    smartTV: 'Optimized for 4K HDR content up to 25Mbps'
+  },
+
+  optimization: {
+    perTitleEncoding: 'Custom encoding settings per content type',
+    machineLearning: 'AI-driven encoding optimization',
+    segmentOptimization: 'Per-segment encoding quality adjustment'
+  }
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- Implementation Strategy -->
+        <section>
+            <h2>🏗️ Implementation Strategy for Our Video Player</h2>
+
+            <div class="implementation-phase">
+                <div class="phase-number">PHASE 1</div>
+                <h3>Demo Implementation (No DRM)</h3>
+                <ul class="advantage-list">
+                    <li>No DRM for demo simplicity - focus on core features</li>
+                    <li>H.264 codec for universal compatibility</li>
+                    <li>Smart TV performance optimization</li>
+                    <li>Comprehensive accessibility implementation</li>
+                    <li>Demonstrate DRM understanding without complexity</li>
+                </ul>
+            </div>
+
+            <div class="implementation-phase">
+                <div class="phase-number">PHASE 2</div>
+                <h3>Framework Development (Enterprise Features)</h3>
+                <ul class="advantage-list">
+                    <li>Multi-DRM support with cloud license servers</li>
+                    <li>Automatic codec selection based on device capabilities</li>
+                    <li>Progressive enhancement: AV1 → HEVC → H.264</li>
+                    <li>Enterprise content protection</li>
+                    <li>Premium streaming capabilities</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Competitive Analysis -->
+        <section>
+            <h2>💼 Competitive Positioning</h2>
+
+            <div class="competitive-grid">
+                <div class="competitor-card">
+                    <div class="competitor-name" style="color: var(--text-secondary);">JW Player</div>
+                    <ul>
+                        <li>Subscription tiers with feature gates</li>
+                        <li>jQuery legacy architecture</li>
+                        <li>DRM as enterprise add-on</li>
+                        <li>Smart TV support requires premium</li>
+                        <li>Proprietary black box</li>
+                    </ul>
+                </div>
+
+                <div class="competitor-card our-framework">
+                    <div class="competitor-name" style="color: var(--accent-primary);">Our Framework</div>
+                    <ul class="advantage-list">
+                        <li>Modern React/TypeScript architecture</li>
+                        <li>Built-in Smart TV optimization</li>
+                        <li>WCAG compliance included</li>
+                        <li>Open source with transparent development</li>
+                        <li>Multi-DRM with open implementation</li>
+                        <li>Lower barrier to entry, no vendor lock-in</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Key Takeaways -->
+        <section>
+            <h2>🎯 Key Takeaways for FOX Interview</h2>
+
+            <div class="drm-system">
+                <h4>DRM Understanding</h4>
+                <p>Can discuss content protection strategies, multi-DRM implementation approaches, and the business value of DRM for premium content distribution.</p>
+            </div>
+
+            <div class="drm-system">
+                <h4>Codec Knowledge</h4>
+                <p>Understand encoding optimization trade-offs, bitrate ladders, and the strategic migration from H.264 to HEVC/AV1 for bandwidth savings.</p>
+            </div>
+
+            <div class="drm-system">
+                <h4>Performance Optimization</h4>
+                <p>Know how to optimize streaming performance for different devices, especially Smart TV constraints and shared codebase requirements.</p>
+            </div>
+
+            <div class="drm-system">
+                <h4>Future-Proofing</h4>
+                <p>Awareness of AV1 adoption trends, hardware acceleration developments, and industry migration patterns for long-term technology strategy.</p>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Initialize syntax highlighting
+        hljs.highlightAll();
+
+        // Interactive functions
+        function toggleDRMFlow() {
+            const flow = document.getElementById('drm-flow');
+            flow.style.animation = flow.style.animation ? '' : 'glow 2s ease-in-out infinite';
+        }
+
+        function highlightCodec(codec) {
+            // Remove existing highlights
+            document.querySelectorAll('.codec-card').forEach(card => {
+                card.style.transform = '';
+                card.style.boxShadow = '';
+                card.style.borderColor = '';
+            });
+
+            // Highlight selected codec
+            event.currentTarget.style.transform = 'translateY(-8px) scale(1.02)';
+            event.currentTarget.style.boxShadow = 'var(--shadow-accent)';
+            event.currentTarget.style.borderColor = 'var(--accent-primary)';
+
+            // Add some educational info
+            console.log(`${codec.toUpperCase()} codec selected for detailed analysis`);
+        }
+
+        // Add smooth scrolling for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Add intersection observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animation = 'fadeInUp 0.6s ease forwards';
+                }
+            });
+        }, observerOptions);
+
+        // Observe all major sections
+        document.querySelectorAll('.codec-card, .drm-system, .implementation-phase').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Add CSS for fade in animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

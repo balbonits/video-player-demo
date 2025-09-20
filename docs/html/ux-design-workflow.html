@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UX Design Workflow & AI Tools Integration | Video Player Demo</title>
+    <link rel="stylesheet" href="../shared-style.css">
+    <style>
+        /* Professional dark theme with accessibility focus */
+        :root {
+            --primary-bg: #0f1419;
+            --secondary-bg: #1a1f2e;
+            --accent-bg: #2a3441;
+            --primary-text: #e0e0e0;
+            --secondary-text: #b0b0b0;
+            --accent-color: #64b5f6;
+            --success-color: #4caf50;
+            --warning-color: #ff9800;
+            --border-color: #3a4553;
+            --focus-color: #90caf9;
+            --code-bg: #1e2329;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary-bg) 0%, var(--secondary-bg) 100%);
+            color: var(--primary-text);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            padding: 3rem 0;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--accent-color), var(--success-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header .meta {
+            color: var(--secondary-text);
+            font-size: 1.1rem;
+        }
+
+        .section {
+            background: var(--secondary-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .section h2 {
+            color: var(--accent-color);
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .section h3 {
+            color: var(--success-color);
+            font-size: 1.4rem;
+            margin: 2rem 0 1rem 0;
+        }
+
+        .section h4 {
+            color: var(--warning-color);
+            font-size: 1.2rem;
+            margin: 1.5rem 0 1rem 0;
+        }
+
+        .code-block {
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .tool-card {
+            background: var(--accent-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .tool-card.recommended {
+            border-left-color: var(--success-color);
+            background: rgba(76, 175, 80, 0.1);
+        }
+
+        .tool-card.premium {
+            border-left-color: var(--warning-color);
+            background: rgba(255, 152, 0, 0.1);
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            padding: 0.5rem 0;
+            padding-left: 2rem;
+            position: relative;
+        }
+
+        .feature-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--success-color);
+            font-weight: bold;
+        }
+
+        .workflow-diagram {
+            background: var(--code-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            text-align: center;
+            font-family: monospace;
+            line-height: 1.8;
+        }
+
+        .phase-card {
+            background: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .phase-card h4 {
+            margin-top: 0;
+            color: var(--accent-color);
+        }
+
+        .timeline {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .deliverable-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .deliverable-item {
+            background: var(--accent-bg);
+            padding: 1rem;
+            border-radius: 6px;
+            border-left: 3px solid var(--success-color);
+        }
+
+        .quote {
+            background: var(--accent-bg);
+            border-left: 4px solid var(--accent-color);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            font-style: italic;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .quote .author {
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-top: 1rem;
+            display: block;
+        }
+
+        /* Focus indicators for accessibility */
+        *:focus {
+            outline: 2px solid var(--focus-color);
+            outline-offset: 2px;
+        }
+
+        /* High contrast support */
+        @media (prefers-contrast: high) {
+            :root {
+                --primary-text: #ffffff;
+                --secondary-text: #cccccc;
+                --border-color: #666666;
+            }
+        }
+
+        /* Reduced motion support */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .section {
+                padding: 1.5rem;
+            }
+
+            .code-block {
+                font-size: 0.8rem;
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🎨 UX Design Workflow & AI Tools Integration</h1>
+            <div class="meta">
+                <strong>Designer:</strong> Riley (UX) |
+                <strong>Collaboration:</strong> Morgan (coordination), Jordan (user flows), Alex (technical feasibility) |
+                <strong>Created:</strong> 2024-09-18
+            </div>
+        </header>
+
+        <section class="section">
+            <h2>🤖 MCP Servers & AI Design Tools Education</h2>
+
+            <h3>What are MCP Servers?</h3>
+            <p><strong>Model Context Protocol (MCP)</strong> is a standardized way for AI assistants like Claude Code to connect to external tools and data sources. Think of it as "USB-C for AI" - a universal connector.</p>
+
+            <h4>How MCP Works:</h4>
+            <div class="workflow-diagram">
+                <div>Claude Code ←→ MCP Protocol ←→ MCP Server</div>
+                <div>                     ↓</div>
+                <div>          [Figma] [Frame0] [Design APIs]</div>
+                <div>                     ↓</div>
+                <div>         Design Data → Wireframes → Components</div>
+                <div>                     ↓</div>
+                <div>            Structured Data → Claude Code</div>
+            </div>
+
+            <h4>Benefits for Our Project:</h4>
+            <ul class="feature-list">
+                <li><strong>Automated Wireframing:</strong> Generate wireframes from text descriptions</li>
+                <li><strong>Design-to-Code:</strong> Convert Figma designs directly to React components</li>
+                <li><strong>Consistency:</strong> Maintain design system consistency across platforms</li>
+                <li><strong>Speed:</strong> Accelerate UX workflow from concept to implementation</li>
+            </ul>
+        </section>
+
+        <section class="section">
+            <h2>🛠️ Recommended AI Design Tools for Our Video Player</h2>
+
+            <div class="tool-card recommended">
+                <h3>⭐ Option 1: Frame0 Diagramming MCP Server (RECOMMENDED)</h3>
+                <div class="code-block">
+# Setup (Free CLI access)
+claude mcp add frame0-diagramming</div>
+
+                <h4>Why Frame0 is Perfect for Our Project:</h4>
+                <ul class="feature-list">
+                    <li><strong>Free CLI access</strong> through MCP</li>
+                    <li><strong>Natural language wireframing:</strong> "Create video player with controls"</li>
+                    <li><strong>Component-based:</strong> Perfect for our component architecture</li>
+                    <li><strong>Export capabilities:</strong> Can generate structured wireframes</li>
+                    <li><strong>Video player specific:</strong> Good for media interface design</li>
+                </ul>
+
+                <h4>Example Commands:</h4>
+                <div class="code-block">
+"Create a video player wireframe with play button, progress bar, volume control, and settings menu"
+"Add Smart TV navigation indicators to the video player wireframe"
+"Generate mobile version of the video player with touch-optimized controls"</div>
+            </div>
+
+            <div class="tool-card premium">
+                <h3>💎 Option 2: Figma MCP Server (PREMIUM OPTION)</h3>
+                <div class="code-block">
+# Setup (Requires Figma Pro)
+claude mcp add figma-dev-mode-mcp-server http://127.0.0.1:3845/mcp</div>
+
+                <h4>Figma MCP Benefits:</h4>
+                <ul class="feature-list">
+                    <li><strong>Professional design tools</strong> with component libraries</li>
+                    <li><strong>Design-to-code conversion</strong> directly in Claude Code</li>
+                    <li><strong>Team collaboration</strong> for design review</li>
+                    <li><strong>Design system export</strong> for consistent implementation</li>
+                </ul>
+                <p><strong>Limitation:</strong> Requires Figma Pro subscription</p>
+            </div>
+
+            <div class="tool-card">
+                <h3>🚀 Option 3: Superdesign MCP Server (ADVANCED OPTION)</h3>
+                <div class="code-block">
+# Setup (Free, no API keys required)
+claude mcp add superdesign-mcp-server</div>
+
+                <h4>Superdesign Benefits:</h4>
+                <ul class="feature-list">
+                    <li><strong>Completely free</strong> with no API key requirements</li>
+                    <li><strong>AI design orchestrator</strong> for comprehensive design workflows</li>
+                    <li><strong>Component generation</strong> with props and styling</li>
+                    <li><strong>Logo and icon creation</strong> for branding elements</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>📋 UX Design Implementation Plan</h2>
+
+            <div class="timeline">
+                <div class="phase-card">
+                    <h4>Phase 1: Wireframe Generation (Day 1)</h4>
+                    <p><strong>Using Frame0 MCP Server</strong></p>
+
+                    <h5>Step 1: Install and Configure Frame0</h5>
+                    <div class="code-block">
+# Install Frame0 MCP server
+claude mcp add frame0-diagramming
+
+# Test connection
+claude mcp list</div>
+
+                    <h5>Step 2: Generate Core Wireframes</h5>
+                    <div class="code-block">
+// Wireframe generation commands
+const wireframePrompts = [
+  // Desktop video player
+  "Create a desktop video player wireframe with these elements: 16:9 video area, centered play button overlay, bottom control bar with play/pause, progress bar, volume control, settings menu, and fullscreen button. Include accessibility labels.",
+
+  // Mobile video player
+  "Generate a mobile video player wireframe optimized for touch: portrait layout, large touch targets (56px minimum), swipe gestures for seek, tap-to-show controls, bottom sheet for settings.",
+
+  // Smart TV interface
+  "Design a Smart TV video player wireframe: large 1920x1080 layout, D-pad navigation indicators, focused element highlighting, TV-safe margins (48px), large text (18px+), spatial navigation flow.",
+
+  // Settings panel
+  "Create a settings panel wireframe for video player: caption customization (font, color, position), quality selection, accessibility options, theme toggle, organized in logical groups.",
+
+  // Accessibility overlay
+  "Generate accessibility features wireframe: high contrast mode toggle, focus indicators, screen reader announcements, keyboard navigation help, caption styling preview."
+]</div>
+
+                    <h5>Step 3: Validate Wireframes with Team</h5>
+                    <ul>
+                        <li><strong>Jordan (Product):</strong> Verify wireframes match user requirements</li>
+                        <li><strong>Alex (Engineer):</strong> Confirm technical feasibility of design elements</li>
+                        <li><strong>Sam (QA):</strong> Review accessibility considerations in wireframes</li>
+                        <li><strong>Morgan (Team Lead):</strong> Coordinate feedback and approve final designs</li>
+                    </ul>
+                </div>
+
+                <div class="phase-card">
+                    <h4>Phase 2: Component Design (Days 2-3)</h4>
+                    <p><strong>Using Superdesign MCP for Component Creation</strong></p>
+
+                    <h5>Component Generation Strategy:</h5>
+                    <div class="code-block">
+// Component design prompts for Superdesign
+const componentPrompts = [
+  // Video player controls
+  "Generate React TypeScript components for video player controls: PlayButton with accessibility props, ProgressBar with seek functionality, VolumeControl with slider and mute toggle, SettingsButton with dropdown menu.",
+
+  // Smart TV navigation
+  "Create Smart TV optimized components: large buttons (64px), clear focus indicators, D-pad navigation support, spatial layout with logical tab order.",
+
+  // Accessibility components
+  "Design accessibility-first components: ARIA-compliant labels, screen reader announcements, high contrast support, keyboard navigation helpers."
+]</div>
+                </div>
+
+                <div class="phase-card">
+                    <h4>Phase 3: Cross-Platform Adaptations (Days 4-6)</h4>
+                    <p><strong>Platform-Specific Design Variations</strong></p>
+
+                    <h5>Platform Adaptation Workflow:</h5>
+                    <div class="code-block">
+interface PlatformAdaptations {
+  web: {
+    baseDesign: 'Desktop wireframes with responsive breakpoints',
+    adaptations: 'Mobile touch targets, tablet landscape optimization',
+    tools: 'Frame0 + Superdesign for responsive variations'
+  },
+
+  mobile: {
+    iOS: 'Native iOS design language with SwiftUI components',
+    android: 'Material Design 3 principles with Jetpack Compose',
+    tools: 'Platform-specific wireframes using AI generation'
+  },
+
+  smartTV: {
+    roku: 'Roku design guidelines with BrightScript components',
+    tizen: 'Samsung Tizen UI patterns with TV-safe areas',
+    vizio: 'Vizio SmartCast interface guidelines',
+    tools: 'TV-specific wireframes with Focus indicators'
+  }
+}</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🔄 AI-Assisted Design Workflow</h2>
+
+            <div class="workflow-diagram">
+                <div>Product Requirements</div>
+                <div>↓</div>
+                <div>AI Wireframe Generation</div>
+                <div>↓</div>
+                <div>Team Review & Feedback</div>
+                <div>↓</div>
+                <div>Approved? → No → Iterate with AI → Back to Generation</div>
+                <div>↓ Yes</div>
+                <div>Component Generation</div>
+                <div>↓</div>
+                <div>Technical Implementation</div>
+                <div>↓</div>
+                <div>Accessibility Validation</div>
+                <div>↓</div>
+                <div>Cross-Platform Adaptation</div>
+                <div>↓</div>
+                <div>Final Design System</div>
+            </div>
+
+            <h3>Quality Control for AI-Generated Designs</h3>
+            <div class="code-block">
+interface DesignQualityControl {
+  technical_validation: {
+    owner: 'Alex (Engineer)',
+    criteria: [
+      'Components are technically feasible',
+      'Design supports performance requirements',
+      'Responsive behavior is clearly defined',
+      'Integration points are well-specified'
+    ]
+  },
+
+  accessibility_validation: {
+    owner: 'Sam (QA) + Riley (UX)',
+    criteria: [
+      'WCAG 2.1 AA compliance built into design',
+      'Focus indicators are clearly specified',
+      'Touch targets meet minimum size requirements',
+      'Color contrast ratios meet standards'
+    ]
+  },
+
+  user_experience_validation: {
+    owner: 'Riley (UX) + Jordan (Product)',
+    criteria: [
+      'User flows are logical and intuitive',
+      'Design supports all user stories',
+      'Cross-platform consistency maintained',
+      'Smart TV considerations integrated'
+    ]
+  }
+}</div>
+        </section>
+
+        <section class="section">
+            <h2>📅 Implementation Timeline for UX Workflow</h2>
+
+            <div class="timeline">
+                <div class="phase-card">
+                    <h4>Day 1: Tool Setup & Core Wireframes</h4>
+                    <ul>
+                        <li><strong>Morning (2 hours):</strong> Install and configure Frame0 MCP server</li>
+                        <li><strong>Afternoon (4 hours):</strong> Generate core wireframes for all platforms</li>
+                        <li><strong>Evening (2 hours):</strong> Team review and iteration</li>
+                    </ul>
+                </div>
+
+                <div class="phase-card">
+                    <h4>Day 2: Component Design</h4>
+                    <ul>
+                        <li><strong>Morning (3 hours):</strong> Use Superdesign to generate component specifications</li>
+                        <li><strong>Afternoon (3 hours):</strong> Cross-platform component adaptations</li>
+                        <li><strong>Evening (2 hours):</strong> Accessibility review and enhancements</li>
+                    </ul>
+                </div>
+
+                <div class="phase-card">
+                    <h4>Day 3: Design System Creation</h4>
+                    <ul>
+                        <li><strong>Morning (2 hours):</strong> Create comprehensive design system documentation</li>
+                        <li><strong>Afternoon (4 hours):</strong> Generate design tokens and CSS variables</li>
+                        <li><strong>Evening (2 hours):</strong> Final design review and approval</li>
+                    </ul>
+                </div>
+
+                <div class="phase-card">
+                    <h4>Days 4-6: Implementation Support</h4>
+                    <ul>
+                        <li><strong>Ongoing:</strong> Support Alex with design-to-code conversion</li>
+                        <li><strong>Validation:</strong> Ensure implemented designs match wireframes</li>
+                        <li><strong>Iteration:</strong> Refine designs based on technical constraints</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🎯 Expected Outcomes</h2>
+
+            <h3>Design Deliverables</h3>
+            <div class="deliverable-grid">
+                <div class="deliverable-item">
+                    <h4>Complete wireframe set</h4>
+                    <p>for all platforms and screen sizes</p>
+                </div>
+                <div class="deliverable-item">
+                    <h4>Component library specification</h4>
+                    <p>with accessibility built-in</p>
+                </div>
+                <div class="deliverable-item">
+                    <h4>Design system documentation</h4>
+                    <p>with tokens and variables</p>
+                </div>
+                <div class="deliverable-item">
+                    <h4>Cross-platform adaptation guide</h4>
+                    <p>for consistent experience</p>
+                </div>
+                <div class="deliverable-item">
+                    <h4>Accessibility compliance documentation</h4>
+                    <p>for all design elements</p>
+                </div>
+            </div>
+
+            <h3>Learning Outcomes for John</h3>
+            <ul class="feature-list">
+                <li><strong>MCP Understanding:</strong> How to integrate AI tools into development workflow</li>
+                <li><strong>Modern UX Patterns:</strong> Smart TV navigation, accessibility-first design</li>
+                <li><strong>Design Systems:</strong> How to create scalable, consistent design systems</li>
+                <li><strong>AI-Assisted Design:</strong> Leveraging AI for faster design iteration</li>
+            </ul>
+
+            <h3>Professional Demonstration</h3>
+            <ul class="feature-list">
+                <li><strong>Enterprise Design Process:</strong> Professional UX workflow and documentation</li>
+                <li><strong>AI Integration:</strong> Modern AI-assisted design capabilities</li>
+                <li><strong>Accessibility Leadership:</strong> WCAG 2.1 AA compliance throughout design</li>
+                <li><strong>Cross-Platform Expertise:</strong> Consistent experience across 6 platforms</li>
+            </ul>
+
+            <div class="quote">
+                "This AI-assisted workflow will let us create professional-quality wireframes and components much faster than traditional design tools, while ensuring accessibility is built in from the start. Perfect for our tight timeline!"
+                <span class="author">— Riley (UX)</span>
+            </div>
+
+            <div class="quote">
+                Ready to set up Frame0 MCP server for our wireframing workflow?
+            </div>
+        </section>
+    </div>
+</body>
+</html>

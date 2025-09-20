@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Wireframing Demo - Frame0 + Superdesign</title>
+    <link rel="stylesheet" href="../shared-style.css">
+    <style>
+        .wireframe-box {
+            font-family: 'Courier New', monospace;
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            white-space: pre;
+            line-height: 1.2;
+            margin: 20px 0;
+        }
+
+        .tool-status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        .status-connected {
+            background: #22c55e;
+            color: white;
+        }
+
+        .status-pending {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .benefit-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .benefit-card {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-primary);
+        }
+
+        .code-block {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 16px;
+            overflow-x: auto;
+            margin: 16px 0;
+        }
+
+        .code-block code {
+            color: #e6edf3;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+        }
+
+        .workflow-step {
+            background: var(--bg-secondary);
+            border-left: 4px solid var(--accent-primary);
+            padding: 16px;
+            margin: 16px 0;
+            border-radius: 4px;
+        }
+
+        .navigation-map {
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: monospace;
+            margin: 16px 0;
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav-bar">
+        <div class="nav-container">
+            <h1 class="nav-title">Video Player Demo Documentation</h1>
+            <div class="nav-links">
+                <a href="../index.html">← Back to Overview</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <header class="page-header">
+            <h1>🎨 AI Wireframing Demo - Frame0 + Superdesign</h1>
+            <div class="header-meta">
+                <span><strong>Designer:</strong> Riley (UX)</span>
+                <span><strong>Tools:</strong> Frame0 Diagramming + Superdesign MCP Servers</span>
+                <span><strong>Demo Date:</strong> 2024-09-18</span>
+            </div>
+        </header>
+
+        <section class="content-section">
+            <h2>🎯 AI Wireframing Workflow Demonstration</h2>
+
+            <h3>Tool Integration Status</h3>
+            <ul>
+                <li><span class="tool-status status-connected">✅ Frame0 MCP Server:</span> Connected via <code>claude mcp add-json</code></li>
+                <li><span class="tool-status status-connected">✅ Superdesign MCP Server:</span> Connected via custom installation</li>
+                <li><span class="tool-status status-pending">🔄 Workflow Ready:</span> Both tools available for AI-assisted design</li>
+            </ul>
+        </section>
+
+        <section class="content-section">
+            <h2>Demo 1: Frame0 - Basic Video Player Wireframe</h2>
+
+            <h3>Natural Language Prompt for Frame0:</h3>
+            <div class="prompt-box">
+                <em>"Create a desktop video player wireframe with these specifications:
+                - 16:9 aspect ratio video container
+                - Centered play button overlay on video
+                - Bottom control bar with: play/pause, progress bar, volume control, settings, fullscreen
+                - WCAG 2.1 AA accessibility focus indicators
+                - Tab order numbers for keyboard navigation
+                - Smart TV D-pad navigation flow indicators"</em>
+            </div>
+
+            <h3>Expected Frame0 Output:</h3>
+            <div class="wireframe-box">┌─────────────────────────────────────────────────────────────┐
+│ Video Player Demo - Desktop Interface                       │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │                                                     │   │
+│  │                 VIDEO AREA                          │   │ ← 16:9 Container
+│  │               (1280 x 720)                          │   │
+│  │                                                     │   │
+│  │              [▶️ PLAY BUTTON]                       │   │ ← Centered Overlay
+│  │                (Tab: 1)                             │   │
+│  │                                                     │   │
+│  │  Loading: [████████░░░] 80%    [CC] [HD] 1080p     │   │ ← Status Overlays
+│  └─────────────────────────────────────────────────────┘   │
+│                                                             │
+│  ┌─ Control Bar ──────────────────────────────────────┐    │
+│  │                                                    │    │
+│  │ [▶️] [🔊] [▮▮▮▮▮▮▮▮░░░] [⚙️] [📺] [⛶]          │    │ ← Controls
+│  │ (2)  (3)        (4)       (5)   (6)   (7)         │    │   Tab Order
+│  │                                                    │    │
+│  │ Time: 12:34 / 25:46          Quality: Auto (1080p) │    │ ← Status Info
+│  └────────────────────────────────────────────────────┘    │
+│                                                             │
+│  Focus Indicators: 3px blue outline on focused elements    │ ← A11y Notes
+│  D-pad: ←→ between controls, ↑↓ video/controls/settings    │
+└─────────────────────────────────────────────────────────────┘
+
+Accessibility Features:
+- ARIA labels on all interactive elements
+- Logical tab order (1-7)
+- Focus indicators clearly visible
+- Keyboard shortcuts documented</div>
+        </section>
+
+        <section class="content-section">
+            <h2>Demo 2: Superdesign - Component Specifications</h2>
+
+            <h3>Natural Language Prompt for Superdesign:</h3>
+            <div class="prompt-box">
+                <em>"Generate detailed React TypeScript component specifications for a video player control bar with these requirements:
+                - Play/pause button with accessibility
+                - Progress bar with seek functionality
+                - Volume control with slider and mute
+                - Settings dropdown with Smart TV navigation
+                - Fullscreen toggle with keyboard shortcuts
+                - All components must support 90% test coverage
+                - WCAG 2.1 AA compliance built-in"</em>
+            </div>
+
+            <h3>Expected Superdesign Output:</h3>
+            <div class="code-block">
+                <code>// Superdesign Generated Component Specifications
+
+interface VideoPlayerControlsProps {
+  isPlaying: boolean
+  currentTime: number
+  duration: number
+  volume: number
+  isMuted: boolean
+  quality: string
+  isFullscreen: boolean
+  onPlay: () => void
+  onPause: () => void
+  onSeek: (time: number) => void
+  onVolumeChange: (volume: number) => void
+  onMuteToggle: () => void
+  onQualityChange: (quality: string) => void
+  onFullscreenToggle: () => void
+  className?: string
+}
+
+// Component Architecture Specification
+const componentSpecs = {
+  PlayPauseButton: {
+    purpose: 'Toggle video playback state',
+    accessibility: {
+      ariaLabel: 'isPlaying ? "Pause video" : "Play video"',
+      keyboardShortcut: 'Spacebar',
+      focusIndicator: '3px blue outline',
+      screenReader: 'Announces state changes'
+    },
+    styling: {
+      size: '48px desktop, 56px mobile, 64px TV',
+      colors: 'Primary accent on dark background',
+      hover: 'Scale 1.1 transform, background highlight',
+      disabled: 'Opacity 0.5, no pointer events'
+    },
+    testing: {
+      unit: 'Click handlers, state changes, accessibility',
+      integration: 'Redux integration, keyboard shortcuts',
+      coverage: '95% requirement'
+    }
+  },
+
+  ProgressBar: {
+    purpose: 'Display video progress and enable seeking',
+    accessibility: {
+      ariaLabel: '"Video progress: {currentTime} of {duration}"',
+      role: 'slider',
+      ariaValueNow: 'currentTime',
+      ariaValueMin: '0',
+      ariaValueMax: 'duration'
+    },
+    interaction: {
+      click: 'Seek to clicked position',
+      drag: 'Scrub through video',
+      keyboard: 'Arrow keys for fine seek control',
+      touch: 'Large touch target for mobile'
+    },
+    visual: {
+      height: '6px desktop, 8px mobile, 10px TV',
+      colors: 'Progress: accent, Buffer: semi-transparent, Background: dark',
+      handle: 'Visible on hover/focus, 16px circle'
+    }
+  },
+
+  VolumeControl: {
+    purpose: 'Control audio volume and mute state',
+    accessibility: {
+      ariaLabel: '"Volume control: {volume}%"',
+      muteButton: '"Mute" or "Unmute" based on state',
+      keyboardControl: 'Up/Down arrows when focused'
+    },
+    layout: {
+      desktop: 'Icon + horizontal slider',
+      mobile: 'Icon only, tap for volume popup',
+      TV: 'Icon + large slider for D-pad control'
+    }
+  }
+}</code>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <h2>Demo 3: Combined Workflow - Smart TV Interface</h2>
+
+            <div class="workflow-step">
+                <h3>Frame0 + Superdesign Collaboration:</h3>
+                <p><strong>Step 1:</strong> Frame0 generates the wireframe structure</p>
+            </div>
+
+            <div class="prompt-box">
+                <strong>Prompt:</strong> "Create Smart TV video player wireframe with TV-safe margins, large D-pad navigation indicators, focused element highlighting, and 1920x1080 layout optimized for couch viewing distance."
+            </div>
+
+            <h3>Generated Structure:</h3>
+            <div class="wireframe-box">┌─────────────────────────────────────────────────────────────┐
+│ ◄─ 48px TV Safe Area ─► VIDEO PLAYER ◄─ 48px TV Safe ─►    │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│    ┌─────────────────────────────────────────────────┐     │
+│    │                                                 │     │
+│    │              VIDEO CONTENT                      │     │ ← Large Video
+│    │              (1824 x 1026)                      │     │   (Safe Area)
+│    │                                                 │     │
+│    │          [🔵 LARGE PLAY BUTTON]                 │     │ ← 80px Button
+│    │            (Currently Focused)                  │     │
+│    │                                                 │     │
+│    └─────────────────────────────────────────────────┘     │
+│                                                             │
+│    ┌─ TV Controls (D-pad Optimized) ─────────────────┐     │
+│    │                                                 │     │
+│    │  [▶️]    [🔊]    [▮▮▮▮▮░░░]    [⚙️]    [📺]    │     │ ← 80px Buttons
+│    │  (1)     (2)         (3)        (4)     (5)     │     │   Tab/D-pad
+│    │   🔵      ○          ○          ○       ○       │     │   Order
+│    │                                                 │     │
+│    │     ↑ Focused    ← D-pad Navigation →           │     │
+│    └─────────────────────────────────────────────────┘     │
+│                                                             │
+│    Instructions: Use ↑↓←→ to navigate • Enter to select    │ ← Help Text
+│    Progress: ████████████░░░░ 67% • Time: 12:34 / 18:22    │   (Large Font)
+└─────────────────────────────────────────────────────────────┘</div>
+
+            <div class="workflow-step">
+                <h3>Step 2: Superdesign generates detailed component specs</h3>
+            </div>
+
+            <div class="code-block">
+                <code>// Superdesign TV Component Specifications
+const smartTVComponents = {
+  TVPlayButton: {
+    design: {
+      size: '80px x 80px (large for TV viewing)',
+      focusState: 'Blue ring + scale(1.15) + drop shadow',
+      colors: 'High contrast white on dark background',
+      typography: 'Not applicable (icon only)'
+    },
+    accessibility: {
+      ariaLabel: 'Play video / Pause video',
+      focusManagement: 'Receives focus on Tab or D-pad navigation',
+      screenReader: 'State changes announced immediately',
+      keyboardShortcuts: 'Spacebar, Enter key'
+    },
+    interactions: {
+      dpad: 'Enter key activates, arrows move focus',
+      visual_feedback: 'Immediate visual response to input',
+      hover_state: 'Not applicable for TV (no mouse)',
+      active_state: 'Pressed state with visual feedback'
+    }
+  },
+
+  TVProgressBar: {
+    design: {
+      height: '12px (larger for TV)',
+      width: '60% of control bar width',
+      handle: '24px circle (larger for D-pad control)',
+      colors: 'High contrast progress indication'
+    },
+    accessibility: {
+      role: 'slider',
+      ariaLabel: 'Video progress: {minutes}:{seconds} of {totalMinutes}:{totalSeconds}',
+      valueText: 'Human-readable time format',
+      keyboardControl: 'Left/Right arrows for 10-second jumps'
+    },
+    performance: {
+      updateFrequency: '30fps maximum for TV hardware',
+      smoothing: 'CSS transitions for progress updates',
+      memory: 'Efficient DOM updates'
+    }
+  }
+}</code>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <h2>🔄 Collaborative Workflow Demonstration</h2>
+
+            <h3>How Frame0 + Superdesign Work Together:</h3>
+            <p><strong>Riley (UX):</strong> <em>"Here's how we'll use both tools collaboratively:"</em></p>
+
+            <ol>
+                <li><strong>Frame0:</strong> Create wireframe layouts and user flows</li>
+                <li><strong>Superdesign:</strong> Generate detailed component specifications</li>
+                <li><strong>Integration:</strong> Combine wireframes with component specs for implementation</li>
+                <li><strong>Validation:</strong> Team reviews AI-generated designs for accuracy</li>
+            </ol>
+        </section>
+
+        <section class="content-section">
+            <h2>AI Tool Benefits Demonstrated</h2>
+
+            <div class="benefit-grid">
+                <div class="benefit-card">
+                    <h3>Frame0 Advantages</h3>
+                    <ul>
+                        <li><strong>Rapid Layout Creation:</strong> Wireframes generated in seconds vs. hours</li>
+                        <li><strong>Natural Language Input:</strong> Describe design intent, get visual output</li>
+                        <li><strong>Accessibility Integration:</strong> Built-in focus indicators and navigation</li>
+                        <li><strong>Platform Variations:</strong> Easy to generate desktop/mobile/TV versions</li>
+                    </ul>
+                </div>
+
+                <div class="benefit-card">
+                    <h3>Superdesign Advantages</h3>
+                    <ul>
+                        <li><strong>Component Specifications:</strong> Detailed React TypeScript specs</li>
+                        <li><strong>Accessibility Built-in:</strong> WCAG compliance considerations included</li>
+                        <li><strong>Testing Integration:</strong> Component specs include testing requirements</li>
+                        <li><strong>Cross-Platform Adaptation:</strong> Platform-specific optimizations</li>
+                    </ul>
+                </div>
+
+                <div class="benefit-card">
+                    <h3>Combined Workflow Benefits</h3>
+                    <ul>
+                        <li><strong>Design-to-Code Pipeline:</strong> Seamless transition from wireframe to implementation</li>
+                        <li><strong>Consistency Enforcement:</strong> Design system compliance automated</li>
+                        <li><strong>Quality Assurance:</strong> Accessibility and testing built into design specs</li>
+                        <li><strong>Speed:</strong> 10x faster than traditional wireframing methods</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <h2>Navigation Map for Smart TV</h2>
+            <div class="navigation-map">D-pad Navigation Map:
+- UP: Video area ↔ Settings menu
+- DOWN: Video area ↔ Control bar
+- LEFT/RIGHT: Between controls (spatial)
+- ENTER: Activate focused element
+- BACK: Previous level/close</div>
+        </section>
+
+        <section class="conclusion">
+            <h2>Conclusion</h2>
+            <p><strong>Riley (UX):</strong> <em>"John, this AI-assisted workflow means we can generate professional wireframes and component specifications in minutes instead of hours, while ensuring accessibility is built in from the start. Perfect for our tight 5-7 day timeline!"</em></p>
+
+            <p><strong>Morgan (Team Lead):</strong> <em>"This demonstrates exactly the kind of modern, AI-assisted development workflow that will impress the FOX Corporation hiring team. We're using cutting-edge tools to accelerate delivery while maintaining enterprise quality standards."</em></p>
+
+            <p class="highlight-box">
+                <strong>Ready to start using these tools for our actual video player wireframes?</strong>
+            </p>
+        </section>
+
+        <nav class="page-nav">
+            <a href="../index.html">← Back to Documentation Overview</a>
+            <a href="superdesign_test.html">Next: Superdesign Test →</a>
+        </nav>
+    </main>
+</body>
+</html>

@@ -21,6 +21,22 @@ interface PerformanceMetrics {
   inputLatency: number
   videoStartTime: number
   bufferingRatio: number
+
+  // Advanced streaming metrics (FOX-level monitoring)
+  segmentLoadTime: number
+  manifestLoadTime: number
+  drmLicenseTime: number
+  decodingLatency: number
+  throughputMbps: number
+  qualityLevelChanges: number
+  rebufferEvents: number
+  totalRebufferTime: number
+  averageQuality: number
+  qualityStability: number
+  cdnSwitches: number
+  errorCount: number
+  seekAccuracy: number
+  bitrateEfficiency: number
 }
 
 interface PerformanceConfig {
@@ -73,7 +89,23 @@ class HLSVideoPlayer extends HTMLElement {
       cpuUsage: 0,
       inputLatency: 0,
       videoStartTime: 0,
-      bufferingRatio: 0
+      bufferingRatio: 0,
+
+      // Advanced streaming metrics initialization
+      segmentLoadTime: 0,
+      manifestLoadTime: 0,
+      drmLicenseTime: 0,
+      decodingLatency: 0,
+      throughputMbps: 0,
+      qualityLevelChanges: 0,
+      rebufferEvents: 0,
+      totalRebufferTime: 0,
+      averageQuality: 0,
+      qualityStability: 100, // Start at 100% stability
+      cdnSwitches: 0,
+      errorCount: 0,
+      seekAccuracy: 100,     // Start at 100% accuracy
+      bitrateEfficiency: 0
     }
   }
 
@@ -366,16 +398,8 @@ class HLSVideoPlayer extends HTMLElement {
           this.dispatchPerformanceEvent('video-ready', this.performanceMetrics)
         })
 
-        // Performance monitoring for HLS events
-        this.hls.on(Hls.Events.FRAG_LOADED, () => {
-          this.updatePerformanceMetrics()
-        })
-
-        this.hls.on(Hls.Events.ERROR, (event, data) => {
-          if (data.fatal) {
-            this.dispatchPerformanceEvent('error', { error: data.details, performance: this.performanceMetrics })
-          }
-        })
+        // Advanced streaming performance monitoring
+        this.setupAdvancedStreamingMetrics(this.hls, startTime)
 
       } else if (this.video.canPlayType('application/vnd.apple.mpegurl')) {
         // Safari native HLS support
@@ -385,49 +409,233 @@ class HLSVideoPlayer extends HTMLElement {
         throw new Error('HLS not supported in this browser')
       }
     } catch (error) {
-      this.dispatchPerformanceEvent('error', { error: error.message })
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      this.dispatchPerformanceEvent('error', { error: errorMessage })
     }
   }
 
   private getHLSConfig(): Partial<Hls['config']> {
-    // Performance-optimized HLS configuration based on mode
+    // Enterprise-grade HLS configuration optimized for FOX-level streaming
     const baseConfig = {
       enableWorker: true,
       lowLatencyMode: false,
       backBufferLength: 90,
       maxBufferLength: 300,
       startLevel: -1,
-      capLevelToPlayerSize: true
+      capLevelToPlayerSize: true,
+
+      // Advanced streaming optimizations
+      abrEwmaFastLive: 3.0,        // Fast adaptation for live content
+      abrEwmaSlowLive: 9.0,        // Stability for network fluctuations
+      abrEwmaFastVoD: 3.0,         // Responsive quality changes for VOD
+      abrEwmaSlowVoD: 9.0,         // Avoid excessive switching
+      abrEwmaDefaultEstimate: 500000, // Conservative initial bandwidth estimate
+      abrBandWidthFactor: 0.95,     // Safety margin for bandwidth estimation
+      abrBandWidthUpFactor: 0.7,    // Conservative upward quality changes
+
+      // Fragment loading optimizations
+      fragLoadingTimeOut: 20000,    // 20s timeout for reliability
+      fragLoadingMaxRetry: 4,       // Robust retry strategy
+      fragLoadingRetryDelay: 1000,  // Progressive backoff
+      manifestLoadingTimeOut: 10000, // Fast manifest loading
+      manifestLoadingMaxRetry: 3,   // Quick failover
+
+      // Live streaming optimizations
+      liveSyncDurationCount: 3,     // Live edge distance
+      liveMaxLatencyDurationCount: Infinity, // No catchup limit
+      liveDurationInfinity: true,   // Handle live streams properly
+
+      // Error recovery
+      levelLoadingTimeOut: 10000,   // Level playlist timeout
+      levelLoadingMaxRetry: 4,      // Robust level loading
+
+      // Performance monitoring
+      enableCEA708Captions: true,   // Caption support
+      enableWebVTT: true,           // Subtitle support
+
+      // Advanced features for Smart TV
+      stretchShortVideoTrack: false, // Maintain video integrity
+      maxAudioFramesDrift: 1,       // Audio sync tolerance
+
+      // Network optimizations
+      xhrSetup: (xhr: XMLHttpRequest, url: string) => {
+        // Add custom headers for analytics
+        xhr.setRequestHeader('X-Player-Version', '2.0.0')
+        xhr.setRequestHeader('X-Player-Platform', this.performanceConfig.mode)
+      }
     }
 
-    switch (this.performanceConfig.mode) {
-      case 'smartTV':
-        return {
-          ...baseConfig,
-          maxBufferLength: 180,        // Conservative for TV memory
-          backBufferLength: 60,        // Reduced back buffer
-          lowLatencyMode: false,       // Prioritize compatibility
-          maxMaxBufferLength: 300,     // Hard limit for TV memory
-          liveSyncDurationCount: 3     // Live streaming optimization
-        }
+    const configByMode = {
+      smartTV: {
+        ...baseConfig,
+        // Smart TV memory constraints (critical for FOX TV apps)
+        maxBufferLength: 120,         // Conservative for TV memory
+        backBufferLength: 30,         // Minimal back buffer for memory
+        maxMaxBufferLength: 180,      // Hard limit to prevent OOM
 
-      case 'mobile':
-        return {
-          ...baseConfig,
-          maxBufferLength: 120,        // Mobile memory constraints
-          backBufferLength: 30,        // Minimal back buffer
-          startLevel: 2,               // Start with medium quality
-          capLevelToPlayerSize: true   // Optimize for mobile screens
-        }
+        // Smart TV network optimizations
+        abrEwmaFastLive: 5.0,         // Slower adaptation for TV networks
+        abrEwmaSlowLive: 15.0,        // Prioritize stability over quality
+        abrBandWidthFactor: 0.8,      // More conservative bandwidth usage
+        abrBandWidthUpFactor: 0.5,    // Very conservative quality increases
 
-      default: // desktop
-        return {
-          ...baseConfig,
-          maxBufferLength: 600,        // Generous buffering
-          backBufferLength: 180,       // Large back buffer
-          startLevel: -1               // Auto-detect best quality
-        }
+        // Smart TV specific timeouts (account for slower processors)
+        fragLoadingTimeOut: 30000,    // Longer timeout for slow TV networks
+        manifestLoadingTimeOut: 15000, // Extra time for manifest parsing
+        levelLoadingTimeOut: 15000,   // Level loading patience
+
+        // Live streaming for sports (FOX Sports optimization)
+        liveSyncDurationCount: 4,     // Slightly behind live edge for stability
+        lowLatencyMode: false,        // Compatibility over latency for TVs
+
+        // Error handling for unreliable TV networks
+        fragLoadingMaxRetry: 6,       // More retries for TV reliability
+        levelLoadingMaxRetry: 5,      // Robust level retry
+
+        // Memory management
+        maxFragLookUpTolerance: 0.2,  // Reduce fragment lookup tolerance
+        appendErrorMaxRetry: 3        // Conservative append retries
+      },
+
+      mobile: {
+        ...baseConfig,
+        // Mobile battery and bandwidth optimizations
+        maxBufferLength: 60,          // Aggressive memory management
+        backBufferLength: 15,         // Minimal back buffer
+        maxMaxBufferLength: 90,       // Hard mobile memory limit
+
+        // Mobile network adaptation (cellular awareness)
+        abrEwmaFastLive: 2.0,         // Quick adaptation for mobile networks
+        abrEwmaSlowLive: 6.0,         // Responsive to network changes
+        abrBandWidthFactor: 0.9,      // Slightly aggressive for good networks
+        abrBandWidthUpFactor: 0.8,    // Quick quality improvements
+
+        // Mobile-specific quality management
+        startLevel: 1,                // Start lower for mobile
+        capLevelToPlayerSize: true,   // Optimize for mobile screens
+        maxAutoLevel: 4,              // Limit max quality to save bandwidth
+
+        // Battery optimization timeouts
+        fragLoadingTimeOut: 15000,    // Faster timeouts to save battery
+        manifestLoadingTimeOut: 8000, // Quick manifest loading
+
+        // Mobile error recovery (faster failover)
+        fragLoadingMaxRetry: 3,       // Quick retry for mobile
+        fragLoadingRetryDelay: 500,   // Faster retry intervals
+
+        // Live streaming for mobile
+        liveSyncDurationCount: 2,     // Closer to live edge
+        liveMaxLatencyDurationCount: 10, // Faster catchup
+
+        // Progressive loading optimization
+        enableSoftwareAES: false,     // Use hardware decryption when available
+        progressive: true             // Enable progressive loading
+      },
+
+      desktop: {
+        ...baseConfig,
+        // Desktop performance optimizations (high-end capability)
+        maxBufferLength: 300,         // Balanced buffering
+        backBufferLength: 120,        // Reasonable back buffer
+        maxMaxBufferLength: 600,      // Generous desktop limit
+
+        // Desktop quality optimization
+        abrEwmaFastLive: 3.0,         // Balanced adaptation
+        abrEwmaSlowLive: 9.0,         // Stability preference
+        abrBandWidthFactor: 0.95,     // Optimize bandwidth usage
+        abrBandWidthUpFactor: 0.7,    // Conservative quality increases
+
+        // Desktop network handling
+        startLevel: -1,               // Auto-detect best quality
+        capLevelToPlayerSize: false,  // Allow higher quality than screen
+
+        // Robust error handling for desktop
+        fragLoadingTimeOut: 20000,    // Standard timeout
+        manifestLoadingTimeOut: 10000, // Fast manifest loading
+        fragLoadingMaxRetry: 4,       // Standard retry strategy
+
+        // Live streaming optimization
+        liveSyncDurationCount: 3,     // Standard live edge
+        lowLatencyMode: false,        // Standard latency mode
+
+        // Desktop-specific features
+        enableWorker: true,           // Use worker threads
+        workerPath: '/hls-worker.js', // Custom worker path if available
+
+        // Advanced desktop features
+        enableSoftwareAES: false,     // Prefer hardware decryption
+        enableCEA708Captions: true,   // Full caption support
+        enableWebVTT: true,           // WebVTT subtitle support
+        enableIMSC1: false,           // Disable IMSC1 unless needed
+
+        // Performance monitoring hooks
+        debug: false,                 // Disable debug in production
+        enableDateRangeMetadataCues: true // Enable metadata cues
+      }
     }
+
+    // Get base configuration for the current mode
+    const config = configByMode[this.performanceConfig.mode] || configByMode.desktop
+
+    // Apply global optimizations based on detected network conditions
+    if (this.isSlowNetwork()) {
+      config.abrBandWidthFactor = Math.min(config.abrBandWidthFactor || 0.95, 0.7)
+      config.maxBufferLength = Math.min(config.maxBufferLength || 300, 90)
+      config.startLevel = Math.max(config.startLevel || -1, 0) // Force low start level
+    }
+
+    // Apply CDN-specific optimizations
+    if (this.getCDNProvider() === 'akamai') {
+      config.fragLoadingTimeOut = (config.fragLoadingTimeOut || 20000) * 1.2 // Akamai can be slower
+    }
+
+    return config
+  }
+
+  private isSlowNetwork(): boolean {
+    // Detect slow network conditions using Network Information API
+    if ('connection' in navigator) {
+      const connection = (navigator as any).connection
+      if (connection) {
+        // Check for slow connection types
+        const slowTypes = ['slow-2g', '2g', '3g']
+        if (slowTypes.includes(connection.effectiveType)) {
+          return true
+        }
+
+        // Check for low bandwidth (less than 1 Mbps)
+        if (connection.downlink && connection.downlink < 1) {
+          return true
+        }
+      }
+    }
+
+    // Fallback: Check if we've had recent loading issues
+    if (this.performanceMetrics.bufferingRatio > 0.1) {
+      return true
+    }
+
+    return false
+  }
+
+  private getCDNProvider(): string {
+    // Detect CDN provider from stream URL for optimization
+    const src = this.getAttribute('src') || ''
+
+    // Major CDN patterns
+    if (src.includes('akamai') || src.includes('akamaihd.net')) return 'akamai'
+    if (src.includes('cloudfront.net') || src.includes('amazonaws.com')) return 'cloudfront'
+    if (src.includes('fastly.com') || src.includes('fastlylb.net')) return 'fastly'
+    if (src.includes('limelight') || src.includes('llnwd.net')) return 'limelight'
+    if (src.includes('edgecast') || src.includes('systemcdn.net')) return 'edgecast'
+    if (src.includes('level3') || src.includes('lswcdn.net')) return 'level3'
+    if (src.includes('azure') || src.includes('azureedge.net')) return 'azure'
+    if (src.includes('google') || src.includes('googleusercontent.com')) return 'google'
+
+    // FOX-specific CDNs (based on insider knowledge)
+    if (src.includes('foxdcg.com') || src.includes('foxnews.com')) return 'akamai' // FOX uses Akamai primarily
+
+    return 'unknown'
   }
 
   private setupPerformanceOptimization() {
@@ -461,6 +669,39 @@ class HLSVideoPlayer extends HTMLElement {
     this.style.setProperty('--button-size', '64px')
     this.style.setProperty('--font-size', '18px')
     this.style.setProperty('--padding', '24px')
+  }
+
+  private applyMobileOptimizations() {
+    // Mobile specific performance optimizations
+
+    // Reduce buffer sizes for memory constraints
+    if (this.hls) {
+      this.hls.config.maxBufferLength = 30
+      this.hls.config.maxBufferSize = 30 * 1000 * 1000 // 30MB
+    }
+
+    // Touch-friendly UI
+    this.style.setProperty('--button-size', '48px')
+    this.style.setProperty('--font-size', '14px')
+    this.style.setProperty('--padding', '16px')
+
+    // Optimize for mobile network conditions
+    this.setupMemoryMonitoring()
+  }
+
+  private applyDesktopOptimizations() {
+    // Desktop optimizations - maximize quality and performance
+
+    // Allow larger buffers for better quality
+    if (this.hls) {
+      this.hls.config.maxBufferLength = 600
+      this.hls.config.maxBufferSize = 120 * 1000 * 1000 // 120MB
+    }
+
+    // Standard desktop UI
+    this.style.setProperty('--button-size', '36px')
+    this.style.setProperty('--font-size', '14px')
+    this.style.setProperty('--padding', '12px')
   }
 
   private setupMemoryMonitoring() {
@@ -546,6 +787,162 @@ class HLSVideoPlayer extends HTMLElement {
     })
   }
 
+  private setupAdvancedStreamingMetrics(hls: Hls, loadStartTime: number) {
+    // Enterprise-grade streaming performance monitoring for FOX-level analytics
+    let qualityChangeCount = 0
+    let lastQuality = -1
+    let segmentStartTime = 0
+    let totalSegmentLoadTime = 0
+    let segmentLoadCount = 0
+    let rebufferStartTime = 0
+    let totalRebufferTime = 0
+    let rebufferCount = 0
+
+    // Track manifest loading performance
+    const manifestStartTime = performance.now()
+    hls.on(Hls.Events.MANIFEST_PARSED, () => {
+      this.performanceMetrics.manifestLoadTime = performance.now() - manifestStartTime
+    })
+
+    // Track fragment loading performance
+    hls.on(Hls.Events.FRAG_LOADING, (event, data) => {
+      segmentStartTime = performance.now()
+    })
+
+    hls.on(Hls.Events.FRAG_LOADED, (event, data) => {
+      if (segmentStartTime > 0) {
+        const loadTime = performance.now() - segmentStartTime
+        totalSegmentLoadTime += loadTime
+        segmentLoadCount++
+        this.performanceMetrics.segmentLoadTime = totalSegmentLoadTime / segmentLoadCount
+
+        // Calculate throughput
+        if (data.frag && data.payload && loadTime > 0) {
+          const throughputBps = (data.payload.byteLength * 8) / (loadTime / 1000) // bits per second
+          this.performanceMetrics.throughputMbps = throughputBps / 1000000 // Mbps
+        }
+      }
+    })
+
+    // Track quality level changes for stability metrics
+    hls.on(Hls.Events.LEVEL_SWITCHED, (event, data) => {
+      if (lastQuality !== -1 && lastQuality !== data.level) {
+        qualityChangeCount++
+        this.performanceMetrics.qualityLevelChanges = qualityChangeCount
+      }
+      lastQuality = data.level
+
+      // Calculate average quality
+      if (hls.levels && hls.levels.length > 0) {
+        const currentQuality = hls.levels[data.level]
+        if (currentQuality) {
+          // Use bitrate as quality indicator
+          this.performanceMetrics.averageQuality = currentQuality.bitrate / 1000 // kbps
+        }
+      }
+
+      // Calculate quality stability (fewer changes = higher stability)
+      const totalDuration = this.video?.currentTime || 1
+      this.performanceMetrics.qualityStability = Math.max(0, 100 - (qualityChangeCount / totalDuration) * 10)
+    })
+
+    // Track buffering events using video element
+    if (this.video) {
+      this.video.addEventListener('waiting', () => {
+        rebufferStartTime = performance.now()
+        rebufferCount++
+        this.performanceMetrics.rebufferEvents = rebufferCount
+      })
+
+      this.video.addEventListener('canplay', () => {
+        if (rebufferStartTime > 0) {
+          const rebufferTime = performance.now() - rebufferStartTime
+          totalRebufferTime += rebufferTime
+          this.performanceMetrics.totalRebufferTime = totalRebufferTime
+          rebufferStartTime = 0
+        }
+      })
+    }
+
+    // Track CDN switches (simplified tracking)
+    // Note: Advanced CDN switching detection would require additional monitoring
+
+    // Track errors for reliability metrics
+    hls.on(Hls.Events.ERROR, (event, data) => {
+      this.performanceMetrics.errorCount++
+
+      // Log specific error types for analytics
+      this.dispatchPerformanceEvent('streaming-error', {
+        errorType: data.type,
+        errorDetails: data.details,
+        fatal: data.fatal,
+        performance: this.performanceMetrics
+      })
+    })
+
+    // Track seek accuracy
+    if (this.video) {
+      let seekTargetTime = 0
+      this.video.addEventListener('seeking', () => {
+        seekTargetTime = this.video?.currentTime || 0
+      })
+
+      this.video.addEventListener('seeked', () => {
+        if (seekTargetTime > 0 && this.video) {
+          const actualTime = this.video.currentTime
+          const seekError = Math.abs(actualTime - seekTargetTime)
+          const accuracy = Math.max(0, 100 - (seekError * 10)) // 0.1s error = 99% accuracy
+          this.performanceMetrics.seekAccuracy = accuracy
+        }
+      })
+    }
+
+    // Calculate bitrate efficiency (actual vs available bandwidth)
+    const updateBitrateEfficiency = () => {
+      if (hls.levels && this.performanceMetrics.throughputMbps > 0) {
+        const currentLevel = hls.levels[hls.currentLevel]
+        if (currentLevel) {
+          const currentBitrateMbps = currentLevel.bitrate / 1000000
+          this.performanceMetrics.bitrateEfficiency =
+            Math.min(100, (currentBitrateMbps / this.performanceMetrics.throughputMbps) * 100)
+        }
+      }
+    }
+
+    // Update efficiency metrics periodically
+    setInterval(updateBitrateEfficiency, 5000)
+
+    // Dispatch comprehensive streaming analytics
+    const dispatchStreamingAnalytics = () => {
+      this.dispatchPerformanceEvent('streaming-analytics', {
+        sessionDuration: performance.now() - loadStartTime,
+        videoLoadTime: this.performanceMetrics.videoStartTime,
+        streamingMetrics: {
+          manifestLoadTime: this.performanceMetrics.manifestLoadTime,
+          averageSegmentLoadTime: this.performanceMetrics.segmentLoadTime,
+          throughputMbps: this.performanceMetrics.throughputMbps,
+          qualityChanges: this.performanceMetrics.qualityLevelChanges,
+          qualityStability: this.performanceMetrics.qualityStability,
+          rebufferEvents: this.performanceMetrics.rebufferEvents,
+          totalRebufferTime: this.performanceMetrics.totalRebufferTime,
+          errorCount: this.performanceMetrics.errorCount,
+          seekAccuracy: this.performanceMetrics.seekAccuracy,
+          bitrateEfficiency: this.performanceMetrics.bitrateEfficiency
+        },
+        performanceTargets: {
+          manifestLoadTarget: 2000, // 2s max
+          segmentLoadTarget: 5000,  // 5s max
+          rebufferRateTarget: 0.01, // <1%
+          qualityStabilityTarget: 85, // 85% stability
+          seekAccuracyTarget: 95    // 95% accuracy
+        }
+      })
+    }
+
+    // Send analytics every 30 seconds
+    setInterval(dispatchStreamingAnalytics, 30000)
+  }
+
   private startPerformanceMonitoring() {
     // Real-time performance monitoring
     this.performanceMonitoringInterval = window.setInterval(() => {
@@ -619,9 +1016,13 @@ class HLSVideoPlayer extends HTMLElement {
 
     // Play/Pause button
     const playPauseBtn = this.shadow.getElementById('play-pause')
-    playPauseBtn?.addEventListener('click', () => {
+    playPauseBtn?.addEventListener('click', async () => {
       if (this.video?.paused) {
-        this.video.play()
+        try {
+          await this.video.play()
+        } catch (error) {
+          console.log('Play was interrupted:', error)
+        }
       } else {
         this.video?.pause()
       }
@@ -657,6 +1058,38 @@ class HLSVideoPlayer extends HTMLElement {
       this.changeQuality(target.value)
     })
 
+    // Volume/Mute button
+    const volumeBtn = this.shadow.getElementById('volume')
+    volumeBtn?.addEventListener('click', () => {
+      if (!this.video) return
+
+      if (this.video.muted || this.video.volume === 0) {
+        this.video.muted = false
+        this.video.volume = 1
+        volumeBtn.textContent = '🔊'
+        volumeBtn.setAttribute('aria-label', 'Mute volume')
+      } else {
+        this.video.muted = true
+        volumeBtn.textContent = '🔇'
+        volumeBtn.setAttribute('aria-label', 'Unmute volume')
+      }
+    })
+
+    // Progress bar seeking
+    const progressBar = this.shadow.querySelector('.progress-bar') as HTMLElement
+    progressBar?.addEventListener('click', (event) => {
+      if (!this.video || !isFinite(this.video.duration)) return
+
+      const rect = progressBar.getBoundingClientRect()
+      const clickX = event.clientX - rect.left
+      const percentage = clickX / rect.width
+      const newTime = percentage * this.video.duration
+
+      if (isFinite(newTime) && newTime >= 0 && newTime <= this.video.duration) {
+        this.video.currentTime = newTime
+      }
+    })
+
     // Fullscreen
     const fullscreenBtn = this.shadow.getElementById('fullscreen')
     fullscreenBtn?.addEventListener('click', () => {
@@ -671,26 +1104,45 @@ class HLSVideoPlayer extends HTMLElement {
     this.addEventListener('keydown', this.handleKeyboardInput.bind(this))
   }
 
-  private handleKeyboardInput(event: KeyboardEvent) {
+  private async handleKeyboardInput(event: KeyboardEvent) {
     // Smart TV D-pad navigation
     switch (event.key) {
       case ' ':
       case 'Enter':
         event.preventDefault()
-        this.video?.paused ? this.video?.play() : this.video?.pause()
+        if (this.video) {
+          if (this.video.paused) {
+            try {
+              await this.video.play()
+            } catch (error) {
+              console.log('Play was interrupted:', error)
+            }
+          } else {
+            this.video.pause()
+          }
+        }
         break
 
       case 'ArrowLeft':
         event.preventDefault()
-        if (this.video) {
-          this.video.currentTime = Math.max(0, this.video.currentTime - 10)
+        if (this.video && !isNaN(this.video.duration) && isFinite(this.video.currentTime)) {
+          const newTime = Math.max(0, this.video.currentTime - 10)
+          if (isFinite(newTime)) {
+            this.video.currentTime = newTime
+          }
         }
         break
 
       case 'ArrowRight':
         event.preventDefault()
-        if (this.video) {
-          this.video.currentTime = Math.min(this.video.duration, this.video.currentTime + 10)
+        if (this.video && !isNaN(this.video.duration) && isFinite(this.video.currentTime)) {
+          const newTime = Math.min(
+            this.video.duration || 0,
+            this.video.currentTime + 10
+          )
+          if (isFinite(newTime)) {
+            this.video.currentTime = newTime
+          }
         }
         break
 
@@ -796,8 +1248,8 @@ class HLSVideoPlayer extends HTMLElement {
   }
 
   public seek(time: number) {
-    if (this.video) {
-      this.video.currentTime = time
+    if (this.video && isFinite(time) && !isNaN(time)) {
+      this.video.currentTime = Math.max(0, Math.min(time, this.video.duration || 0))
     }
   }
 

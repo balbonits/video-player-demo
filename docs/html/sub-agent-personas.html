@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sub-Agent Personas - Team Architecture</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <style>
+        :root {
+            --background: #0a0a0a;
+            --foreground: #fafafa;
+            --card: #111111;
+            --card-foreground: #fafafa;
+            --primary: #6366f1;
+            --primary-foreground: #fafafa;
+            --secondary: #1f1f1f;
+            --secondary-foreground: #a1a1aa;
+            --muted: #1f1f1f;
+            --muted-foreground: #71717a;
+            --accent: #18181b;
+            --accent-foreground: #fafafa;
+            --border: #27272a;
+            --input: #27272a;
+            --ring: #6366f1;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --error: #ef4444;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+            background: var(--background) !important;
+            color: var(--foreground) !important;
+            line-height: 1.6 !important;
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace !important;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .card {
+            background: var(--card) !important;
+            border: 1px solid var(--border) !important;
+            border-radius: 12px !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .card:hover {
+            border-color: var(--primary) !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 20px 25px -5px rgba(99, 102, 241, 0.1) !important;
+        }
+
+        .persona-card {
+            background: var(--card) !important;
+            border: 2px solid transparent !important;
+            border-radius: 16px !important;
+            transition: all 0.4s ease !important;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .persona-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, transparent, rgba(99, 102, 241, 0.1));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .persona-card:hover::before {
+            opacity: 1;
+        }
+
+        .persona-card:hover {
+            border-color: var(--primary) !important;
+            transform: translateY(-4px) scale(1.02) !important;
+            box-shadow: 0 25px 35px -5px rgba(99, 102, 241, 0.2) !important;
+        }
+
+        .persona-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 24px;
+            border: 4px solid rgba(99, 102, 241, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .persona-card:hover .persona-avatar {
+            transform: scale(1.1);
+            border-color: rgba(139, 92, 246, 0.4);
+        }
+
+        .role-badge {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .specialization-tag {
+            background: var(--accent);
+            border: 1px solid var(--border);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .specialization-tag:hover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .workflow-diagram {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05));
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 16px;
+            padding: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .workflow-step {
+            background: var(--card);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .workflow-step:hover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.05);
+            transform: scale(1.05);
+        }
+
+        .workflow-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 24px;
+        }
+
+        .context-item {
+            background: var(--accent);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .context-item:hover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--success);
+            border: 2px solid rgba(34, 197, 94, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+
+        .nav-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+            color: var(--muted-foreground);
+            font-size: 14px;
+        }
+
+        .nav-breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .nav-breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .coordination-timeline {
+            position: relative;
+        }
+
+        .coordination-timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, var(--primary), #8b5cf6);
+            transform: translateX(-50%);
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .timeline-item:nth-child(odd) {
+            flex-direction: row;
+        }
+
+        .timeline-item:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+
+        .timeline-content {
+            width: 45%;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-content:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .timeline-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--primary);
+            border: 4px solid var(--background);
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+        }
+
+        @media (max-width: 768px) {
+            .coordination-timeline::before {
+                left: 20px;
+            }
+
+            .timeline-item {
+                flex-direction: row !important;
+                padding-left: 40px;
+            }
+
+            .timeline-content {
+                width: 100%;
+            }
+
+            .timeline-dot {
+                left: 20px;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Header -->
+    <header class="border-b border-gray-800 bg-black/50 backdrop-blur-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <a href="index.html" class="flex items-center space-x-4">
+                        <div class="w-10 h-10 rounded-lg bg-indigo-600/10 border border-indigo-600/20 flex items-center justify-center">
+                            <i data-lucide="users" class="w-5 h-5 text-indigo-400"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-lg font-bold gradient-text">Team Personas</h1>
+                            <p class="text-sm text-gray-400">Sub-Agent Architecture & Setup</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-2">
+                        <div class="status-indicator"></div>
+                        <span class="text-sm text-green-400">All Agents Configured</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-6 py-8">
+        <!-- Breadcrumb -->
+        <div class="nav-breadcrumb">
+            <a href="index.html">Documentation</a>
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            <a href="sub-agents-readme.html">Sub-Agents Guide</a>
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            <span>Team Personas</span>
+        </div>
+
+        <!-- Header Section -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold gradient-text mb-4">Sub-Agent Team Architecture</h1>
+            <p class="text-xl text-gray-300 mb-6">
+                Specialized AI personas with performance optimization focus and complete project context
+            </p>
+            <div class="flex items-center justify-center space-x-8 text-sm text-gray-400">
+                <div class="flex items-center space-x-2">
+                    <i data-lucide="calendar" class="w-4 h-4"></i>
+                    <span>2024-09-19</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <i data-lucide="user" class="w-4 h-4"></i>
+                    <span>Architecture Lead: Morgan</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <i data-lucide="cpu" class="w-4 h-4"></i>
+                    <span>5 Specialized Agents</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Team Overview -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-bold mb-8">Persona to Sub-Agent Mapping</h2>
+
+            <div class="grid lg:grid-cols-2 xl:grid-cols-3 gap-8">
+                <!-- Alex - Engineer -->
+                <div class="persona-card p-6">
+                    <div class="flex flex-col items-center text-center mb-6">
+                        <div class="persona-avatar mb-4">A</div>
+                        <h3 class="text-xl font-bold mb-2">Alex</h3>
+                        <div class="role-badge mb-2">alex-engineer</div>
+                        <p class="text-gray-400 text-sm">Technical Implementation & Performance</p>
+                    </div>
+
+                    <div class="space-y-4 relative z-10">
+                        <div>
+                            <h4 class="font-semibold mb-2 text-green-400">Specialization</h4>
+                            <p class="text-sm text-gray-300">Technical implementation, performance optimization</p>
+                        </div>
+
+                        <div>
+                            <h4 class="font-semibold mb-2 text-blue-400">Focus</h4>
+                            <p class="text-sm text-gray-300">JavaScript performance optimization for FOX shared TV codebase</p>
+                        </div>
+
+                        <div>
+                            <h4 class="font-semibold mb-2 text-purple-400">Tools</h4>
+                            <div class="flex flex-wrap gap-1">
+                                <span class="specialization-tag">Write</span>
+                                <span class="specialization-tag">Edit</span>
+                                <span class="specialization-tag">Read</span>
+                                <span class="specialization-tag">Bash</span>
+                                <span class="specialization-tag">TodoWrite</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 class="font-semibold mb-2 text-yellow-400">Existing Work</h4>
+                            <p class="text-xs text-gray-400">30+ technical specification files and implementation plans</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sam - QA -->
+                <div class="persona-card p-6">
+                    <div class="flex flex-col items-center text-center mb-6">
+                        <div class="persona-avatar mb-4" style="background: linear-gradient(135deg, #22c55e, #16a34a);">S</div>
+                        <h3 class="text-xl font-bold mb-2">Sam</h3>
+                        <div class="role-badge mb-2">sam-qa</div>
+                        <p class="text-gray-400 text-sm">Testing & Quality Assurance</p>
+                    </div>
+
+                    <div class="space-y-4 relative z-10">
+                        <div>
+                            <h4 class="font-semibold mb-2 text-green-400">Specialization</h4>
+                            <p class="text-sm text-gray-300">Testing automation, quality assurance, performance validation</p>
+                        </div>
+
+                        <div>
+                            <h4 class="font-semibold mb-2 text-blue-400">Focus</h4>
+                            <p class="text-sm text-gray-300">90% test coverage with performance regression prevention</p>
+                        </div>
+
+                        <div>
+                            <h4 class="font-semibold mb-2 text-purple-400">Tools</h4>
+                            <div class="flex flex-wrap gap-1">
+                                <span class="specialization-tag">Write</span>
+                                <span class="specialization-tag">Edit</span>
+                                <span class="specialization-tag">Read</span>
+                                <span class="specialization-tag">Bash</span>
+                                <span class="specialization-tag">Grep</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 class="font-semibold mb-2 text-yellow-400">Existing Work</h4>
+                            <p class="text-xs text-gray-400">Complete testing framework analysis and coverage specifications</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Jordan - Product -->
+                <div class="persona-card p-6">
+                    <div class="flex flex-col items-center text-center mb-6">
+                        <div class="persona-avatar mb-4" style="background: linear-gradient(135deg, #f59e0b, #d97706);">J</div>
+                        <h3 class="text-xl font-bold mb-2">Jordan</h3>
+                        <div class="role-badge mb-2">jordan-product</div>
+                        <p class="text-gray-400 text-sm">Product Strategy & Research</p>
+                    </div>
+
+                    <div class="space-y-4 relative z-10">
+                        <div>
+                            <h4 class="font-semibold mb-2 text-green-400">Specialization</h4>
+                            <p class="text-sm text-gray-300">Product strategy, market research, business requirements</p>
+                        </div>
+
+                        <div>
+                            <h4 class="font-semibold mb-2 text-blue-400">Focus</h4>
+                            <p class="text-sm text-gray-300">Performance optimization business value and FOX alignment</p>
+                        </div>
+
+                        <div>
+                            <h4 class="font-semibold mb-2 text-purple-400">Tools</h4>
+                            <div class="flex flex-wrap gap-1">
+                                <span class="specialization-tag">WebSearch</span>
+                                <span class="specialization-tag">Write</span>
+                                <span class="specialization-tag">Read</span>
+                                <span class="specialization-tag">TodoWrite</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 class="font-semibold mb-2 text-yellow-400">Existing Work</h4>
+                            <p class="text-xs text-gray-400">Comprehensive product specifications and market research</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Casey - Release -->
+                <div class="persona-card p-6">
+                    <div class="flex flex-col items-center text-center mb-6">
+                        <div class="persona-avatar mb-4" style="background: linear-gradient(135deg, #ef4444, #dc2626);">C</div>
+                        <h3 class="text-xl font-bold mb-2">Casey</h3>
+                        <div class="role-badge mb-2">casey-release</div>
+                        <p class="text-gray-400 text-sm">DevOps & Performance Monitoring</p>
+                    </div>
+
+                    <div class="space-y-4 relative z-10">
+                        <div>
+                            <h4 class="font-semibold mb-2 text-green-400">Specialization</h4>
+                            <p class="text-sm text-gray-300">DevOps, deployment, performance monitoring, analytics</p>
+                        </div>
+
+                        <div>
+                            <h4 class="font-semibold mb-2 text-blue-400">Focus</h4>
+                            <p class="text-sm text-gray-300">Performance monitoring infrastructure and deployment optimization</p>
+                        </div>
+
+                        <div>
+                            <h4 class="font-semibold mb-2 text-purple-400">Tools</h4>
+                            <div class="flex flex-wrap gap-1">
+                                <span class="specialization-tag">Write</span>
+                                <span class="specialization-tag">Edit</span>
+                                <span class="specialization-tag">Bash</span>
+                                <span class="specialization-tag">Glob</span>
+                                <span class="specialization-tag">TodoWrite</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 class="font-semibold mb-2 text-yellow-400">Existing Work</h4>
+                            <p class="text-xs text-gray-400">Comprehensive DevOps specifications and deployment strategies</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Riley - UX -->
+                <div class="persona-card p-6">
+                    <div class="flex flex-col items-center text-center mb-6">
+                        <div class="persona-avatar mb-4" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">R</div>
+                        <h3 class="text-xl font-bold mb-2">Riley</h3>
+                        <div class="role-badge mb-2">riley-ux</div>
+                        <p class="text-gray-400 text-sm">Performance-Conscious UX Design</p>
+                    </div>
+
+                    <div class="space-y-4 relative z-10">
+                        <div>
+                            <h4 class="font-semibold mb-2 text-green-400">Specialization</h4>
+                            <p class="text-sm text-gray-300">UX design, accessibility, performance-conscious design</p>
+                        </div>
+
+                        <div>
+                            <h4 class="font-semibold mb-2 text-blue-400">Focus</h4>
+                            <p class="text-sm text-gray-300">Performance-optimized UX patterns for Smart TV constraints</p>
+                        </div>
+
+                        <div>
+                            <h4 class="font-semibold mb-2 text-purple-400">Tools</h4>
+                            <div class="flex flex-wrap gap-1">
+                                <span class="specialization-tag">Write</span>
+                                <span class="specialization-tag">Edit</span>
+                                <span class="specialization-tag">Read</span>
+                                <span class="specialization-tag">TodoWrite</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 class="font-semibold mb-2 text-yellow-400">Existing Work</h4>
+                            <p class="text-xs text-gray-400">Professional wireframe gallery and responsive design specifications</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Context Integration -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-bold mb-8">Sub-Agent Context Integration</h2>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Alex Context -->
+                <div class="card p-6">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-12 h-12 rounded-lg bg-indigo-600/10 border border-indigo-600/20 flex items-center justify-center">
+                            <span class="font-bold text-indigo-400">A</span>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold">Alex (Engineer) Context</h3>
+                            <p class="text-sm text-gray-400">Complete technical architecture access</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <div class="context-item">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm font-medium">Personal Journal</span>
+                                <span class="text-xs text-gray-400 mono">personas/alex-engineer/JOURNAL.md</span>
+                            </div>
+                        </div>
+                        <div class="context-item">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm font-medium">Project Specs</span>
+                                <span class="text-xs text-gray-400 mono">personas/alex-engineer/PROJECT.md</span>
+                            </div>
+                        </div>
+                        <div class="context-item">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm font-medium">Implementation Plans</span>
+                                <span class="text-xs text-gray-400 mono">docs/plans/ALEX_*</span>
+                            </div>
+                        </div>
+                        <div class="context-item">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm font-medium">Performance Specs</span>
+                                <span class="text-xs text-gray-400 mono">docs/specs/PERFORMANCE_*</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 p-3 bg-green-600/10 border border-green-600/20 rounded-8">
+                        <h4 class="font-semibold text-green-400 text-sm mb-2">Key Decisions</h4>
+                        <ul class="text-xs text-gray-300 space-y-1">
+                            <li>• Next.js Pages Router for fast development</li>
+                            <li>• Redux Toolkit Action Creators for enterprise patterns</li>
+                            <li>• HLS.js direct implementation for performance control</li>
+                            <li>• TypeScript strict mode for code quality</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Sam Context -->
+                <div class="card p-6">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-12 h-12 rounded-lg bg-green-600/10 border border-green-600/20 flex items-center justify-center">
+                            <span class="font-bold text-green-400">S</span>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold">Sam (QA) Context</h3>
+                            <p class="text-sm text-gray-400">Complete testing framework access</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <div class="context-item">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm font-medium">Testing Framework</span>
+                                <span class="text-xs text-gray-400 mono">docs/specs/SAM_TESTING_*</span>
+                            </div>
+                        </div>
+                        <div class="context-item">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm font-medium">Coverage Specs</span>
+                                <span class="text-xs text-gray-400 mono">docs/specs/TEST_COVERAGE_*</span>
+                            </div>
+                        </div>
+                        <div class="context-item">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm font-medium">QA Documentation</span>
+                                <span class="text-xs text-gray-400 mono">docs/QA.md</span>
+                            </div>
+                        </div>
+                        <div class="context-item">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm font-medium">OTT Testing</span>
+                                <span class="text-xs text-gray-400 mono">docs/specs/OTT_DEVICE_*</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 p-3 bg-green-600/10 border border-green-600/20 rounded-8">
+                        <h4 class="font-semibold text-green-400 text-sm mb-2">Quality Standards</h4>
+                        <ul class="text-xs text-gray-300 space-y-1">
+                            <li>• 90% overall test coverage requirement</li>
+                            <li>• 95% coverage for critical video player components</li>
+                            <li>• WCAG 2.1 AA compliance with zero violations</li>
+                            <li>• Performance regression prevention</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Jordan Context -->
+                <div class="card p-6">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-12 h-12 rounded-lg bg-yellow-600/10 border border-yellow-600/20 flex items-center justify-center">
+                            <span class="font-bold text-yellow-400">J</span>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold">Jordan (Product) Context</h3>
+                            <p class="text-sm text-gray-400">Complete product strategy access</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <div class="context-item">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm font-medium">Product Documentation</span>
+                                <span class="text-xs text-gray-400 mono">docs/PRODUCT.md</span>
+                            </div>
+                        </div>
+                        <div class="context-item">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm font-medium">Feature Matrix</span>
+                                <span class="text-xs text-gray-400 mono">docs/FEATURE_MATRIX.md</span>
+                            </div>
+                        </div>
+                        <div class="context-item">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm font-medium">Content Strategy</span>
+                                <span class="text-xs text-gray-400 mono">docs/specs/VIDEO_CONTENT_*</span>
+                            </div>
+                        </div>
+                        <div class="context-item">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm font-medium">Platform Costs</span>
+                                <span class="text-xs text-gray-400 mono">docs/PLATFORM_COSTS_*</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 p-3 bg-blue-600/10 border border-blue-600/20 rounded-8">
+                        <h4 class="font-semibold text-blue-400 text-sm mb-2">Business Objectives</h4>
+                        <ul class="text-xs text-gray-300 space-y-1">
+                            <li>• FOX Corporation job application support</li>
+                            <li>• Performance optimization business value</li>
+                            <li>• Shared codebase architecture alignment</li>
+                            <li>• Competitive advantage through expertise</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Combined Casey & Riley Context -->
+                <div class="card p-6">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="flex -space-x-2">
+                            <div class="w-8 h-8 rounded-full bg-red-600/20 border border-red-600/30 flex items-center justify-center z-10">
+                                <span class="font-bold text-red-400 text-xs">C</span>
+                            </div>
+                            <div class="w-8 h-8 rounded-full bg-purple-600/20 border border-purple-600/30 flex items-center justify-center">
+                                <span class="font-bold text-purple-400 text-xs">R</span>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold">Casey & Riley Context</h3>
+                            <p class="text-sm text-gray-400">DevOps & UX specialized access</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <h4 class="font-semibold text-red-400 text-sm mb-2">Casey (DevOps)</h4>
+                            <div class="space-y-1">
+                                <div class="text-xs text-gray-300 bg-red-600/5 p-2 rounded">Build & Deployment Specs</div>
+                                <div class="text-xs text-gray-300 bg-red-600/5 p-2 rounded">Performance Monitoring</div>
+                                <div class="text-xs text-gray-300 bg-red-600/5 p-2 rounded">Analytics Dashboard</div>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-purple-400 text-sm mb-2">Riley (UX)</h4>
+                            <div class="space-y-1">
+                                <div class="text-xs text-gray-300 bg-purple-600/5 p-2 rounded">Wireframe Gallery</div>
+                                <div class="text-xs text-gray-300 bg-purple-600/5 p-2 rounded">Design System</div>
+                                <div class="text-xs text-gray-300 bg-purple-600/5 p-2 rounded">Accessibility Standards</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Coordination Workflow -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-bold mb-8">Sub-Agent Coordination Workflow</h2>
+
+            <div class="workflow-diagram">
+                <h3 class="text-lg font-semibold mb-8 text-center">Parallel Execution Strategy</h3>
+
+                <!-- Phase 1 Foundation -->
+                <div class="coordination-timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <div class="flex items-center space-x-3 mb-3">
+                                <div class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center text-sm font-bold">A</div>
+                                <div>
+                                    <h4 class="font-semibold">Alex: TDD Web Component</h4>
+                                    <p class="text-xs text-gray-400">Performance optimization implementation</p>
+                                </div>
+                            </div>
+                            <div class="text-sm text-gray-300">
+                                Implements performance-optimized components with TDD methodology for Smart TV constraints
+                            </div>
+                        </div>
+                        <div class="timeline-dot"></div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <div class="flex items-center space-x-3 mb-3">
+                                <div class="w-8 h-8 rounded-full bg-green-600 text-white flex items-center justify-center text-sm font-bold">S</div>
+                                <div>
+                                    <h4 class="font-semibold">Sam: Test Specifications</h4>
+                                    <p class="text-xs text-gray-400">Performance validation framework</p>
+                                </div>
+                            </div>
+                            <div class="text-sm text-gray-300">
+                                Creates comprehensive test specifications and performance validation suites
+                            </div>
+                        </div>
+                        <div class="timeline-dot"></div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <div class="flex items-center space-x-3 mb-3">
+                                <div class="w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center text-sm font-bold">C</div>
+                                <div>
+                                    <h4 class="font-semibold">Casey: Monitoring Pipeline</h4>
+                                    <p class="text-xs text-gray-400">Analytics and performance tracking</p>
+                                </div>
+                            </div>
+                            <div class="text-sm text-gray-300">
+                                Sets up performance monitoring infrastructure and real-time analytics dashboard
+                            </div>
+                        </div>
+                        <div class="timeline-dot"></div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <div class="flex items-center space-x-3 mb-3">
+                                <div class="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center text-sm font-bold">R</div>
+                                <div>
+                                    <h4 class="font-semibold">Riley: Performance UX</h4>
+                                    <p class="text-xs text-gray-400">Optimized wireframes and specifications</p>
+                                </div>
+                            </div>
+                            <div class="text-sm text-gray-300">
+                                Creates performance-optimized wireframes and UX specifications for Smart TV
+                            </div>
+                        </div>
+                        <div class="timeline-dot"></div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <div class="flex items-center space-x-3 mb-3">
+                                <div class="w-8 h-8 rounded-full bg-yellow-600 text-white flex items-center justify-center text-sm font-bold">J</div>
+                                <div>
+                                    <h4 class="font-semibold">Jordan: Business Analysis</h4>
+                                    <p class="text-xs text-gray-400">Competitive analysis and value research</p>
+                                </div>
+                            </div>
+                            <div class="text-sm text-gray-300">
+                                Conducts competitive analysis and validates business value for FOX positioning
+                            </div>
+                        </div>
+                        <div class="timeline-dot"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Communication Protocol -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-bold mb-8">Communication Protocol</h2>
+
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center">
+                        <i data-lucide="cpu" class="w-5 h-5 text-green-400 mr-2"></i>
+                        Autonomous Operation
+                    </h3>
+                    <ul class="space-y-3 text-sm text-gray-300">
+                        <li class="flex items-start space-x-2">
+                            <i data-lucide="check" class="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0"></i>
+                            <span>Each agent makes decisions within their domain expertise</span>
+                        </li>
+                        <li class="flex items-start space-x-2">
+                            <i data-lucide="file-text" class="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0"></i>
+                            <span>All agents update their respective documentation</span>
+                        </li>
+                        <li class="flex items-start space-x-2">
+                            <i data-lucide="activity" class="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0"></i>
+                            <span>Real-time TODOS.md updates for coordination</span>
+                        </li>
+                        <li class="flex items-start space-x-2">
+                            <i data-lucide="shield" class="w-4 h-4 text-yellow-400 mt-0.5 flex-shrink-0"></i>
+                            <span>Maintain enterprise-level practices throughout</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center">
+                        <i data-lucide="users" class="w-5 h-5 text-blue-400 mr-2"></i>
+                        Cross-Agent Collaboration
+                    </h3>
+                    <ul class="space-y-3 text-sm text-gray-300">
+                        <li class="flex items-start space-x-2">
+                            <i data-lucide="git-merge" class="w-4 h-4 text-indigo-400 mt-0.5 flex-shrink-0"></i>
+                            <span>Alex and Sam coordinate on TDD implementation</span>
+                        </li>
+                        <li class="flex items-start space-x-2">
+                            <i data-lucide="target" class="w-4 h-4 text-yellow-400 mt-0.5 flex-shrink-0"></i>
+                            <span>Jordan and Alex align on performance specifications</span>
+                        </li>
+                        <li class="flex items-start space-x-2">
+                            <i data-lucide="workflow" class="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0"></i>
+                            <span>Casey and Alex coordinate on CI/CD requirements</span>
+                        </li>
+                        <li class="flex items-start space-x-2">
+                            <i data-lucide="palette" class="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0"></i>
+                            <span>Riley and Alex coordinate on design implementation</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center">
+                        <i data-lucide="alert-triangle" class="w-5 h-5 text-yellow-400 mr-2"></i>
+                        Escalation Protocol
+                    </h3>
+                    <ul class="space-y-3 text-sm text-gray-300">
+                        <li class="flex items-start space-x-2">
+                            <i data-lucide="message-circle" class="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0"></i>
+                            <span>Agents coordinate directly for minor issues</span>
+                        </li>
+                        <li class="flex items-start space-x-2">
+                            <i data-lucide="user-check" class="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0"></i>
+                            <span>Morgan coordinates complex decisions</span>
+                        </li>
+                        <li class="flex items-start space-x-2">
+                            <i data-lucide="user" class="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0"></i>
+                            <span>Escalate scope changes to John</span>
+                        </li>
+                        <li class="flex items-start space-x-2">
+                            <i data-lucide="help-circle" class="w-4 h-4 text-yellow-400 mt-0.5 flex-shrink-0"></i>
+                            <span>Cross-agent consultation for technical blocks</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Implementation Status -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-bold mb-8">Implementation Status & Future State</h2>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Current Status -->
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center">
+                        <i data-lucide="check-circle" class="w-5 h-5 text-green-400 mr-2"></i>
+                        Current Status
+                    </h3>
+
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-3 bg-green-600/10 border border-green-600/20 rounded-8">
+                            <span class="text-sm font-medium">Files Created</span>
+                            <span class="text-green-400 text-sm">✅ Complete</span>
+                        </div>
+
+                        <div class="flex items-center justify-between p-3 bg-yellow-600/10 border border-yellow-600/20 rounded-8">
+                            <span class="text-sm font-medium">Recognition Issue</span>
+                            <span class="text-yellow-400 text-sm">⚠️ Workaround Active</span>
+                        </div>
+
+                        <div class="flex items-center justify-between p-3 bg-green-600/10 border border-green-600/20 rounded-8">
+                            <span class="text-sm font-medium">Context Integration</span>
+                            <span class="text-green-400 text-sm">✅ Complete</span>
+                        </div>
+
+                        <div class="flex items-center justify-between p-3 bg-green-600/10 border border-green-600/20 rounded-8">
+                            <span class="text-sm font-medium">Performance Focus</span>
+                            <span class="text-green-400 text-sm">✅ Throughout</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 p-3 bg-blue-600/10 border border-blue-600/20 rounded-8">
+                        <h4 class="font-semibold text-blue-400 text-sm mb-2">Current Approach</h4>
+                        <p class="text-xs text-gray-300">
+                            Enhanced persona-based coordination with sub-agent concepts using Task tool
+                            for parallel execution while maintaining development velocity.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Future State -->
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center">
+                        <i data-lucide="rocket" class="w-5 h-5 text-purple-400 mr-2"></i>
+                        Future Implementation
+                    </h3>
+
+                    <div class="space-y-4">
+                        <div class="p-3 bg-purple-600/10 border border-purple-600/20 rounded-8">
+                            <h4 class="font-semibold text-purple-400 text-sm mb-1">True Parallel Execution</h4>
+                            <p class="text-xs text-gray-300">Up to 10 concurrent specialized agents with 90%+ performance improvement</p>
+                        </div>
+
+                        <div class="p-3 bg-cyan-600/10 border border-cyan-600/20 rounded-8">
+                            <h4 class="font-semibold text-cyan-400 text-sm mb-1">Automatic Coordination</h4>
+                            <p class="text-xs text-gray-300">Task delegation and dependency management without human oversight</p>
+                        </div>
+
+                        <div class="p-3 bg-green-600/10 border border-green-600/20 rounded-8">
+                            <h4 class="font-semibold text-green-400 text-sm mb-1">Enterprise Value</h4>
+                            <p class="text-xs text-gray-300">Dramatic acceleration of complex development projects with specialized expertise</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 p-3 bg-indigo-600/10 border border-indigo-600/20 rounded-8">
+                        <h4 class="font-semibold text-indigo-400 text-sm mb-2">Ready for Upgrade</h4>
+                        <p class="text-xs text-gray-300">
+                            Complete foundation prepared for immediate transition to true sub-agents
+                            when Claude Code technical issues are resolved.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Call to Action -->
+        <section class="text-center bg-gradient-to-r from-indigo-600/10 to-purple-600/10 border border-indigo-600/20 rounded-16 p-8">
+            <h2 class="text-2xl font-bold gradient-text mb-4">Morgan's Sub-Agent Documentation Mission</h2>
+            <p class="text-gray-300 mb-6 max-w-3xl mx-auto">
+                Provide comprehensive foundation for sub-agent implementation while documenting our enhanced
+                persona-based approach that incorporates sub-agent concepts and specialized coordination patterns.
+            </p>
+            <div class="flex flex-wrap justify-center gap-4">
+                <a href="sub-agents-readme.html"
+                   class="px-6 py-3 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors flex items-center space-x-2">
+                    <i data-lucide="book-open" class="w-4 h-4"></i>
+                    <span>Sub-Agents Guide</span>
+                </a>
+                <a href="subagents-setup-guide.html"
+                   class="px-6 py-3 border border-indigo-600 text-indigo-400 rounded-lg font-medium hover:bg-indigo-600/10 transition-colors flex items-center space-x-2">
+                    <i data-lucide="settings" class="w-4 h-4"></i>
+                    <span>Setup Guide</span>
+                </a>
+                <a href="index.html"
+                   class="px-6 py-3 border border-gray-600 text-gray-400 rounded-lg font-medium hover:bg-gray-600/10 transition-colors flex items-center space-x-2">
+                    <i data-lucide="home" class="w-4 h-4"></i>
+                    <span>Documentation Hub</span>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-800 mt-16">
+        <div class="max-w-7xl mx-auto px-6 py-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="text-sm text-gray-400 mb-4 md:mb-0">
+                    <p>&copy; 2025 John Dilig - Video Player Demo Project</p>
+                    <p class="mono">Architecture Lead: Morgan | Performance optimization focus throughout</p>
+                </div>
+                <div class="flex items-center space-x-6">
+                    <div class="flex items-center space-x-2">
+                        <div class="status-indicator"></div>
+                        <span class="text-sm text-green-400">Ready for sub-agent implementation</span>
+                    </div>
+                    <div class="text-sm text-gray-400">
+                        <span>Status: 2024-09-19</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Add smooth hover animations for persona cards
+        document.querySelectorAll('.persona-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-8px) scale(1.02)';
+            });
+
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+
+        // Add click effects for context items
+        document.querySelectorAll('.context-item').forEach(item => {
+            item.addEventListener('click', function() {
+                this.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 150);
+            });
+        });
+
+        // Animate timeline on scroll
+        function animateTimeline() {
+            const timelineItems = document.querySelectorAll('.timeline-item');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.3 });
+
+            timelineItems.forEach((item, index) => {
+                item.style.opacity = '0';
+                item.style.transform = 'translateY(20px)';
+                item.style.transition = `opacity 0.6s ease ${index * 0.1}s, transform 0.6s ease ${index * 0.1}s`;
+                observer.observe(item);
+            });
+        }
+
+        // Initialize animations
+        setTimeout(animateTimeline, 500);
+
+        // Add interactive specialization tags
+        document.querySelectorAll('.specialization-tag').forEach(tag => {
+            tag.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.05)';
+                this.style.borderColor = '#6366f1';
+            });
+
+            tag.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+                this.style.borderColor = '#27272a';
+            });
+        });
+    </script>
+</body>
+</html>

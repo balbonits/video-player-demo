@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Code Sub-Agents - Complete Guide</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <style>
+        :root {
+            --background: #0a0a0a;
+            --foreground: #fafafa;
+            --card: #111111;
+            --card-foreground: #fafafa;
+            --primary: #6366f1;
+            --primary-foreground: #fafafa;
+            --secondary: #1f1f1f;
+            --secondary-foreground: #a1a1aa;
+            --muted: #1f1f1f;
+            --muted-foreground: #71717a;
+            --accent: #18181b;
+            --accent-foreground: #fafafa;
+            --border: #27272a;
+            --input: #27272a;
+            --ring: #6366f1;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --error: #ef4444;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+            background: var(--background) !important;
+            color: var(--foreground) !important;
+            line-height: 1.6 !important;
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace !important;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .card {
+            background: var(--card) !important;
+            border: 1px solid var(--border) !important;
+            border-radius: 12px !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .card:hover {
+            border-color: var(--primary) !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 20px 25px -5px rgba(99, 102, 241, 0.1) !important;
+        }
+
+        .code-block {
+            background: #1a1a1a !important;
+            border: 1px solid var(--border) !important;
+            border-radius: 8px !important;
+            padding: 16px !important;
+            font-family: 'JetBrains Mono', monospace !important;
+            font-size: 14px !important;
+            overflow-x: auto !important;
+            position: relative;
+        }
+
+        .code-block::before {
+            content: attr(data-language);
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            font-size: 12px;
+            color: var(--muted-foreground);
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        .architecture-diagram {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05));
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 12px;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .diagram-node {
+            background: var(--card);
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+            position: relative;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .diagram-node:hover {
+            border-color: #8b5cf6;
+            background: rgba(139, 92, 246, 0.1);
+            transform: scale(1.02);
+        }
+
+        .diagram-arrow {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+        }
+
+        .diagram-arrow::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), #8b5cf6);
+            border-radius: 1px;
+        }
+
+        .benefit-card {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.05), rgba(16, 185, 129, 0.05));
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .issue-card {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.05), rgba(251, 191, 36, 0.05));
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .config-option {
+            background: var(--accent);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .config-option:hover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .step-indicator {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .nav-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+            color: var(--muted-foreground);
+            font-size: 14px;
+        }
+
+        .nav-breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .nav-breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .performance-metric {
+            background: var(--accent);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .performance-metric:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .metric-label {
+            color: var(--muted-foreground);
+            font-size: 14px;
+        }
+
+        .troubleshooting-item {
+            border-left: 4px solid var(--warning);
+            background: rgba(245, 158, 11, 0.05);
+            padding: 16px 20px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 16px;
+        }
+
+        .solution-item {
+            border-left: 4px solid var(--success);
+            background: rgba(34, 197, 94, 0.05);
+            padding: 16px 20px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .diagram-node {
+                margin: 8px 0;
+            }
+
+            .performance-metric {
+                margin-bottom: 16px;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Header -->
+    <header class="border-b border-gray-800 bg-black/50 backdrop-blur-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <a href="index.html" class="flex items-center space-x-4">
+                        <div class="w-10 h-10 rounded-lg bg-indigo-600/10 border border-indigo-600/20 flex items-center justify-center">
+                            <i data-lucide="users" class="w-5 h-5 text-indigo-400"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-lg font-bold gradient-text">Sub-Agents Guide</h1>
+                            <p class="text-sm text-gray-400">Complete implementation guide</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm bg-indigo-600/10 text-indigo-400 px-3 py-1 rounded-full border border-indigo-600/20">
+                        Morgan (Team Lead)
+                    </span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-6 py-8">
+        <!-- Breadcrumb -->
+        <div class="nav-breadcrumb">
+            <a href="index.html">Documentation</a>
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            <span>Sub-Agents Guide</span>
+        </div>
+
+        <!-- Header Section -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold gradient-text mb-4">Claude Code Sub-Agents</h1>
+            <p class="text-xl text-gray-300 mb-6">
+                Comprehensive guide to specialized AI agent coordination and parallel execution
+            </p>
+            <div class="flex items-center justify-center space-x-8 text-sm text-gray-400">
+                <div class="flex items-center space-x-2">
+                    <i data-lucide="calendar" class="w-4 h-4"></i>
+                    <span>2024-09-19</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <i data-lucide="user" class="w-4 h-4"></i>
+                    <span>Documentation Lead: Morgan</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <i data-lucide="target" class="w-4 h-4"></i>
+                    <span>Video player demo project</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Core Concept -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold mb-6">What are Claude Code Sub-Agents?</h2>
+
+            <div class="grid md:grid-cols-2 gap-6 mb-8">
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center">
+                        <i data-lucide="brain" class="w-5 h-5 text-indigo-400 mr-2"></i>
+                        Definition & Core Concept
+                    </h3>
+                    <p class="text-gray-300 mb-4">
+                        Claude Code sub-agents are specialized AI assistants that can be invoked to handle specific types of tasks.
+                        They enable more efficient problem-solving by providing task-specific configurations with customized system prompts,
+                        tools, and separate context windows.
+                    </p>
+                </div>
+
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center">
+                        <i data-lucide="zap" class="w-5 h-5 text-yellow-400 mr-2"></i>
+                        Key Benefits
+                    </h3>
+                    <ul class="space-y-2 text-gray-300">
+                        <li class="flex items-start space-x-2">
+                            <i data-lucide="check" class="w-4 h-4 text-green-400 mt-1 flex-shrink-0"></i>
+                            <span>90.2% performance improvement over single-agent</span>
+                        </li>
+                        <li class="flex items-start space-x-2">
+                            <i data-lucide="check" class="w-4 h-4 text-green-400 mt-1 flex-shrink-0"></i>
+                            <span>Up to 10 concurrent agents supported</span>
+                        </li>
+                        <li class="flex items-start space-x-2">
+                            <i data-lucide="check" class="w-4 h-4 text-green-400 mt-1 flex-shrink-0"></i>
+                            <span>Specialized domain expertise</span>
+                        </li>
+                        <li class="flex items-start space-x-2">
+                            <i data-lucide="check" class="w-4 h-4 text-green-400 mt-1 flex-shrink-0"></i>
+                            <span>Independent context isolation</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Architecture Diagram -->
+            <div class="architecture-diagram mb-8">
+                <h3 class="text-lg font-semibold mb-6 text-center">Sub-Agent Architecture</h3>
+
+                <!-- Main Diagram -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <!-- Specialized Intelligence -->
+                    <div class="diagram-node">
+                        <i data-lucide="brain" class="w-8 h-8 text-indigo-400 mx-auto mb-2"></i>
+                        <h4 class="font-semibold text-sm">Specialized Intelligence</h4>
+                        <p class="text-xs text-gray-400 mt-1">Domain-optimized expertise</p>
+                    </div>
+
+                    <!-- Independent Context -->
+                    <div class="diagram-node">
+                        <i data-lucide="layers" class="w-8 h-8 text-purple-400 mx-auto mb-2"></i>
+                        <h4 class="font-semibold text-sm">Independent Context</h4>
+                        <p class="text-xs text-gray-400 mt-1">Isolated conversation threads</p>
+                    </div>
+
+                    <!-- Parallel Execution -->
+                    <div class="diagram-node">
+                        <i data-lucide="cpu" class="w-8 h-8 text-cyan-400 mx-auto mb-2"></i>
+                        <h4 class="font-semibold text-sm">Parallel Execution</h4>
+                        <p class="text-xs text-gray-400 mt-1">Concurrent task processing</p>
+                    </div>
+                </div>
+
+                <!-- Arrows connecting the nodes -->
+                <div class="hidden md:flex justify-between items-center px-12">
+                    <div class="diagram-arrow w-24">
+                        <i data-lucide="arrow-right" class="w-6 h-6 z-10 bg-gray-900 px-2"></i>
+                    </div>
+                    <div class="diagram-arrow w-24">
+                        <i data-lucide="arrow-right" class="w-6 h-6 z-10 bg-gray-900 px-2"></i>
+                    </div>
+                </div>
+
+                <!-- Outcome -->
+                <div class="mt-6 text-center">
+                    <div class="diagram-node max-w-md mx-auto">
+                        <i data-lucide="trending-up" class="w-8 h-8 text-green-400 mx-auto mb-2"></i>
+                        <h4 class="font-semibold">90.2% Performance Improvement</h4>
+                        <p class="text-xs text-gray-400 mt-1">Orchestrator-worker pattern with automatic delegation</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Performance Metrics -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold mb-6">Performance & Optimization Benefits</h2>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+                <div class="performance-metric">
+                    <div class="metric-value">90.2%</div>
+                    <div class="metric-label">Performance Boost</div>
+                </div>
+                <div class="performance-metric">
+                    <div class="metric-value">10</div>
+                    <div class="metric-label">Max Concurrent Agents</div>
+                </div>
+                <div class="performance-metric">
+                    <div class="metric-value">12</div>
+                    <div class="metric-label">Agents Rebuilt Frontend</div>
+                </div>
+                <div class="performance-metric">
+                    <div class="metric-value">10K+</div>
+                    <div class="metric-label">Lines Coordinated</div>
+                </div>
+            </div>
+
+            <div class="benefit-card">
+                <h3 class="text-lg font-semibold mb-4 flex items-center">
+                    <i data-lucide="trending-up" class="w-5 h-5 text-green-400 mr-2"></i>
+                    Real-World Performance Results
+                </h3>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="font-semibold text-green-300 mb-2">Anthropic Research Findings</h4>
+                        <ul class="space-y-1 text-sm text-gray-300">
+                            <li>• 90.2% better performance than single-agent approach</li>
+                            <li>• Claude Opus 4 as lead agent, Claude Sonnet 4 as subagents</li>
+                            <li>• Orchestrator-worker architecture pattern</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-green-300 mb-2">Practical Example</h4>
+                        <ul class="space-y-1 text-sm text-gray-300">
+                            <li>• 12 Claude agents rebuilt entire frontend overnight</li>
+                            <li>• One refactored components, another wrote tests</li>
+                            <li>• 10,000+ lines of perfectly coordinated changes</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- File Format & Configuration -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold mb-6">Sub-Agent File Format & Configuration</h2>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Standard File Structure -->
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold mb-4">Standard File Structure</h3>
+                    <div class="code-block" data-language="markdown">
+---
+name: agent-name
+description: When this agent should be invoked and what it specializes in
+tools: Write, Edit, Read, Bash  # Optional - specific tool access
+model: sonnet  # Optional - haiku|sonnet|opus or inherit
+---
+
+# Agent Name - Specialization
+
+## Role & Expertise
+Detailed description of agent capabilities and focus areas
+
+## Primary Mission
+Specific objectives and goals for this agent
+
+## Key Technologies
+Technologies and tools this agent has expertise in
+
+## Collaboration Protocol
+How this agent works with other agents and stakeholders
+
+## Success Criteria
+Measurable outcomes and quality standards
+                    </div>
+                </div>
+
+                <!-- Configuration Options -->
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold mb-4">Configuration Options</h3>
+                    <div class="space-y-4">
+                        <div class="config-option">
+                            <h4 class="font-semibold text-sm mb-1">name</h4>
+                            <p class="text-xs text-gray-400 mb-1">Format: kebab-case identifier</p>
+                            <p class="text-xs text-gray-300">Example: alex-engineer</p>
+                        </div>
+
+                        <div class="config-option">
+                            <h4 class="font-semibold text-sm mb-1">description</h4>
+                            <p class="text-xs text-gray-400 mb-1">Activation criteria and specialization</p>
+                            <p class="text-xs text-gray-300">Include "use PROACTIVELY" for auto-invocation</p>
+                        </div>
+
+                        <div class="config-option">
+                            <h4 class="font-semibold text-sm mb-1">tools</h4>
+                            <p class="text-xs text-gray-400 mb-1">Restrict tool access for security</p>
+                            <p class="text-xs text-gray-300">Options: Write, Edit, Read, Bash, WebSearch</p>
+                        </div>
+
+                        <div class="config-option">
+                            <h4 class="font-semibold text-sm mb-1">model</h4>
+                            <p class="text-xs text-gray-400 mb-1">haiku (simple) | sonnet (standard) | opus (complex)</p>
+                            <p class="text-xs text-gray-300">Default: Inherits main agent model</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Directory Structure -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold mb-6">Directory Structure & Setup</h2>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Project-Level Structure -->
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center">
+                        <i data-lucide="folder" class="w-5 h-5 text-blue-400 mr-2"></i>
+                        Project-Level Sub-Agents (Recommended)
+                    </h3>
+                    <div class="code-block" data-language="bash">
+# Project-specific agents
+.claude/
+└── agents/
+    ├── alex-engineer.md
+    ├── sam-qa.md
+    ├── jordan-product.md
+    ├── casey-release.md
+    └── riley-ux.md
+                    </div>
+                </div>
+
+                <!-- User-Level Structure -->
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center">
+                        <i data-lucide="user" class="w-5 h-5 text-green-400 mr-2"></i>
+                        User-Level Sub-Agents (Global)
+                    </h3>
+                    <div class="code-block" data-language="bash">
+# Global agents available across all projects
+~/.claude/
+└── agents/
+    ├── code-reviewer.md
+    ├── test-automation.md
+    └── performance-optimizer.md
+                    </div>
+                </div>
+            </div>
+
+            <!-- Setup Commands -->
+            <div class="card p-6 mt-6">
+                <h3 class="text-lg font-semibold mb-4 flex items-center">
+                    <i data-lucide="terminal" class="w-5 h-5 text-purple-400 mr-2"></i>
+                    Setup Commands
+                </h3>
+                <div class="code-block" data-language="bash">
+# Create project sub-agents directory
+mkdir -p .claude/agents
+
+# Create user sub-agents directory
+mkdir -p ~/.claude/agents
+
+# Verify directory structure
+ls -la .claude/agents/
+ls -la ~/.claude/agents/
+                </div>
+            </div>
+        </section>
+
+        <!-- Management & Invocation -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold mb-6">Sub-Agent Management & Invocation</h2>
+
+            <div class="grid md:grid-cols-3 gap-6">
+                <!-- Management Commands -->
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold mb-4">Management Commands</h3>
+                    <div class="space-y-3">
+                        <div class="config-option">
+                            <div class="mono text-sm text-indigo-400">/agents</div>
+                            <p class="text-xs text-gray-400">List available sub-agents</p>
+                        </div>
+                        <div class="config-option">
+                            <div class="mono text-sm text-indigo-400">/agents agent-name</div>
+                            <p class="text-xs text-gray-400">View specific agent details</p>
+                        </div>
+                        <div class="config-option">
+                            <div class="mono text-sm text-indigo-400">Ask [agent-name] to...</div>
+                            <p class="text-xs text-gray-400">Invoke specific agent</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Automatic Delegation -->
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold mb-4">Automatic Delegation</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-start space-x-3">
+                            <i data-lucide="cpu" class="w-5 h-5 text-green-400 mt-1 flex-shrink-0"></i>
+                            <div>
+                                <h4 class="font-semibold text-sm">Seamless Selection</h4>
+                                <p class="text-xs text-gray-400">Claude Code automatically selects appropriate specialist</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <i data-lucide="workflow" class="w-5 h-5 text-blue-400 mt-1 flex-shrink-0"></i>
+                            <div>
+                                <h4 class="font-semibold text-sm">Context-Aware</h4>
+                                <p class="text-xs text-gray-400">Task-based routing without manual selection</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <i data-lucide="zap" class="w-5 h-5 text-yellow-400 mt-1 flex-shrink-0"></i>
+                            <div>
+                                <h4 class="font-semibold text-sm">Efficient Workflow</h4>
+                                <p class="text-xs text-gray-400">No interruption to development flow</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Parallel Execution -->
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold mb-4">Parallel Execution</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-start space-x-3">
+                            <i data-lucide="users" class="w-5 h-5 text-purple-400 mt-1 flex-shrink-0"></i>
+                            <div>
+                                <h4 class="font-semibold text-sm">Multiple Agents</h4>
+                                <p class="text-xs text-gray-400">Up to 10 concurrent instances</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <i data-lucide="layers" class="w-5 h-5 text-cyan-400 mt-1 flex-shrink-0"></i>
+                            <div>
+                                <h4 class="font-semibold text-sm">Independent Context</h4>
+                                <p class="text-xs text-gray-400">Each agent maintains separate context</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <i data-lucide="git-merge" class="w-5 h-5 text-green-400 mt-1 flex-shrink-0"></i>
+                            <div>
+                                <h4 class="font-semibold text-sm">Auto Coordination</h4>
+                                <p class="text-xs text-gray-400">Automatic task sequencing and dependency management</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Troubleshooting -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold mb-6">Troubleshooting & Known Issues</h2>
+
+            <div class="issue-card mb-6">
+                <h3 class="text-lg font-semibold mb-4 flex items-center">
+                    <i data-lucide="alert-triangle" class="w-5 h-5 text-yellow-400 mr-2"></i>
+                    Common Problems (2024)
+                </h3>
+
+                <div class="space-y-4">
+                    <div class="troubleshooting-item">
+                        <h4 class="font-semibold text-warning mb-2">Recognition Issues</h4>
+                        <p class="text-sm text-gray-300 mb-2">
+                            <strong>Problem:</strong> Sub-agents created but not detected by Claude Code
+                        </p>
+                        <p class="text-sm text-gray-400 mb-2">
+                            <strong>Affected:</strong> Claude Code 1.0.62 and some later versions
+                        </p>
+                        <p class="text-sm text-gray-400">
+                            <strong>Workaround:</strong> Use general-purpose agent with specific prompts as temporary solution
+                        </p>
+                    </div>
+
+                    <div class="troubleshooting-item">
+                        <h4 class="font-semibold text-warning mb-2">File Format Issues</h4>
+                        <p class="text-sm text-gray-300 mb-2">
+                            <strong>Problem:</strong> Incorrect YAML frontmatter or file structure
+                        </p>
+                        <p class="text-sm text-gray-400">
+                            <strong>Solution:</strong> Verify exact YAML format with proper dashes and spacing
+                        </p>
+                    </div>
+
+                    <div class="troubleshooting-item">
+                        <h4 class="font-semibold text-warning mb-2">Directory Permissions</h4>
+                        <p class="text-sm text-gray-300 mb-2">
+                            <strong>Problem:</strong> Permission errors accessing .claude/agents/ directory
+                        </p>
+                        <div class="code-block text-xs mt-2" data-language="bash">chmod -R 755 .claude/agents/</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Debugging Steps -->
+            <div class="card p-6">
+                <h3 class="text-lg font-semibold mb-4 flex items-center">
+                    <i data-lucide="bug" class="w-5 h-5 text-red-400 mr-2"></i>
+                    Debugging Steps
+                </h3>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="space-y-3">
+                        <div class="flex items-start space-x-3">
+                            <div class="step-indicator">1</div>
+                            <div>
+                                <h4 class="font-semibold text-sm">Verify file structure</h4>
+                                <div class="code-block text-xs mt-1">ls -la .claude/agents/</div>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <div class="step-indicator">2</div>
+                            <div>
+                                <h4 class="font-semibold text-sm">Check file format</h4>
+                                <div class="code-block text-xs mt-1">head -10 .claude/agents/alex-engineer.md</div>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <div class="step-indicator">3</div>
+                            <div>
+                                <h4 class="font-semibold text-sm">Test agent recognition</h4>
+                                <div class="code-block text-xs mt-1">claude /agents</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex items-start space-x-3">
+                            <div class="step-indicator">4</div>
+                            <div>
+                                <h4 class="font-semibold text-sm">Manual invocation test</h4>
+                                <div class="code-block text-xs mt-1">claude "List available sub-agents"</div>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <div class="step-indicator">5</div>
+                            <div>
+                                <h4 class="font-semibold text-sm">Alternative approach</h4>
+                                <div class="code-block text-xs mt-1">Use general-purpose with persona prompts</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Alternative Approaches -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold mb-6">Alternative Approaches & Workarounds</h2>
+
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="solution-item">
+                    <h3 class="font-semibold text-green-300 mb-2 flex items-center">
+                        <i data-lucide="user" class="w-4 h-4 mr-2"></i>
+                        General-Purpose Proxy
+                    </h3>
+                    <p class="text-sm text-gray-300 mb-2">
+                        Use general-purpose agent with persona-specific prompts
+                    </p>
+                    <ul class="text-xs text-gray-400 space-y-1">
+                        <li>• Maintains specialized behavior</li>
+                        <li>• Bypasses sub-agent bugs</li>
+                        <li>• Single agent execution limitation</li>
+                    </ul>
+                </div>
+
+                <div class="solution-item">
+                    <h3 class="font-semibold text-green-300 mb-2 flex items-center">
+                        <i data-lucide="list-checks" class="w-4 h-4 mr-2"></i>
+                        Task Tool Integration
+                    </h3>
+                    <p class="text-sm text-gray-300 mb-2">
+                        Use Task tool with detailed persona specifications
+                    </p>
+                    <ul class="text-xs text-gray-400 space-y-1">
+                        <li>• Specialized task execution</li>
+                        <li>• Proper tool access</li>
+                        <li>• Complete persona context</li>
+                    </ul>
+                </div>
+
+                <div class="solution-item">
+                    <h3 class="font-semibold text-green-300 mb-2 flex items-center">
+                        <i data-lucide="workflow" class="w-4 h-4 mr-2"></i>
+                        Hybrid Approach
+                    </h3>
+                    <p class="text-sm text-gray-300 mb-2">
+                        Continue persona-based workflow with sub-agent concepts
+                    </p>
+                    <ul class="text-xs text-gray-400 space-y-1">
+                        <li>• Proven effective workflow</li>
+                        <li>• Enhanced coordination</li>
+                        <li>• Ready for future upgrade</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Research Summary -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold mb-6">Sub-Agent Research Summary</h2>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center">
+                        <i data-lucide="lightbulb" class="w-5 h-5 text-yellow-400 mr-2"></i>
+                        What We Learned
+                    </h3>
+                    <ul class="space-y-3 text-gray-300">
+                        <li class="flex items-start space-x-3">
+                            <i data-lucide="trending-up" class="w-4 h-4 text-green-400 mt-1 flex-shrink-0"></i>
+                            <span><strong>Sub-agents are powerful:</strong> 90%+ performance improvement potential</span>
+                        </li>
+                        <li class="flex items-start space-x-3">
+                            <i data-lucide="alert-circle" class="w-4 h-4 text-yellow-400 mt-1 flex-shrink-0"></i>
+                            <span><strong>Current limitations:</strong> Claude Code version issues preventing proper recognition</span>
+                        </li>
+                        <li class="flex items-start space-x-3">
+                            <i data-lucide="cpu" class="w-4 h-4 text-blue-400 mt-1 flex-shrink-0"></i>
+                            <span><strong>Architecture benefits:</strong> Specialized intelligence and parallel execution</span>
+                        </li>
+                        <li class="flex items-start space-x-3">
+                            <i data-lucide="bug" class="w-4 h-4 text-red-400 mt-1 flex-shrink-0"></i>
+                            <span><strong>Implementation challenges:</strong> Technical bugs in current Claude Code version</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center">
+                        <i data-lucide="target" class="w-5 h-5 text-indigo-400 mr-2"></i>
+                        Our Strategic Decision
+                    </h3>
+                    <ul class="space-y-3 text-gray-300">
+                        <li class="flex items-start space-x-3">
+                            <i data-lucide="play" class="w-4 h-4 text-green-400 mt-1 flex-shrink-0"></i>
+                            <span><strong>Immediate:</strong> Continue enhanced persona-based approach with sub-agent concepts</span>
+                        </li>
+                        <li class="flex items-start space-x-3">
+                            <i data-lucide="parallel" class="w-4 h-4 text-blue-400 mt-1 flex-shrink-0"></i>
+                            <span><strong>Parallel:</strong> Document and prepare for true sub-agent implementation</span>
+                        </li>
+                        <li class="flex items-start space-x-3">
+                            <i data-lucide="arrow-up" class="w-4 h-4 text-purple-400 mt-1 flex-shrink-0"></i>
+                            <span><strong>Future:</strong> Migrate to actual sub-agents when technical issues resolved</span>
+                        </li>
+                        <li class="flex items-start space-x-3">
+                            <i data-lucide="gauge" class="w-4 h-4 text-cyan-400 mt-1 flex-shrink-0"></i>
+                            <span><strong>Benefit:</strong> Maintain development velocity while preparing for upgrade</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Call to Action -->
+        <section class="text-center bg-gradient-to-r from-indigo-600/10 to-purple-600/10 border border-indigo-600/20 rounded-12 p-8">
+            <h2 class="text-2xl font-bold gradient-text mb-4">Ready to Implement Sub-Agents?</h2>
+            <p class="text-gray-300 mb-6 max-w-2xl mx-auto">
+                This documentation provides complete foundation for sub-agent implementation and troubleshooting,
+                ensuring we're ready to leverage this powerful capability as soon as it becomes technically viable.
+            </p>
+            <div class="flex flex-wrap justify-center gap-4">
+                <a href="sub-agent-personas.html"
+                   class="px-6 py-3 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors flex items-center space-x-2">
+                    <i data-lucide="users" class="w-4 h-4"></i>
+                    <span>View Team Personas</span>
+                </a>
+                <a href="subagents-setup-guide.html"
+                   class="px-6 py-3 border border-indigo-600 text-indigo-400 rounded-lg font-medium hover:bg-indigo-600/10 transition-colors flex items-center space-x-2">
+                    <i data-lucide="settings" class="w-4 h-4"></i>
+                    <span>Setup Guide</span>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-800 mt-16">
+        <div class="max-w-7xl mx-auto px-6 py-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="text-sm text-gray-400 mb-4 md:mb-0">
+                    <p>&copy; 2025 John Dilig - Video Player Demo Project</p>
+                    <p class="mono">Morgan's Sub-Agent Research Mission: Comprehensive documentation and implementation strategy</p>
+                </div>
+                <div class="flex items-center space-x-6">
+                    <a href="index.html" class="text-indigo-400 hover:underline text-sm">← Back to Documentation</a>
+                    <div class="text-sm text-gray-400">
+                        <span>Research Date: 2024-09-19</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Add smooth scroll for internal links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Add hover effects for diagram nodes
+        document.querySelectorAll('.diagram-node').forEach(node => {
+            node.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.05)';
+                this.style.borderColor = '#8b5cf6';
+            });
+
+            node.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+                this.style.borderColor = '#6366f1';
+            });
+        });
+
+        // Animate performance metrics on scroll
+        function animateMetrics() {
+            const metrics = document.querySelectorAll('.metric-value');
+            metrics.forEach(metric => {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const targetText = entry.target.textContent;
+                            const targetValue = parseFloat(targetText.replace(/[^\d.]/g, ''));
+                            if (!isNaN(targetValue)) {
+                                let current = 0;
+                                const increment = targetValue / 50;
+                                const timer = setInterval(() => {
+                                    current += increment;
+                                    if (current >= targetValue) {
+                                        current = targetValue;
+                                        clearInterval(timer);
+                                    }
+                                    if (targetText.includes('%')) {
+                                        entry.target.textContent = Math.round(current) + '%';
+                                    } else if (targetText.includes('K')) {
+                                        entry.target.textContent = Math.round(current) + 'K+';
+                                    } else {
+                                        entry.target.textContent = Math.round(current);
+                                    }
+                                }, 20);
+                            }
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.5 });
+                observer.observe(metric);
+            });
+        }
+
+        // Initialize animations
+        setTimeout(animateMetrics, 500);
+    </script>
+</body>
+</html>

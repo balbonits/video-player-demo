@@ -3,24 +3,6 @@
 import React, { useEffect, useRef } from 'react'
 import dynamic from 'next/dynamic'
 
-// TypeScript declaration for the custom element
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      'hls-video-player': React.DetailedHTMLProps<
-        React.HTMLAttributes<HTMLElement> & {
-          src?: string
-          'performance-mode'?: 'smartTV' | 'mobile' | 'desktop'
-          autoplay?: boolean
-          'show-performance'?: boolean
-          controls?: boolean
-        },
-        HTMLElement
-      >
-    }
-  }
-}
-
 interface ReactHLSPlayerProps {
   src: string
   performanceMode?: 'smartTV' | 'mobile' | 'desktop'

@@ -1,0 +1,583 @@
+/* DevOps Documentation Dark Theme with CI/CD Pipeline Visualizations */
+
+:root {
+  /* Dark theme color system for DevOps documentation */
+  --background: #0a0a0b;
+  --surface: #111115;
+  --surface-elevated: #1a1a20;
+  --surface-highlight: #222228;
+
+  /* Text colors */
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --text-accent: #38bdf8;
+
+  /* CI/CD Pipeline colors */
+  --pipeline-pending: #fbbf24;
+  --pipeline-running: #3b82f6;
+  --pipeline-success: #10b981;
+  --pipeline-failed: #ef4444;
+  --pipeline-skipped: #6b7280;
+
+  /* DevOps specific colors */
+  --deploy-staging: #8b5cf6;
+  --deploy-production: #ec4899;
+  --monitoring: #06d6a0;
+  --security: #f59e0b;
+
+  /* Accent colors for different sections */
+  --accent-release: #22d3ee;
+  --accent-build: #a855f7;
+  --accent-test: #14b8a6;
+  --accent-deploy: #f97316;
+  --accent-monitor: #84cc16;
+
+  /* Interactive elements */
+  --border: #334155;
+  --border-hover: #475569;
+  --border-active: #64748b;
+
+  /* Code and syntax highlighting */
+  --code-bg: #1e293b;
+  --code-border: #334155;
+  --yaml-key: #f8fafc;
+  --yaml-value: #38bdf8;
+  --yaml-string: #10b981;
+  --yaml-comment: #64748b;
+
+  /* Typography */
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', monospace;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Layout */
+  --max-width: 1200px;
+  --content-padding: 2rem;
+  --gap: 1.5rem;
+
+  /* Animations */
+  --transition-fast: 0.15s ease-out;
+  --transition-medium: 0.3s ease-out;
+  --transition-slow: 0.6s ease-out;
+}
+
+/* Base styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans) !important;
+  background: var(--background) !important;
+  color: var(--text-primary) !important;
+  line-height: 1.6 !important;
+  font-size: 16px !important;
+}
+
+/* Container and layout */
+.devops-container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: var(--content-padding);
+  min-height: 100vh;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-primary) !important;
+  font-weight: 600 !important;
+  margin-bottom: 1rem !important;
+  line-height: 1.3 !important;
+}
+
+h1 {
+  font-size: 2.5rem !important;
+  color: var(--accent-release) !important;
+  border-bottom: 2px solid var(--accent-release) !important;
+  padding-bottom: 0.5rem !important;
+  margin-bottom: 2rem !important;
+}
+
+h2 {
+  font-size: 2rem !important;
+  color: var(--text-primary) !important;
+  margin-top: 3rem !important;
+  margin-bottom: 1.5rem !important;
+  position: relative;
+}
+
+h2:before {
+  content: '';
+  position: absolute;
+  left: -1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 100%;
+  background: var(--accent-build);
+  border-radius: 2px;
+}
+
+h3 {
+  font-size: 1.5rem !important;
+  color: var(--text-accent) !important;
+  margin-top: 2rem !important;
+}
+
+h4 {
+  font-size: 1.25rem !important;
+  color: var(--text-secondary) !important;
+  margin-top: 1.5rem !important;
+}
+
+p {
+  color: var(--text-secondary) !important;
+  margin-bottom: 1rem !important;
+  max-width: 80ch;
+}
+
+/* Code blocks and syntax highlighting */
+code {
+  font-family: var(--font-mono) !important;
+  background: var(--code-bg) !important;
+  color: var(--text-primary) !important;
+  padding: 0.2em 0.4em !important;
+  border-radius: 4px !important;
+  font-size: 0.9em !important;
+}
+
+pre {
+  background: var(--surface-elevated) !important;
+  border: 1px solid var(--code-border) !important;
+  border-radius: 8px !important;
+  padding: 1.5rem !important;
+  overflow-x: auto !important;
+  margin: 1.5rem 0 !important;
+  position: relative;
+}
+
+pre code {
+  background: none !important;
+  padding: 0 !important;
+  color: var(--text-primary) !important;
+  font-size: 0.875rem !important;
+  line-height: 1.5 !important;
+}
+
+/* YAML/GitHub Actions syntax highlighting */
+.yaml-key { color: var(--yaml-key) !important; }
+.yaml-value { color: var(--yaml-value) !important; }
+.yaml-string { color: var(--yaml-string) !important; }
+.yaml-comment { color: var(--yaml-comment) !important; }
+
+/* Tables for deployment matrix and cost analysis */
+table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  margin: 2rem 0 !important;
+  background: var(--surface) !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3) !important;
+}
+
+th {
+  background: var(--surface-highlight) !important;
+  color: var(--text-primary) !important;
+  font-weight: 600 !important;
+  padding: 1rem !important;
+  text-align: left !important;
+  border-bottom: 1px solid var(--border) !important;
+}
+
+td {
+  padding: 0.75rem 1rem !important;
+  border-bottom: 1px solid var(--border) !important;
+  color: var(--text-secondary) !important;
+}
+
+tr:hover {
+  background: var(--surface-elevated) !important;
+  transition: background var(--transition-fast) !important;
+}
+
+/* Lists */
+ul, ol {
+  margin: 1rem 0 !important;
+  padding-left: 2rem !important;
+}
+
+li {
+  color: var(--text-secondary) !important;
+  margin-bottom: 0.5rem !important;
+}
+
+/* CI/CD Pipeline visualization */
+.pipeline-stage {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  margin: 0.25rem;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: all var(--transition-fast);
+  border: 1px solid transparent;
+}
+
+.pipeline-pending {
+  background: rgba(251, 191, 36, 0.1);
+  color: var(--pipeline-pending);
+  border-color: var(--pipeline-pending);
+}
+
+.pipeline-running {
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--pipeline-running);
+  border-color: var(--pipeline-running);
+  animation: pulse 2s infinite;
+}
+
+.pipeline-success {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--pipeline-success);
+  border-color: var(--pipeline-success);
+}
+
+.pipeline-failed {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--pipeline-failed);
+  border-color: var(--pipeline-failed);
+}
+
+.pipeline-skipped {
+  background: rgba(107, 114, 128, 0.1);
+  color: var(--pipeline-skipped);
+  border-color: var(--pipeline-skipped);
+}
+
+/* Deployment flow diagram */
+.deployment-flow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: var(--surface);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  overflow-x: auto;
+}
+
+.flow-step {
+  flex-shrink: 0;
+  padding: 1rem;
+  background: var(--surface-elevated);
+  border-radius: 6px;
+  border: 1px solid var(--border-hover);
+  text-align: center;
+  min-width: 120px;
+  transition: all var(--transition-medium);
+}
+
+.flow-step:hover {
+  border-color: var(--text-accent);
+  transform: translateY(-2px);
+}
+
+.flow-arrow {
+  color: var(--text-muted);
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+/* Environment badges */
+.env-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.env-development {
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--pipeline-running);
+  border: 1px solid var(--pipeline-running);
+}
+
+.env-staging {
+  background: rgba(139, 92, 246, 0.1);
+  color: var(--deploy-staging);
+  border: 1px solid var(--deploy-staging);
+}
+
+.env-production {
+  background: rgba(236, 72, 153, 0.1);
+  color: var(--deploy-production);
+  border: 1px solid var(--deploy-production);
+}
+
+/* Quality gates visualization */
+.quality-gate {
+  background: var(--surface-elevated);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1rem;
+  margin: 1rem 0;
+  position: relative;
+}
+
+.quality-gate:before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--accent-test);
+  border-radius: 6px 0 0 6px;
+}
+
+.quality-gate h4 {
+  color: var(--accent-test) !important;
+  margin: 0 0 0.5rem 0 !important;
+}
+
+/* Cost analysis styling */
+.cost-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  margin: 0.5rem 0;
+  transition: all var(--transition-fast);
+}
+
+.cost-item:hover {
+  border-color: var(--border-hover);
+  background: var(--surface-elevated);
+}
+
+.cost-free {
+  border-left: 4px solid var(--pipeline-success);
+}
+
+.cost-paid {
+  border-left: 4px solid var(--pipeline-failed);
+}
+
+.cost-value {
+  font-weight: 600;
+  font-family: var(--font-mono);
+}
+
+.cost-free .cost-value {
+  color: var(--pipeline-success);
+}
+
+.cost-paid .cost-value {
+  color: var(--pipeline-failed);
+}
+
+/* Monitoring dashboard simulation */
+.monitoring-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.metric-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: all var(--transition-medium);
+}
+
+.metric-card:hover {
+  border-color: var(--monitoring);
+  box-shadow: 0 4px 12px rgba(6, 214, 160, 0.1);
+}
+
+.metric-title {
+  color: var(--text-primary) !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  margin-bottom: 0.5rem !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.metric-value {
+  color: var(--monitoring) !important;
+  font-size: 2rem !important;
+  font-weight: 700 !important;
+  font-family: var(--font-mono) !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.metric-status {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.metric-healthy {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--pipeline-success);
+}
+
+.metric-warning {
+  background: rgba(251, 191, 36, 0.1);
+  color: var(--pipeline-pending);
+}
+
+.metric-critical {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--pipeline-failed);
+}
+
+/* Interactive timeline */
+.timeline {
+  position: relative;
+  padding-left: 2rem;
+  margin: 2rem 0;
+}
+
+.timeline:before {
+  content: '';
+  position: absolute;
+  left: 1rem;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--border);
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 2rem;
+  padding-left: 2rem;
+}
+
+.timeline-item:before {
+  content: '';
+  position: absolute;
+  left: -0.5rem;
+  top: 0.5rem;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background: var(--accent-deploy);
+  border: 2px solid var(--background);
+}
+
+.timeline-item.completed:before {
+  background: var(--pipeline-success);
+}
+
+.timeline-item.in-progress:before {
+  background: var(--pipeline-running);
+  animation: pulse 2s infinite;
+}
+
+.timeline-item.pending:before {
+  background: var(--pipeline-pending);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  :root {
+    --content-padding: 1rem;
+    --gap: 1rem;
+  }
+
+  .deployment-flow {
+    flex-direction: column;
+  }
+
+  .flow-arrow {
+    transform: rotate(90deg);
+  }
+
+  .monitoring-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Animations */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.fade-in {
+  animation: slideInRight var(--transition-medium) ease-out;
+}
+
+/* Focus and accessibility */
+*:focus {
+  outline: 2px solid var(--text-accent);
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --background: #000000;
+    --surface: #111111;
+    --text-primary: #ffffff;
+    --border: #666666;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Print styles */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  .pipeline-stage,
+  .env-badge,
+  .metric-card {
+    border: 1px solid #000 !important;
+    background: white !important;
+    color: black !important;
+  }
+}
