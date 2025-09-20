@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HLS Video Player Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a1a;
+            color: white;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .player-container {
+            width: 100%;
+            height: 450px;
+            margin: 20px 0;
+            background: black;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .info {
+            background: #333;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>HLS Video Player Test</h1>
+        <p>Testing the HLS Video Player Web Component with Planete Interdite stream</p>
+
+        <div class="player-container">
+            <hls-video-player
+                src="http://sample.vodobox.com/planete_interdite/planete_interdite_alternate.m3u8"
+                performance-mode="desktop"
+                controls
+                style="width: 100%; height: 100%;">
+            </hls-video-player>
+        </div>
+
+        <div class="info">
+            <h3>Stream Information</h3>
+            <ul>
+                <li><strong>Source:</strong> Planete Interdite HLS stream</li>
+                <li><strong>Format:</strong> HTTP Live Streaming (HLS)</li>
+                <li><strong>Features:</strong> Adaptive bitrate, WebVTT captions</li>
+                <li><strong>Performance Mode:</strong> Desktop</li>
+            </ul>
+        </div>
+
+        <div class="info">
+            <h3>Controls</h3>
+            <ul>
+                <li><strong>Space/Enter:</strong> Play/Pause</li>
+                <li><strong>Arrow Left:</strong> Seek backward 10s</li>
+                <li><strong>Arrow Right:</strong> Seek forward 10s</li>
+                <li><strong>F:</strong> Toggle fullscreen</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Import the HLS Video Player Web Component -->
+    <script type="module">
+        // Import HLS.js
+        import Hls from 'https://cdn.skypack.dev/hls.js';
+        window.Hls = Hls;
+
+        // Define the Web Component inline for testing
+        class HLSVideoPlayer extends HTMLElement {
+            constructor() {
+                super();
+                this.attachShadow({ mode: 'open' });
+                this.hls = null;
+                this.video = null;
+            }
+
+            connectedCallback() {
+                this.render();
+                this.initPlayer();
+            }
+
+            render() {
+                this.shadowRoot.innerHTML = `
+                    <style>
+                        :host {
+                            display: block;
+                            width: 100%;
+                            height: 100%;
+                            background: black;
+                        }
+                        video {
+                            width: 100%;
+                            height: 100%;
+                            object-fit: contain;
+                        }
+                    </style>
+                    <video controls crossorigin="anonymous" playsinline></video>
+                `;
+            }
+
+            initPlayer() {
+                this.video = this.shadowRoot.querySelector('video');
+                const src = this.getAttribute('src');
+
+                if (src && Hls.isSupported()) {
+                    this.hls = new Hls();
+                    this.hls.loadSource(src);
+                    this.hls.attachMedia(this.video);
+
+                    this.hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                        console.log('HLS manifest loaded successfully');
+                    });
+
+                    this.hls.on(Hls.Events.ERROR, (event, data) => {
+                        console.error('HLS error:', data);
+                    });
+                } else if (this.video.canPlayType('application/vnd.apple.mpegurl')) {
+                    this.video.src = src;
+                } else {
+                    console.error('HLS not supported');
+                }
+            }
+
+            disconnectedCallback() {
+                if (this.hls) {
+                    this.hls.destroy();
+                }
+            }
+        }
+
+        // Register the custom element
+        customElements.define('hls-video-player', HLSVideoPlayer);
+
+        // Add performance monitoring
+        const player = document.querySelector('hls-video-player');
+
+        // Listen for events
+        player.addEventListener('hls-performance', (event) => {
+            console.log('Performance event:', event.detail);
+        });
+
+        console.log('HLS Video Player test page loaded');
+    </script>
+</body>
+</html>
