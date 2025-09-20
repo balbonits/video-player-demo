@@ -124,7 +124,7 @@ class PerformanceMonitor {
   /**
    * Track video-specific performance metrics
    */
-  public trackVideoMetrics(videoElement: HTMLVideoElement): void {
+  public trackVideoMetrics(videoElement: HTMLVideoElement): () => void {
     const startTime = performance.now();
     let firstFrameTime: number | null = null;
     let rebufferCount = 0;
