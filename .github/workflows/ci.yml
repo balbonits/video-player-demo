@@ -152,7 +152,7 @@ jobs:
         run: npm ci
 
       - name: Download build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: build-web-player-pages-${{ github.sha }}
           path: apps/web-player-pages/.next/
@@ -211,7 +211,7 @@ jobs:
         run: npx playwright install ${{ matrix.browser }}
 
       - name: Download build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: build-web-player-pages-${{ github.sha }}
           path: apps/web-player-pages/.next/
@@ -272,7 +272,7 @@ jobs:
         run: npm ci
 
       - name: Download build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: build-web-player-pages-${{ github.sha }}
           path: apps/web-player-pages/.next/
