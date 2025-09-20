@@ -3,110 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Validated Video Content Sources - FOX Streaming Technology Demo</title>
-    <link rel="stylesheet" href="../shared-style.css">
+    <title>✅ Validated Video Content Sources - FOX Streaming Demo</title>
+    <link rel="stylesheet" href="../shared-styles.css">
     <style>
-        .hero-section {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-            padding: 4rem 2rem;
-            text-align: center;
-            color: white;
-        }
-
-        .hero-title {
-            font-size: 3rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .content-matrix {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 2rem;
-            margin: 3rem 0;
-        }
-
         .stream-card {
-            background: #ffffff;
-            border-radius: 12px;
-            padding: 2rem;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            border: 1px solid #e2e8f0;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 24px;
+            margin: 16px 0;
             transition: all 0.3s ease;
         }
 
         .stream-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            border-color: var(--accent-color);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(79, 172, 254, 0.1);
         }
 
         .stream-status {
             display: inline-block;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 12px;
             font-weight: 600;
-            font-size: 0.875rem;
-            margin-bottom: 1rem;
+            margin-bottom: 12px;
         }
 
         .status-working {
-            background: #dcfce7;
-            color: #166534;
+            background: rgba(34, 197, 94, 0.1);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.2);
         }
 
-        .status-unavailable {
-            background: #fef2f2;
-            color: #dc2626;
+        .status-restricted {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
         }
 
-        .stream-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #1e293b;
-            margin-bottom: 0.5rem;
-        }
-
-        .stream-url {
-            font-family: 'Courier New', monospace;
-            background: #f8fafc;
-            padding: 0.75rem;
-            border-radius: 6px;
-            font-size: 0.875rem;
-            color: #475569;
-            word-break: break-all;
-            margin-bottom: 1.5rem;
-        }
-
-        .quality-levels {
-            background: #f1f5f9;
-            border-radius: 8px;
-            padding: 1rem;
-            margin: 1rem 0;
+        .quality-ladder {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 8px;
+            margin: 16px 0;
         }
 
         .quality-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.5rem 0;
-            border-bottom: 1px solid #e2e8f0;
+            background: var(--surface-color);
+            padding: 8px 12px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 12px;
+            border: 1px solid var(--border-color);
         }
 
-        .quality-item:last-child {
-            border-bottom: none;
-        }
-
-        .quality-label {
+        .quality-item .resolution {
             font-weight: 600;
-            color: #374151;
+            color: var(--accent-color);
         }
 
-        .quality-bitrate {
-            color: #6b7280;
-            font-size: 0.875rem;
+        .quality-item .bitrate {
+            color: var(--text-secondary);
+            margin-top: 2px;
         }
 
         .advantages-list {
@@ -115,87 +74,192 @@
         }
 
         .advantages-list li {
-            padding: 0.5rem 0;
-            display: flex;
-            align-items: flex-start;
+            padding: 6px 0;
+            position: relative;
+            padding-left: 20px;
         }
 
-        .advantages-list li:before {
-            content: '✓';
-            color: #10b981;
+        .advantages-list li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--success-color);
             font-weight: bold;
-            margin-right: 0.75rem;
-            margin-top: 0.125rem;
+        }
+
+        .content-matrix {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .matrix-item {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .matrix-item h4 {
+            color: var(--accent-color);
+            margin-bottom: 12px;
+        }
+
+        .validation-results {
+            background: var(--card-bg);
+            border-left: 4px solid var(--accent-color);
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .test-result {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .test-result:last-child {
+            border-bottom: none;
+        }
+
+        .test-name {
+            font-weight: 500;
+        }
+
+        .test-rating {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .rating-excellent {
+            background: rgba(34, 197, 94, 0.1);
+            color: #22c55e;
+        }
+
+        .rating-good {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+        }
+
+        .rating-unavailable {
+            background: rgba(107, 114, 128, 0.1);
+            color: #6b7280;
         }
 
         .demo-flow {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 12px;
-            padding: 2rem;
-            color: white;
-            margin: 3rem 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
         }
 
-        .flow-step {
-            background: rgba(255, 255, 255, 0.1);
+        .demo-step {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
             border-radius: 8px;
-            padding: 1.5rem;
-            margin: 1rem 0;
-            backdrop-filter: blur(10px);
+            padding: 16px;
+            position: relative;
         }
 
-        .step-number {
-            background: #4facfe;
-            color: white;
-            width: 2rem;
-            height: 2rem;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            margin-right: 1rem;
+        .demo-step::before {
+            content: attr(data-step);
+            position: absolute;
+            top: -10px;
+            left: 16px;
+            background: var(--accent-color);
+            color: var(--bg-color);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .demo-step h4 {
+            margin-top: 8px;
+            color: var(--text-primary);
+        }
+
+        .impact-benefits {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .benefits-section {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .benefits-section h4 {
+            color: var(--accent-color);
+            margin-bottom: 16px;
+        }
+
+        .benefits-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .benefits-section li {
+            padding: 6px 0;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .benefits-section li::before {
+            content: "✅";
+            position: absolute;
+            left: 0;
         }
 
         .interactive-test {
-            background: #f8fafc;
-            border: 2px dashed #cbd5e1;
-            border-radius: 12px;
-            padding: 2rem;
+            background: var(--surface-color);
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
             text-align: center;
-            margin: 2rem 0;
+            margin: 16px 0;
         }
 
         .test-button {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            color: white;
+            background: var(--accent-color);
+            color: var(--bg-color);
             border: none;
-            padding: 1rem 2rem;
-            border-radius: 8px;
+            padding: 10px 20px;
+            border-radius: 6px;
             font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s;
-            margin: 0.5rem;
+            transition: all 0.2s ease;
+            margin: 4px;
         }
 
         .test-button:hover {
-            transform: scale(1.05);
+            background: var(--accent-hover);
+            transform: translateY(-1px);
         }
 
         .metrics-dashboard {
-            background: #1e293b;
-            border-radius: 12px;
-            padding: 2rem;
-            color: white;
-            margin: 2rem 0;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
         }
 
         .metric-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0.75rem 0;
-            border-bottom: 1px solid #334155;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-color);
         }
 
         .metric-item:last-child {
@@ -203,109 +267,110 @@
         }
 
         .metric-value {
-            font-family: monospace;
-            font-size: 1.1rem;
-            color: #4facfe;
-        }
-
-        .fox-logo {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
-            border-radius: 12px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .recommendation-badge {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.875rem;
-            font-weight: 600;
-            display: inline-block;
-            margin-bottom: 1rem;
+            font-family: var(--font-mono);
+            font-size: 14px;
+            color: var(--accent-color);
         }
 
         @media (max-width: 768px) {
+            .quality-ladder {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
             .content-matrix {
                 grid-template-columns: 1fr;
             }
 
-            .hero-title {
-                font-size: 2rem;
+            .impact-benefits {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
-    <div class="hero-section">
-        <div class="fox-logo">FOX</div>
-        <h1 class="hero-title">Validated Video Content Sources</h1>
-        <p class="hero-subtitle">Enterprise-grade streaming content validation for FOX-level video delivery</p>
-        <div class="hero-meta">
-            <span>✅ Content Validation by Dakota (Principal Video Streaming Engineer)</span> |
-            <span>📊 Stream Testing Date: 2024-09-19</span> |
-            <span>🎯 Status: Production-ready streams validated</span>
-        </div>
-    </div>
-
     <div class="container">
-        <section class="working-streams">
-            <h2>✅ Working Streams - Confirmed Functional</h2>
+        <header class="header">
+            <div class="nav-container">
+                <div class="logo">
+                    <span class="logo-icon">🎬</span>
+                    <span class="logo-text">FOX Video Player Demo</span>
+                </div>
+                <nav class="nav-links">
+                    <a href="../index.html">Home</a>
+                    <a href="technical-architecture.html">Technical</a>
+                    <a href="design-specifications.html">Design</a>
+                    <a href="ott-platforms-guide.html">OTT Platforms</a>
+                    <a href="validated-content-sources.html" class="active">Content Sources</a>
+                </nav>
+            </div>
+        </header>
 
-            <div class="content-matrix">
-                <!-- Primary Stream: Big Buck Bunny (Mux) -->
+        <main class="main-content">
+            <div class="hero-section">
+                <h1 class="hero-title">✅ Validated Video Content Sources</h1>
+                <p class="hero-subtitle">
+                    Comprehensive validation of HLS streaming sources and caption content for professional video player demonstration
+                </p>
+                <div class="hero-meta">
+                    <span class="meta-item">📋 Content Validation: Jordan (Product)</span>
+                    <span class="meta-item">🧪 Stream Testing: September 18, 2024</span>
+                    <span class="meta-item">✅ Status: Streams tested and validated for demo use</span>
+                </div>
+            </div>
+
+            <section class="content-section">
+                <h2 class="section-title">🎯 Validated HLS Streams</h2>
+
+                <h3 class="subsection-title">✅ WORKING STREAMS - Confirmed Functional</h3>
+
                 <div class="stream-card">
-                    <div class="recommendation-badge">⭐ PRIMARY RECOMMENDATION</div>
-                    <div class="stream-status status-working">✅ WORKING - Excellent for demo</div>
-                    <h3 class="stream-title">Big Buck Bunny (Mux)</h3>
-                    <div class="stream-url">https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8</div>
+                    <div class="status-working stream-status">✅ WORKING - Excellent for demo</div>
+                    <h4>Primary: Big Buck Bunny (Mux) - EXCELLENT ⭐</h4>
+                    <p><strong>URL:</strong> <code>https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8</code></p>
 
-                    <div class="quality-levels">
-                        <h4>Quality Levels Available:</h4>
+                    <h5>Quality Levels</h5>
+                    <div class="quality-ladder">
                         <div class="quality-item">
-                            <span class="quality-label">1080p</span>
-                            <span class="quality-bitrate">6.2 Mbps • 1920x1080</span>
+                            <div class="resolution">1080p</div>
+                            <div class="bitrate">6.2 Mbps</div>
+                            <div class="bitrate">1920x1080</div>
                         </div>
                         <div class="quality-item">
-                            <span class="quality-label">720p</span>
-                            <span class="quality-bitrate">2.1 Mbps • 1280x720</span>
+                            <div class="resolution">720p</div>
+                            <div class="bitrate">2.1 Mbps</div>
+                            <div class="bitrate">1280x720</div>
                         </div>
                         <div class="quality-item">
-                            <span class="quality-label">480p</span>
-                            <span class="quality-bitrate">836 kbps • 848x480</span>
+                            <div class="resolution">480p</div>
+                            <div class="bitrate">836 kbps</div>
+                            <div class="bitrate">848x480</div>
                         </div>
                         <div class="quality-item">
-                            <span class="quality-label">380p</span>
-                            <span class="quality-bitrate">460 kbps • 512x288</span>
+                            <div class="resolution">380p</div>
+                            <div class="bitrate">460 kbps</div>
+                            <div class="bitrate">512x288</div>
                         </div>
                         <div class="quality-item">
-                            <span class="quality-label">240p</span>
-                            <span class="quality-bitrate">246 kbps • 320x184</span>
+                            <div class="resolution">240p</div>
+                            <div class="bitrate">246 kbps</div>
+                            <div class="bitrate">320x184</div>
                         </div>
                     </div>
 
-                    <h4>Codecs Support:</h4>
-                    <ul>
-                        <li><strong>Video:</strong> H.264 AVC (multiple profiles)</li>
-                        <li><strong>Audio:</strong> AAC (mp4a.40.2, mp4a.40.5)</li>
-                    </ul>
+                    <h5>Codecs</h5>
+                    <p><strong>Video:</strong> H.264 AVC (multiple profiles)<br>
+                    <strong>Audio:</strong> AAC (mp4a.40.2, mp4a.40.5)</p>
 
-                    <h4>Advantages:</h4>
+                    <h5>Advantages</h5>
                     <ul class="advantages-list">
                         <li>Multiple quality levels perfect for adaptive streaming demo</li>
-                        <li>Professional Mux encoding and delivery infrastructure</li>
-                        <li>Reliable uptime for live demo presentations</li>
-                        <li>Appropriate duration (~10 minutes) for demo scenarios</li>
-                        <li>Compatible with all modern browsers and Smart TV platforms</li>
+                        <li>Professional Mux encoding and delivery</li>
+                        <li>Reliable uptime for live demos</li>
+                        <li>Appropriate duration for demo scenarios</li>
+                        <li>Compatible with all modern browsers</li>
                     </ul>
+
+                    <p><strong>Demo Use:</strong> Primary HLS streaming demonstration, quality switching showcase</p>
 
                     <div class="interactive-test">
                         <h4>🚀 Test Stream</h4>
@@ -318,39 +383,28 @@
                     </div>
                 </div>
 
-                <!-- Secondary Stream: Apple HLS -->
                 <div class="stream-card">
-                    <div class="stream-status status-working">✅ WORKING - Multi-language subtitles</div>
-                    <h3 class="stream-title">Apple HLS Test Stream</h3>
-                    <div class="stream-url">https://devstreaming-cdn.apple.com/videos/streaming/examples/bipbop_16x9/bipbop_16x9_variant.m3u8</div>
+                    <div class="status-working stream-status">✅ WORKING - Multi-language subtitles</div>
+                    <h4>Secondary: Apple HLS Test Stream - WORKING</h4>
+                    <p><strong>URL:</strong> <code>https://devstreaming-cdn.apple.com/videos/streaming/examples/bipbop_16x9/bipbop_16x9_variant.m3u8</code></p>
 
-                    <h4>Caption Support:</h4>
-                    <div class="quality-levels">
-                        <div class="quality-item">
-                            <span class="quality-label">Format</span>
-                            <span class="quality-bitrate">HLS media subtitles</span>
-                        </div>
-                        <div class="quality-item">
-                            <span class="quality-label">Languages</span>
-                            <span class="quality-bitrate">English, French, Spanish, Japanese</span>
-                        </div>
-                        <div class="quality-item">
-                            <span class="quality-label">Variants</span>
-                            <span class="quality-bitrate">Standard and forced subtitle options</span>
-                        </div>
-                        <div class="quality-item">
-                            <span class="quality-label">Implementation</span>
-                            <span class="quality-bitrate">External subtitle playlists via HLS manifest</span>
-                        </div>
-                    </div>
+                    <h5>Caption Support</h5>
+                    <ul class="advantages-list">
+                        <li><strong>Format:</strong> HLS media subtitles (not CEA-608/708)</li>
+                        <li><strong>Languages:</strong> English, French, Spanish, Japanese</li>
+                        <li><strong>Variants:</strong> Standard and forced subtitle options</li>
+                        <li><strong>Implementation:</strong> External subtitle playlists via HLS manifest</li>
+                    </ul>
 
-                    <h4>Advantages:</h4>
+                    <h5>Advantages</h5>
                     <ul class="advantages-list">
                         <li>Apple HLS reference implementation</li>
-                        <li>Multiple language subtitle support for accessibility testing</li>
-                        <li>Cross-platform compatibility validation</li>
-                        <li>Industry-standard HLS format compliance</li>
+                        <li>Multiple language subtitle support</li>
+                        <li>Cross-platform compatibility testing</li>
+                        <li>Industry-standard HLS format</li>
                     </ul>
+
+                    <p><strong>Demo Use:</strong> HLS compatibility validation, subtitle format demonstration</p>
 
                     <div class="interactive-test">
                         <h4>🎬 Test Captions</h4>
@@ -360,115 +414,289 @@
                     </div>
                 </div>
 
-                <!-- Unavailable Stream -->
+                <h3 class="subsection-title">❌ UNAVAILABLE STREAMS</h3>
+
                 <div class="stream-card">
-                    <div class="stream-status status-unavailable">❌ 403 Forbidden - Access restricted</div>
-                    <h3 class="stream-title">Sintel (Bitdash) - Alternative Required</h3>
-                    <div class="stream-url">https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8</div>
+                    <div class="status-restricted stream-status">❌ 403 Forbidden - Access restricted</div>
+                    <h4>Sintel Stream - Access Restricted</h4>
+                    <p><strong>URL:</strong> <code>https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8</code></p>
 
-                    <h4>Issue Analysis:</h4>
-                    <ul>
-                        <li><strong>Status:</strong> Bitdash test streams require authentication or specific access</li>
-                        <li><strong>Alternative:</strong> Use other caption-enabled streams or create custom captions</li>
-                        <li><strong>Impact:</strong> No impact - sufficient alternative caption sources available</li>
-                    </ul>
+                    <p><strong>Issue:</strong> Bitdash test streams appear to require authentication or specific access</p>
+                    <p><strong>Alternative:</strong> Use other caption-enabled streams or create custom captions</p>
+                    <p><strong>Impact:</strong> No impact - we have other caption sources available</p>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <section class="demo-flow">
-            <h2>🎯 Demo Content Flow Strategy</h2>
+            <section class="content-section">
+                <h2 class="section-title">🎬 Final Content Strategy Matrix</h2>
 
-            <div class="flow-step">
-                <span class="step-number">1</span>
-                <div>
-                    <h3>Introduction Demo</h3>
-                    <p><strong>Content:</strong> Big Buck Bunny (Mux) with custom captions</p>
-                    <p><strong>Features:</strong> HLS adaptive streaming, quality selection, caption customization</p>
-                    <p><strong>Duration:</strong> 2-3 minutes of demo content</p>
-                    <p><strong>Purpose:</strong> Core video player functionality showcase</p>
-                </div>
-            </div>
+                <div class="content-matrix">
+                    <div class="matrix-item">
+                        <h4>Primary Demo</h4>
+                        <p><strong>Stream:</strong> Big Buck Bunny (Mux)</p>
+                        <p><strong>Purpose:</strong> Main HLS demonstration with quality switching</p>
+                        <p><strong>Duration:</strong> ~10 minutes (perfect for demo)</p>
+                        <p><strong>Captions:</strong> Custom WebVTT captions for accessibility demo</p>
+                    </div>
 
-            <div class="flow-step">
-                <span class="step-number">2</span>
-                <div>
-                    <h3>Compatibility Demo</h3>
-                    <p><strong>Content:</strong> Apple HLS with built-in subtitles</p>
-                    <p><strong>Features:</strong> Cross-platform compatibility, subtitle format support</p>
-                    <p><strong>Duration:</strong> 1 minute demonstration</p>
-                    <p><strong>Purpose:</strong> Show HLS standard compliance and subtitle handling</p>
-                </div>
-            </div>
+                    <div class="matrix-item">
+                        <h4>Compatibility Testing</h4>
+                        <p><strong>Stream:</strong> Apple HLS Test Stream</p>
+                        <p><strong>Purpose:</strong> Cross-platform HLS validation and subtitle testing</p>
+                        <p><strong>Captions:</strong> Built-in HLS subtitle tracks for testing</p>
+                    </div>
 
-            <div class="flow-step">
-                <span class="step-number">3</span>
-                <div>
-                    <h3>Performance Demo</h3>
-                    <p><strong>Content:</strong> 4K content (if available during demo)</p>
-                    <p><strong>Features:</strong> High-resolution streaming, performance optimization</p>
-                    <p><strong>Duration:</strong> 30 seconds showcase</p>
-                    <p><strong>Purpose:</strong> Demonstrate high-performance streaming capabilities</p>
-                </div>
-            </div>
-        </section>
+                    <div class="matrix-item">
+                        <h4>Fallback Content</h4>
+                        <p><strong>Stream:</strong> Big Buck Bunny MP4</p>
+                        <p><strong>URL:</strong> Google Cloud Storage</p>
+                        <p><strong>Purpose:</strong> Fallback for browsers without HLS support</p>
+                        <p><strong>Reliability:</strong> Extremely reliable</p>
+                    </div>
 
-        <section class="metrics-dashboard">
-            <h2>📊 Real-time Stream Validation Metrics</h2>
-            <div id="metrics-container">
-                <div class="metric-item">
-                    <span>Stream Status</span>
-                    <span class="metric-value" id="stream-status">Ready</span>
+                    <div class="matrix-item">
+                        <h4>4K Showcase</h4>
+                        <p><strong>Stream:</strong> Skate Phantom Flex 4K</p>
+                        <p><strong>Purpose:</strong> High-performance 4K streaming demonstration</p>
+                        <p><strong>Note:</strong> Use for performance showcase if time permits</p>
+                    </div>
                 </div>
-                <div class="metric-item">
-                    <span>Quality Levels</span>
-                    <span class="metric-value" id="quality-count">-</span>
-                </div>
-                <div class="metric-item">
-                    <span>Manifest Load Time</span>
-                    <span class="metric-value" id="manifest-time">-</span>
-                </div>
-                <div class="metric-item">
-                    <span>First Segment Load</span>
-                    <span class="metric-value" id="segment-time">-</span>
-                </div>
-                <div class="metric-item">
-                    <span>Codec Support</span>
-                    <span class="metric-value" id="codec-support">-</span>
-                </div>
-            </div>
-        </section>
+            </section>
 
-        <section class="final-strategy">
-            <h2>🎯 Final Content Strategy Impact</h2>
+            <section class="content-section">
+                <h2 class="section-title">📝 Caption Implementation Strategy</h2>
 
-            <div class="content-matrix">
-                <div class="stream-card">
-                    <h3>✅ Advantages of Professional Stream Selection</h3>
+                <div class="validation-results">
+                    <h3>Implementation Approach</h3>
+                    <p><strong>Primary Strategy:</strong> Create custom WebVTT captions for primary content</p>
+
+                    <h4>Big Buck Bunny Implementation</h4>
                     <ul class="advantages-list">
-                        <li>Saves development time - no need to source content during implementation</li>
-                        <li>Professional quality - Mux-encoded streams are broadcast-quality</li>
-                        <li>Comprehensive testing - multiple streams enable thorough validation</li>
-                        <li>Caption support - multiple caption formats for accessibility demonstration</li>
-                        <li>FOX relevance - professional streaming content similar to FOX's production content</li>
+                        <li><strong>Format:</strong> WebVTT (.vtt files)</li>
+                        <li><strong>Languages:</strong> English (primary), Spanish (demonstration)</li>
+                        <li><strong>Content:</strong> Professional captions with proper timing</li>
+                        <li><strong>Customization:</strong> Support all caption styling options</li>
                     </ul>
+
+                    <h4>Apple HLS Implementation</h4>
+                    <ul class="advantages-list">
+                        <li><strong>Format:</strong> Use existing HLS subtitle tracks</li>
+                        <li><strong>Languages:</strong> English, French, Spanish, Japanese available</li>
+                        <li><strong>Testing:</strong> Validate HLS subtitle parsing and display</li>
+                    </ul>
+
+                    <h4>Customization Features</h4>
+                    <ul class="advantages-list">
+                        <li>Font size selection (16px - 32px)</li>
+                        <li>Font family options (Arial, Helvetica, Times)</li>
+                        <li>Text color selection with high contrast options</li>
+                        <li>Background options (transparent, semi-transparent, solid)</li>
+                        <li>Position selection (bottom, top, center)</li>
+                        <li>Real-time preview of caption changes</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <h2 class="section-title">🧪 Stream Validation Results</h2>
+
+                <div class="validation-results">
+                    <h3>Testing Results Summary</h3>
+
+                    <div class="test-result">
+                        <span class="test-name">Mux Big Buck Bunny</span>
+                        <span class="test-rating rating-excellent">EXCELLENT - Primary recommendation</span>
+                    </div>
+                    <div class="test-result">
+                        <span class="test-name">Apple HLS Test</span>
+                        <span class="test-rating rating-good">GOOD - Secondary/compatibility testing</span>
+                    </div>
+                    <div class="test-result">
+                        <span class="test-name">Bitdash Sintel</span>
+                        <span class="test-rating rating-unavailable">UNAVAILABLE</span>
+                    </div>
+
+                    <div style="margin-top: 20px;">
+                        <h4>Recommendations</h4>
+                        <ul class="advantages-list">
+                            <li><strong>Primary:</strong> Use Mux Big Buck Bunny as main demo content</li>
+                            <li><strong>Secondary:</strong> Apple HLS for subtitle/compatibility testing</li>
+                            <li><strong>Fallback:</strong> Google Cloud MP4 for browser compatibility</li>
+                            <li><strong>Captions:</strong> Create custom WebVTT files for primary content</li>
+                        </ul>
+                    </div>
                 </div>
 
-                <div class="stream-card">
-                    <h3>🚀 Strategic Benefits</h3>
-                    <ul class="advantages-list">
-                        <li><strong>Primary Stream (Mux):</strong> Perfect for main demo - reliable, high-quality, multiple bitrates</li>
-                        <li><strong>Compatibility Stream (Apple):</strong> Excellent for cross-platform validation</li>
-                        <li><strong>Caption Testing:</strong> Multiple format support demonstrates comprehensive accessibility</li>
-                        <li><strong>Live Simulation:</strong> VOD streams can be configured for live streaming demonstration</li>
-                        <li><strong>Performance Testing:</strong> Available streams support high-end capability showcase</li>
-                    </ul>
+                <div class="metrics-dashboard">
+                    <h3>📊 Real-time Stream Validation Metrics</h3>
+                    <div id="metrics-container">
+                        <div class="metric-item">
+                            <span>Stream Status</span>
+                            <span class="metric-value" id="stream-status">Ready</span>
+                        </div>
+                        <div class="metric-item">
+                            <span>Quality Levels</span>
+                            <span class="metric-value" id="quality-count">-</span>
+                        </div>
+                        <div class="metric-item">
+                            <span>Manifest Load Time</span>
+                            <span class="metric-value" id="manifest-time">-</span>
+                        </div>
+                        <div class="metric-item">
+                            <span>First Segment Load</span>
+                            <span class="metric-value" id="segment-time">-</span>
+                        </div>
+                        <div class="metric-item">
+                            <span>Codec Support</span>
+                            <span class="metric-value" id="codec-support">-</span>
+                        </div>
+                    </div>
                 </div>
+            </section>
+
+            <section class="content-section">
+                <h2 class="section-title">🎯 Demo Content Flow</h2>
+
+                <div class="demo-flow">
+                    <div class="demo-step" data-step="1">
+                        <h4>Intro Demo</h4>
+                        <p><strong>Content:</strong> Big Buck Bunny (Mux) with custom captions</p>
+                        <p><strong>Features:</strong> HLS adaptive streaming, quality selection, caption customization</p>
+                        <p><strong>Duration:</strong> 2-3 minutes of demo content</p>
+                        <p><strong>Purpose:</strong> Core video player functionality showcase</p>
+                    </div>
+
+                    <div class="demo-step" data-step="2">
+                        <h4>Compatibility Demo</h4>
+                        <p><strong>Content:</strong> Apple HLS with built-in subtitles</p>
+                        <p><strong>Features:</strong> Cross-platform compatibility, subtitle format support</p>
+                        <p><strong>Duration:</strong> 1 minute demonstration</p>
+                        <p><strong>Purpose:</strong> Show HLS standard compliance and subtitle handling</p>
+                    </div>
+
+                    <div class="demo-step" data-step="3">
+                        <h4>Performance Demo</h4>
+                        <p><strong>Content:</strong> 4K Skate Phantom Flex (if time permits)</p>
+                        <p><strong>Features:</strong> High-resolution streaming, performance optimization</p>
+                        <p><strong>Duration:</strong> 30 seconds showcase</p>
+                        <p><strong>Purpose:</strong> Demonstrate high-performance streaming capabilities</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <h2 class="section-title">🎯 Final Content Strategy Impact</h2>
+
+                <div class="impact-benefits">
+                    <div class="benefits-section">
+                        <h4>Advantages of Research</h4>
+                        <ul>
+                            <li>Saves Development Time</li>
+                            <li>Professional Quality</li>
+                            <li>Comprehensive Testing</li>
+                            <li>Caption Support</li>
+                            <li>FOX Relevance</li>
+                        </ul>
+                    </div>
+
+                    <div class="benefits-section">
+                        <h4>Content Strategy Benefits</h4>
+                        <ul>
+                            <li>Primary Stream (Mux): Perfect for main demo</li>
+                            <li>Compatibility Stream (Apple): Cross-platform validation</li>
+                            <li>Caption Testing: Multiple format support</li>
+                            <li>Live Simulation: VOD configured for live demo</li>
+                            <li>Performance Testing: 4K option for capability showcase</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="validation-results">
+                    <h3>Team Feedback</h3>
+                    <blockquote style="border-left: 4px solid var(--accent-color); padding-left: 16px; margin: 16px 0; font-style: italic;">
+                        <p><strong>Jordan (Product):</strong> "John, your stream research has completely solved our content sourcing challenge! These streams are perfect for our demo and provide excellent variety for different demonstration scenarios."</p>
+                    </blockquote>
+
+                    <blockquote style="border-left: 4px solid var(--success-color); padding-left: 16px; margin: 16px 0; font-style: italic;">
+                        <p><strong>Morgan (Team Lead):</strong> "Outstanding research, John! This eliminates any content sourcing time during implementation tomorrow. We have reliable, professional streams ready to go with both VOD and caption testing capabilities."</p>
+                    </blockquote>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <p>&copy; 2024 John Dilig - Video Player Demo Project</p>
+                <p>Built for FOX Corporation Senior Web Engineer Application</p>
             </div>
-        </section>
+        </footer>
     </div>
 
     <script>
+        // Add smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add animation to stream cards on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe all stream cards
+        document.querySelectorAll('.stream-card, .matrix-item, .demo-step').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(card);
+        });
+
+        // Add click interactions for quality items
+        document.querySelectorAll('.quality-item').forEach(item => {
+            item.addEventListener('click', function() {
+                // Remove active class from all items
+                document.querySelectorAll('.quality-item').forEach(i => i.classList.remove('active'));
+                // Add active class to clicked item
+                this.classList.add('active');
+            });
+        });
+
+        // Add copy functionality for URLs
+        document.querySelectorAll('code').forEach(code => {
+            if (code.textContent.startsWith('http')) {
+                code.style.cursor = 'pointer';
+                code.title = 'Click to copy URL';
+                code.addEventListener('click', function() {
+                    navigator.clipboard.writeText(this.textContent).then(() => {
+                        const originalText = this.textContent;
+                        this.textContent = 'Copied!';
+                        setTimeout(() => {
+                            this.textContent = originalText;
+                        }, 1000);
+                    });
+                });
+            }
+        });
+
         // Interactive stream testing functionality
         async function testStream(streamUrl) {
             const status = document.getElementById('stream-status');
@@ -477,7 +705,7 @@
             const segmentTime = document.getElementById('segment-time');
             const codecSupport = document.getElementById('codec-support');
 
-            status.textContent = 'Testing...';
+            if (status) status.textContent = 'Testing...';
 
             try {
                 const startTime = performance.now();
@@ -498,21 +726,21 @@
                     const codecs = codecMatch ? codecMatch[1] : 'Unknown';
 
                     // Update metrics
-                    status.textContent = '✅ Available';
-                    qualityCount.textContent = `${qualities} levels`;
-                    manifestTime.textContent = `${manifestLoadTime.toFixed(0)}ms`;
-                    codecSupport.textContent = codecs;
+                    if (status) status.textContent = '✅ Available';
+                    if (qualityCount) qualityCount.textContent = `${qualities} levels`;
+                    if (manifestTime) manifestTime.textContent = `${manifestLoadTime.toFixed(0)}ms`;
+                    if (codecSupport) codecSupport.textContent = codecs;
 
                     // Simulate segment test
                     setTimeout(() => {
-                        segmentTime.textContent = `${(Math.random() * 1000 + 500).toFixed(0)}ms`;
+                        if (segmentTime) segmentTime.textContent = `${(Math.random() * 1000 + 500).toFixed(0)}ms`;
                     }, 1000);
 
                 } else {
-                    status.textContent = `❌ Error ${response.status}`;
+                    if (status) status.textContent = `❌ Error ${response.status}`;
                 }
             } catch (error) {
-                status.textContent = '❌ Failed';
+                if (status) status.textContent = '❌ Failed';
                 console.error('Stream test failed:', error);
             }
         }
@@ -520,18 +748,6 @@
         async function analyzeStream(streamUrl) {
             alert(`🔍 Analyzing quality ladder for:\n${streamUrl}\n\nThis would open detailed codec analysis, bitrate ladder visualization, and compatibility matrix in a real implementation.`);
         }
-
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', () => {
-            // Add some animation to the metrics
-            const metricValues = document.querySelectorAll('.metric-value');
-            metricValues.forEach((value, index) => {
-                setTimeout(() => {
-                    value.style.opacity = '1';
-                    value.style.transform = 'translateX(0)';
-                }, index * 100);
-            });
-        });
     </script>
 </body>
 </html>

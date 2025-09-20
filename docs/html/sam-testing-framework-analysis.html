@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sam (QA) - Testing Framework Analysis & Recommendations</title>
+    <link rel="stylesheet" href="../shared-styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            /* QA Executive Theme */
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --info: #3b82f6;
+
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-tertiary: #f1f5f9;
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --border-light: #f1f5f9;
+        }
+
+        .framework-comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .framework-card {
+            background: var(--bg-primary);
+            border: 2px solid var(--border);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .framework-card.recommended {
+            border-color: var(--success);
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(16, 185, 129, 0.1) 100%);
+        }
+
+        .framework-card.recommended::before {
+            content: "⭐ RECOMMENDED";
+            position: absolute;
+            top: -10px;
+            right: -30px;
+            background: var(--success);
+            color: white;
+            padding: 0.5rem 2rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            transform: rotate(45deg);
+            width: 120px;
+            text-align: center;
+        }
+
+        .framework-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .framework-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .framework-logo {
+            font-size: 2.5rem;
+            margin-right: 1rem;
+        }
+
+        .framework-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .framework-rating {
+            margin-left: auto;
+            background: var(--primary);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .framework-rating.excellent { background: var(--success); }
+        .framework-rating.good { background: var(--info); }
+        .framework-rating.fair { background: var(--warning); }
+        .framework-rating.poor { background: var(--danger); }
+
+        .pros-cons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .pros, .cons {
+            background: var(--bg-secondary);
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+
+        .pros h4 {
+            color: var(--success);
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .cons h4 {
+            color: var(--danger);
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .pros ul, .cons ul {
+            margin: 0;
+            padding-left: 1rem;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        .verdict {
+            background: var(--bg-tertiary);
+            border-left: 4px solid var(--primary);
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 0 0.5rem 0.5rem 0;
+            font-style: italic;
+            color: var(--text-secondary);
+        }
+
+        .comparison-matrix {
+            background: var(--bg-primary);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            overflow-x: auto;
+        }
+
+        .matrix-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .matrix-table th,
+        .matrix-table td {
+            padding: 0.75rem;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .matrix-table th {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .matrix-table td:first-child {
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .score-cell {
+            font-weight: 700;
+            border-radius: 0.375rem;
+            padding: 0.5rem;
+        }
+
+        .score-5 { background: #dcfce7; color: #166534; }
+        .score-4 { background: #dbeafe; color: #1e40af; }
+        .score-3 { background: #fef3c7; color: #92400e; }
+        .score-2 { background: #fecaca; color: #991b1b; }
+        .score-1 { background: #f3f4f6; color: #374151; }
+
+        .implementation-guide {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .guide-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .guide-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .guide-title {
+            font-weight: 700;
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+        }
+
+        .guide-description {
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .code-example {
+            background: #1e293b;
+            color: #e2e8f0;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+
+        .code-example .comment {
+            color: #94a3b8;
+        }
+
+        .code-example .keyword {
+            color: #38bdf8;
+        }
+
+        .code-example .string {
+            color: #34d399;
+        }
+
+        .code-example .function {
+            color: #fbbf24;
+        }
+
+        .bdd-showcase {
+            background: var(--bg-secondary);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .gherkin-example {
+            background: #0f172a;
+            color: #e2e8f0;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.875rem;
+            line-height: 1.6;
+            overflow-x: auto;
+        }
+
+        .gherkin-keyword {
+            color: #38bdf8;
+            font-weight: 600;
+        }
+
+        .gherkin-string {
+            color: #34d399;
+        }
+
+        .gherkin-comment {
+            color: #94a3b8;
+        }
+
+        .timeline-visualization {
+            background: var(--bg-primary);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: 0.75rem;
+            border-left: 4px solid var(--primary);
+        }
+
+        .timeline-time {
+            background: var(--primary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            min-width: 100px;
+            text-align: center;
+            margin-right: 1rem;
+        }
+
+        .timeline-content {
+            flex: 1;
+        }
+
+        .timeline-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .timeline-description {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .chart-container {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .chart-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .framework-comparison {
+                grid-template-columns: 1fr;
+            }
+
+            .pros-cons {
+                grid-template-columns: 1fr;
+            }
+
+            .guide-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .matrix-table {
+                font-size: 0.75rem;
+            }
+
+            .matrix-table th,
+            .matrix-table td {
+                padding: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="document-header">
+            <div class="header-content">
+                <h1 class="document-title">
+                    🧪 Sam (QA) - Testing Framework Analysis
+                </h1>
+                <div class="header-meta">
+                    <div class="meta-item">
+                        <strong>QA Engineer:</strong> Sam
+                    </div>
+                    <div class="meta-item">
+                        <strong>Research Date:</strong> 2024-09-18
+                    </div>
+                    <div class="meta-item">
+                        <strong>Recommendation:</strong> Playwright + Jest Stack
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <nav class="document-nav">
+            <ul>
+                <li><a href="#e2e-frameworks">E2E Frameworks</a></li>
+                <li><a href="#comparison">Framework Comparison</a></li>
+                <li><a href="#bdd-testing">BDD Testing</a></li>
+                <li><a href="#recommendation">Final Recommendation</a></li>
+                <li><a href="#implementation">Implementation</a></li>
+                <li><a href="#timeline">Timeline Integration</a></li>
+            </ul>
+        </nav>
+
+        <main class="document-content">
+            <section id="e2e-frameworks" class="content-section">
+                <h2>📊 E2E Testing Framework Analysis</h2>
+
+                <div class="framework-comparison">
+                    <div class="framework-card recommended">
+                        <div class="framework-header">
+                            <div class="framework-logo">🎭</div>
+                            <div>
+                                <div class="framework-name">Playwright</div>
+                                <div class="framework-rating excellent">Excellent</div>
+                            </div>
+                        </div>
+
+                        <div class="pros-cons">
+                            <div class="pros">
+                                <h4>✅ Advantages</h4>
+                                <ul>
+                                    <li>Cross-browser testing (Chromium, Firefox, WebKit)</li>
+                                    <li>30% faster than alternatives</li>
+                                    <li>Built-in parallelization</li>
+                                    <li>Auto-wait eliminates flaky tests</li>
+                                    <li>Video recording capabilities</li>
+                                    <li>Mobile emulation</li>
+                                    <li>TypeScript-first design</li>
+                                </ul>
+                            </div>
+                            <div class="cons">
+                                <h4>❌ Limitations</h4>
+                                <ul>
+                                    <li>Steeper learning curve initially</li>
+                                    <li>Newer ecosystem vs Selenium</li>
+                                    <li>Less third-party plugins</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="verdict">
+                            <strong>Verdict:</strong> Optimal for video player testing with superior performance and cross-browser support essential for our project.
+                        </div>
+                    </div>
+
+                    <div class="framework-card">
+                        <div class="framework-header">
+                            <div class="framework-logo">🌲</div>
+                            <div>
+                                <div class="framework-name">Cypress</div>
+                                <div class="framework-rating good">Good</div>
+                            </div>
+                        </div>
+
+                        <div class="pros-cons">
+                            <div class="pros">
+                                <h4>✅ Advantages</h4>
+                                <ul>
+                                    <li>Excellent developer experience</li>
+                                    <li>Time-travel debugging</li>
+                                    <li>Real-time test visualization</li>
+                                    <li>Strong community</li>
+                                    <li>Simple setup</li>
+                                </ul>
+                            </div>
+                            <div class="cons">
+                                <h4>❌ Limitations</h4>
+                                <ul>
+                                    <li>Chromium-only (major limitation)</li>
+                                    <li>No built-in parallelization</li>
+                                    <li>Same-origin policy restrictions</li>
+                                    <li>No multiple tab support</li>
+                                    <li>Slower execution</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="verdict">
+                            <strong>Verdict:</strong> Good for simple React testing, but lacks cross-browser support needed for our project.
+                        </div>
+                    </div>
+
+                    <div class="framework-card">
+                        <div class="framework-header">
+                            <div class="framework-logo">🕷️</div>
+                            <div>
+                                <div class="framework-name">Selenium</div>
+                                <div class="framework-rating fair">Fair</div>
+                            </div>
+                        </div>
+
+                        <div class="pros-cons">
+                            <div class="pros">
+                                <h4>✅ Advantages</h4>
+                                <ul>
+                                    <li>Mature ecosystem</li>
+                                    <li>Legacy browser support</li>
+                                    <li>Multiple language support</li>
+                                    <li>Industry standard</li>
+                                </ul>
+                            </div>
+                            <div class="cons">
+                                <h4>❌ Limitations</h4>
+                                <ul>
+                                    <li>Slower performance</li>
+                                    <li>Complex setup</li>
+                                    <li>Flaky tests</li>
+                                    <li>No built-in debugging tools</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="verdict">
+                            <strong>Verdict:</strong> Overkill for our modern web application, performance penalty not justified.
+                        </div>
+                    </div>
+
+                    <div class="framework-card">
+                        <div class="framework-header">
+                            <div class="framework-logo">🎪</div>
+                            <div>
+                                <div class="framework-name">Puppeteer</div>
+                                <div class="framework-rating fair">Fair</div>
+                            </div>
+                        </div>
+
+                        <div class="pros-cons">
+                            <div class="pros">
+                                <h4>✅ Advantages</h4>
+                                <ul>
+                                    <li>Fast Chrome execution</li>
+                                    <li>DevTools Protocol access</li>
+                                    <li>Lightweight setup</li>
+                                    <li>PDF generation</li>
+                                </ul>
+                            </div>
+                            <div class="cons">
+                                <h4>❌ Limitations</h4>
+                                <ul>
+                                    <li>Chrome/Chromium only</li>
+                                    <li>No built-in test runner</li>
+                                    <li>Limited mobile support</li>
+                                    <li>No built-in assertions</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="verdict">
+                            <strong>Verdict:</strong> Too limited for comprehensive cross-platform video player testing.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <h3 class="chart-title">E2E Framework Performance Comparison</h3>
+                    <canvas id="frameworkChart" style="height: 400px;"></canvas>
+                </div>
+            </section>
+
+            <section id="comparison" class="content-section">
+                <h2>🏆 Framework Comparison Matrix</h2>
+
+                <div class="comparison-matrix">
+                    <h3>Comprehensive Framework Evaluation</h3>
+                    <table class="matrix-table">
+                        <thead>
+                            <tr>
+                                <th>Framework</th>
+                                <th>Cross-Browser</th>
+                                <th>Performance</th>
+                                <th>Video Testing</th>
+                                <th>TypeScript</th>
+                                <th>CI/CD</th>
+                                <th>Learning Curve</th>
+                                <th>Overall Score</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Playwright</strong></td>
+                                <td><span class="score-cell score-5">5/5</span></td>
+                                <td><span class="score-cell score-5">5/5</span></td>
+                                <td><span class="score-cell score-5">5/5</span></td>
+                                <td><span class="score-cell score-5">5/5</span></td>
+                                <td><span class="score-cell score-5">5/5</span></td>
+                                <td><span class="score-cell score-3">3/5</span></td>
+                                <td><span class="score-cell score-5">4.7/5</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Cypress</strong></td>
+                                <td><span class="score-cell score-2">2/5</span></td>
+                                <td><span class="score-cell score-3">3/5</span></td>
+                                <td><span class="score-cell score-4">4/5</span></td>
+                                <td><span class="score-cell score-4">4/5</span></td>
+                                <td><span class="score-cell score-4">4/5</span></td>
+                                <td><span class="score-cell score-5">5/5</span></td>
+                                <td><span class="score-cell score-4">3.7/5</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Selenium</strong></td>
+                                <td><span class="score-cell score-5">5/5</span></td>
+                                <td><span class="score-cell score-2">2/5</span></td>
+                                <td><span class="score-cell score-3">3/5</span></td>
+                                <td><span class="score-cell score-3">3/5</span></td>
+                                <td><span class="score-cell score-3">3/5</span></td>
+                                <td><span class="score-cell score-2">2/5</span></td>
+                                <td><span class="score-cell score-3">3.0/5</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Puppeteer</strong></td>
+                                <td><span class="score-cell score-2">2/5</span></td>
+                                <td><span class="score-cell score-4">4/5</span></td>
+                                <td><span class="score-cell score-3">3/5</span></td>
+                                <td><span class="score-cell score-4">4/5</span></td>
+                                <td><span class="score-cell score-3">3/5</span></td>
+                                <td><span class="score-cell score-4">4/5</span></td>
+                                <td><span class="score-cell score-3">3.3/5</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="chart-container">
+                    <h3 class="chart-title">Framework Scoring Breakdown</h3>
+                    <canvas id="scoringChart" style="height: 400px;"></canvas>
+                </div>
+            </section>
+
+            <section id="bdd-testing" class="content-section">
+                <h2>🥒 BDD Testing Framework Analysis</h2>
+
+                <div class="bdd-showcase">
+                    <h3>Cucumber + Gherkin Integration</h3>
+                    <p>Behavior-Driven Development (BDD) provides natural language test specifications that enhance stakeholder communication and create living documentation.</p>
+
+                    <div class="gherkin-example">
+<span class="gherkin-keyword">Feature:</span> <span class="gherkin-string">Video Player HLS Streaming</span>
+  <span class="gherkin-keyword">As a</span> user viewing the video player demo
+  <span class="gherkin-keyword">I want</span> reliable adaptive streaming playback
+  <span class="gherkin-keyword">So that</span> I can watch videos smoothly regardless of network conditions
+
+  <span class="gherkin-keyword">Background:</span>
+    <span class="gherkin-keyword">Given</span> I am on the video player demo page
+    <span class="gherkin-keyword">And</span> the page has loaded completely
+    <span class="gherkin-keyword">And</span> my network connection is stable
+
+  <span class="gherkin-comment"># Critical test scenario</span>
+  <span class="gherkin-keyword">@critical @hls-streaming</span>
+  <span class="gherkin-keyword">Scenario:</span> <span class="gherkin-string">Automatic Quality Selection</span>
+    <span class="gherkin-keyword">When</span> the video starts playing
+    <span class="gherkin-keyword">Then</span> the player should automatically select optimal quality
+    <span class="gherkin-keyword">And</span> quality should adapt based on network bandwidth
+    <span class="gherkin-keyword">And</span> I should see a quality indicator showing current resolution
+
+  <span class="gherkin-keyword">@critical @smart-tv</span>
+  <span class="gherkin-keyword">Scenario:</span> <span class="gherkin-string">Smart TV D-pad Navigation</span>
+    <span class="gherkin-keyword">Given</span> I am using a Smart TV with remote control
+    <span class="gherkin-keyword">When</span> I press the right arrow key
+    <span class="gherkin-keyword">Then</span> focus should move to the next control element
+    <span class="gherkin-keyword">And</span> the focused element should be clearly highlighted
+    <span class="gherkin-keyword">And</span> I should be able to activate it with the Enter key
+                    </div>
+
+                    <div class="guide-grid">
+                        <div class="guide-item" style="background: var(--bg-primary); color: var(--text-primary); border: 1px solid var(--border);">
+                            <div class="guide-title">Benefits for Our Project</div>
+                            <div class="guide-description">
+                                <ul>
+                                    <li>Natural language specifications readable by stakeholders</li>
+                                    <li>Living documentation that stays current</li>
+                                    <li>Cross-functional team alignment</li>
+                                    <li>Excellent for video player user journeys</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="guide-item" style="background: var(--bg-primary); color: var(--text-primary); border: 1px solid var(--border);">
+                            <div class="guide-title">Integration Options</div>
+                            <div class="guide-description">
+                                <ul>
+                                    <li><strong>Playwright-Cucumber:</strong> Best automation + readability</li>
+                                    <li><strong>Cypress-Cucumber:</strong> Good debugging + Gherkin</li>
+                                    <li><strong>Jest-Cucumber:</strong> Unit test BDD integration</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="code-example">
+<span class="comment">// Step definitions in TypeScript</span>
+<span class="keyword">import</span> { Given, When, Then } <span class="keyword">from</span> <span class="string">'@cucumber/cucumber'</span>
+<span class="keyword">import</span> { expect } <span class="keyword">from</span> <span class="string">'@playwright/test'</span>
+
+<span class="function">Given</span>(<span class="string">'I am on the video player demo page'</span>, <span class="keyword">async function</span>() {
+  <span class="keyword">await</span> <span class="keyword">this</span>.page.goto(<span class="string">'/demo/hls-streaming'</span>)
+  <span class="keyword">await</span> <span class="function">expect</span>(<span class="keyword">this</span>.page.locator(<span class="string">'[data-testid="video-player"]'</span>)).toBeVisible()
+})
+
+<span class="function">When</span>(<span class="string">'the video starts playing'</span>, <span class="keyword">async function</span>() {
+  <span class="keyword">await</span> <span class="keyword">this</span>.page.click(<span class="string">'[aria-label="Play video"]'</span>)
+  <span class="keyword">await</span> <span class="function">expect</span>(<span class="keyword">this</span>.page.locator(<span class="string">'video'</span>)).toHaveAttribute(<span class="string">'paused'</span>, <span class="string">'false'</span>)
+})
+
+<span class="function">Then</span>(<span class="string">'the player should automatically select optimal quality'</span>, <span class="keyword">async function</span>() {
+  <span class="keyword">const</span> qualityIndicator = <span class="keyword">this</span>.page.locator(<span class="string">'[data-testid="quality-indicator"]'</span>)
+  <span class="keyword">await</span> <span class="function">expect</span>(qualityIndicator).toContainText(<span class="string">/\d+p/</span>)
+})
+                </div>
+            </section>
+
+            <section id="recommendation" class="content-section">
+                <h2>🎯 Final Testing Stack Recommendation</h2>
+
+                <div class="implementation-guide">
+                    <h3>Recommended Testing Architecture</h3>
+                    <div class="guide-grid">
+                        <div class="guide-item">
+                            <div class="guide-title">Unit Testing</div>
+                            <div class="guide-description">
+                                <strong>Jest + Testing Library</strong><br>
+                                Fast execution, excellent TypeScript support, React-focused with 90% coverage target.
+                            </div>
+                        </div>
+
+                        <div class="guide-item">
+                            <div class="guide-title">Integration Testing</div>
+                            <div class="guide-description">
+                                <strong>Jest + Testing Library + MSW</strong><br>
+                                Same tools as unit tests with realistic API mocking for component interactions.
+                            </div>
+                        </div>
+
+                        <div class="guide-item">
+                            <div class="guide-title">E2E Testing</div>
+                            <div class="guide-description">
+                                <strong>Playwright</strong><br>
+                                Cross-browser support, video testing capabilities, Smart TV simulation.
+                            </div>
+                        </div>
+
+                        <div class="guide-item">
+                            <div class="guide-title">Accessibility Testing</div>
+                            <div class="guide-description">
+                                <strong>Axe-core + Manual Testing</strong><br>
+                                Automated WCAG validation with NVDA, VoiceOver, JAWS compatibility.
+                            </div>
+                        </div>
+
+                        <div class="guide-item">
+                            <div class="guide-title">BDD Testing (Optional)</div>
+                            <div class="guide-description">
+                                <strong>Cucumber + Gherkin</strong><br>
+                                Stakeholder communication with Playwright-Cucumber integration.
+                            </div>
+                        </div>
+
+                        <div class="guide-item">
+                            <div class="guide-title">Performance Testing</div>
+                            <div class="guide-description">
+                                <strong>Lighthouse CI + Web Vitals</strong><br>
+                                Core Web Vitals monitoring with video-specific performance metrics.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <h3 class="chart-title">Recommended Testing Stack Distribution</h3>
+                    <canvas id="stackChart" style="height: 300px;"></canvas>
+                </div>
+            </section>
+
+            <section id="implementation" class="content-section">
+                <h2>🏗️ Video Player Specific Implementation</h2>
+
+                <div class="code-example">
+<span class="comment">// Playwright configuration for Smart TV testing</span>
+<span class="keyword">export default</span> <span class="function">defineConfig</span>({
+  projects: [
+    <span class="comment">// Standard web browsers</span>
+    { name: <span class="string">'chromium'</span>, use: { ...devices[<span class="string">'Desktop Chrome'</span>] } },
+    { name: <span class="string">'firefox'</span>, use: { ...devices[<span class="string">'Desktop Firefox'</span>] } },
+    { name: <span class="string">'webkit'</span>, use: { ...devices[<span class="string">'Desktop Safari'</span>] } },
+
+    <span class="comment">// Mobile devices</span>
+    { name: <span class="string">'mobile-chrome'</span>, use: { ...devices[<span class="string">'Pixel 5'</span>] } },
+    { name: <span class="string">'mobile-safari'</span>, use: { ...devices[<span class="string">'iPhone 12'</span>] } },
+
+    <span class="comment">// Smart TV simulation</span>
+    {
+      name: <span class="string">'roku-simulation'</span>,
+      use: {
+        viewport: { width: <span class="string">1920</span>, height: <span class="string">1080</span> },
+        userAgent: <span class="string">'Mozilla/5.0 (Linux; Tizen 6.0) Roku/12.0'</span>,
+        deviceScaleFactor: <span class="string">1</span>,
+        hasTouch: <span class="keyword">false</span>,
+        colorScheme: <span class="string">'dark'</span>
+      }
+    }
+  ]
+})
+                </div>
+
+                <div class="framework-comparison">
+                    <div class="framework-card">
+                        <div class="framework-header">
+                            <div class="framework-logo">🎬</div>
+                            <div>
+                                <div class="framework-name">HLS Streaming Tests</div>
+                                <div class="framework-rating excellent">Priority</div>
+                            </div>
+                        </div>
+                        <ul style="margin: 1rem 0; padding-left: 1rem;">
+                            <li>HLS manifest loading and parsing</li>
+                            <li>Quality level detection and switching</li>
+                            <li>Adaptive streaming under network conditions</li>
+                            <li>Error handling for invalid streams</li>
+                            <li>Cross-browser HLS compatibility</li>
+                        </ul>
+                    </div>
+
+                    <div class="framework-card">
+                        <div class="framework-header">
+                            <div class="framework-logo">📺</div>
+                            <div>
+                                <div class="framework-name">Smart TV Tests</div>
+                                <div class="framework-rating excellent">Critical</div>
+                            </div>
+                        </div>
+                        <ul style="margin: 1rem 0; padding-left: 1rem;">
+                            <li>D-pad navigation through controls</li>
+                            <li>TV-safe area margin validation</li>
+                            <li>Memory constraint simulation</li>
+                            <li>Performance under TV hardware limits</li>
+                            <li>Focus indicator visibility</li>
+                        </ul>
+                    </div>
+
+                    <div class="framework-card">
+                        <div class="framework-header">
+                            <div class="framework-logo">♿</div>
+                            <div>
+                                <div class="framework-name">Accessibility Tests</div>
+                                <div class="framework-rating excellent">Required</div>
+                            </div>
+                        </div>
+                        <ul style="margin: 1rem 0; padding-left: 1rem;">
+                            <li>Axe-core WCAG 2.1 AA validation</li>
+                            <li>Keyboard-only operation testing</li>
+                            <li>Screen reader compatibility</li>
+                            <li>Caption customization features</li>
+                            <li>High contrast mode support</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section id="timeline" class="content-section">
+                <h2>⏱️ Testing Timeline Integration</h2>
+
+                <div class="timeline-visualization">
+                    <h3>Alignment with Alex's Implementation Timeline</h3>
+
+                    <div class="timeline-item">
+                        <div class="timeline-time">Hour 1</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">Alex: Basic video player + HLS integration</div>
+                            <div class="timeline-description">Sam: Unit tests for HLS initialization, Redux integration, basic controls - 70% coverage achieved</div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-time">Hour 2</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">Alex: Smart TV navigation + accessibility features</div>
+                            <div class="timeline-description">Sam: Integration tests, accessibility validation, E2E critical paths - 90% coverage, WCAG compliance</div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-time">Post-Impl</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">Alex: Performance optimization + polish</div>
+                            <div class="timeline-description">Sam: Comprehensive E2E suite, performance testing, cross-platform validation - 95% critical coverage</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <h3 class="chart-title">Testing Coverage Timeline</h3>
+                    <canvas id="timelineChart" style="height: 300px;"></canvas>
+                </div>
+            </section>
+        </main>
+
+        <footer class="document-footer">
+            <div class="footer-content">
+                <p><strong>Sam's Testing Framework Mission:</strong> Implement a comprehensive testing strategy using Jest + Playwright + Axe-core that ensures 90% code coverage, WCAG 2.1 AA compliance, and reliable cross-platform functionality. While Mocha/Chai/Sinon.js offers more flexibility, Jest's zero-configuration React integration and built-in coverage reporting make it optimal for our rapid implementation timeline.</p>
+                <p>This testing framework analysis provides the foundation for implementing enterprise-grade quality assurance that demonstrates the professional testing practices FOX Corporation values in senior engineering candidates.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // E2E Framework Performance Chart
+        const frameworkCtx = document.getElementById('frameworkChart').getContext('2d');
+        new Chart(frameworkCtx, {
+            type: 'radar',
+            data: {
+                labels: ['Cross-Browser', 'Performance', 'Video Testing', 'TypeScript', 'CI/CD', 'Learning Curve'],
+                datasets: [
+                    {
+                        label: 'Playwright',
+                        data: [5, 5, 5, 5, 5, 3],
+                        backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                        borderColor: '#10b981',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#10b981'
+                    },
+                    {
+                        label: 'Cypress',
+                        data: [2, 3, 4, 4, 4, 5],
+                        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                        borderColor: '#3b82f6',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#3b82f6'
+                    },
+                    {
+                        label: 'Selenium',
+                        data: [5, 2, 3, 3, 3, 2],
+                        backgroundColor: 'rgba(245, 158, 11, 0.2)',
+                        borderColor: '#f59e0b',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#f59e0b'
+                    },
+                    {
+                        label: 'Puppeteer',
+                        data: [2, 4, 3, 4, 3, 4],
+                        backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                        borderColor: '#ef4444',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#ef4444'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        beginAtZero: true,
+                        max: 5,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+
+        // Framework Scoring Chart
+        const scoringCtx = document.getElementById('scoringChart').getContext('2d');
+        new Chart(scoringCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Playwright', 'Cypress', 'Selenium', 'Puppeteer'],
+                datasets: [{
+                    label: 'Overall Score',
+                    data: [4.7, 3.7, 3.0, 3.3],
+                    backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444'],
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 5,
+                        ticks: {
+                            callback: function(value) {
+                                return value + '/5';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Recommended Testing Stack Chart
+        const stackCtx = document.getElementById('stackChart').getContext('2d');
+        new Chart(stackCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Unit Tests (Jest)', 'Integration (Jest+MSW)', 'E2E (Playwright)', 'Accessibility (Axe)', 'Performance (Lighthouse)'],
+                datasets: [{
+                    data: [60, 30, 10, 15, 10],
+                    backgroundColor: [
+                        '#10b981',
+                        '#3b82f6',
+                        '#f59e0b',
+                        '#8b5cf6',
+                        '#ef4444'
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20
+                        }
+                    }
+                }
+            }
+        });
+
+        // Testing Coverage Timeline Chart
+        const timelineCtx = document.getElementById('timelineChart').getContext('2d');
+        new Chart(timelineCtx, {
+            type: 'line',
+            data: {
+                labels: ['Start', 'Hour 1', 'Hour 2', 'Post-Implementation', 'Final'],
+                datasets: [
+                    {
+                        label: 'Unit Test Coverage',
+                        data: [0, 70, 85, 90, 92],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: 'Integration Coverage',
+                        data: [0, 40, 75, 85, 88],
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: 'E2E Coverage',
+                        data: [0, 20, 60, 80, 85],
+                        borderColor: '#f59e0b',
+                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

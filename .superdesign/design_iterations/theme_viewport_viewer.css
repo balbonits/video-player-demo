@@ -1,0 +1,476 @@
+:root {
+  --background: oklch(0.0500 0 0);
+  --foreground: oklch(0.9900 0 0);
+  --card: oklch(0.0800 0 0);
+  --card-foreground: oklch(0.9900 0 0);
+  --popover: oklch(0.0800 0 0);
+  --popover-foreground: oklch(0.9900 0 0);
+  --primary: oklch(0.7200 0.2000 200);
+  --primary-foreground: oklch(0.0500 0 0);
+  --secondary: oklch(0.1300 0 0);
+  --secondary-foreground: oklch(0.9900 0 0);
+  --muted: oklch(0.1100 0 0);
+  --muted-foreground: oklch(0.6000 0 0);
+  --accent: oklch(0.7500 0.2200 120);
+  --accent-foreground: oklch(0.0500 0 0);
+  --destructive: oklch(0.5770 0.2450 27.3250);
+  --destructive-foreground: oklch(0.9900 0 0);
+  --border: oklch(0.1600 0 0);
+  --input: oklch(0.1300 0 0);
+  --ring: oklch(0.7200 0.2000 200);
+  --chart-1: oklch(0.7200 0.2000 200);
+  --chart-2: oklch(0.7500 0.2200 120);
+  --chart-3: oklch(0.6800 0.1800 280);
+  --chart-4: oklch(0.7000 0.2100 60);
+  --chart-5: oklch(0.6500 0.1900 320);
+  --sidebar: oklch(0.0800 0 0);
+  --sidebar-foreground: oklch(0.9900 0 0);
+  --sidebar-primary: oklch(0.7200 0.2000 200);
+  --sidebar-primary-foreground: oklch(0.0500 0 0);
+  --sidebar-accent: oklch(0.7500 0.2200 120);
+  --sidebar-accent-foreground: oklch(0.0500 0 0);
+  --sidebar-border: oklch(0.1600 0 0);
+  --sidebar-ring: oklch(0.7200 0.2000 200);
+  --font-sans: 'Geist', 'Inter', system-ui, sans-serif;
+  --font-serif: 'Geist', 'Inter', system-ui, sans-serif;
+  --font-mono: 'Geist Mono', 'JetBrains Mono', monospace;
+  --radius: 0.75rem;
+  --shadow-2xs: 0 2px 4px 0px hsl(200 50% 60% / 0.08);
+  --shadow-xs: 0 2px 4px 0px hsl(200 50% 60% / 0.12);
+  --shadow-sm: 0 2px 4px 0px hsl(200 50% 60% / 0.16), 0 1px 2px -1px hsl(200 50% 60% / 0.16);
+  --shadow: 0 2px 4px 0px hsl(200 50% 60% / 0.20), 0 1px 2px -1px hsl(200 50% 60% / 0.20);
+  --shadow-md: 0 2px 4px 0px hsl(200 50% 60% / 0.24), 0 2px 4px -1px hsl(200 50% 60% / 0.24);
+  --shadow-lg: 0 2px 4px 0px hsl(200 50% 60% / 0.28), 0 4px 6px -1px hsl(200 50% 60% / 0.28);
+  --shadow-xl: 0 2px 4px 0px hsl(200 50% 60% / 0.32), 0 8px 10px -1px hsl(200 50% 60% / 0.32);
+  --shadow-2xl: 0 2px 4px 0px hsl(200 50% 60% / 0.40);
+  --tracking-normal: 0em;
+  --spacing: 0.25rem;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+/* Viewport viewer specific styles */
+body {
+  background: var(--background) !important;
+  color: var(--foreground) !important;
+  font-family: var(--font-sans) !important;
+  overflow-x: hidden !important;
+}
+
+.viewport-container {
+  background: var(--background) !important;
+  min-height: 100vh !important;
+  padding: 1.5rem !important;
+}
+
+.viewer-panel {
+  background: var(--card) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-lg) !important;
+  padding: 2rem !important;
+  margin-bottom: 2rem !important;
+  box-shadow: var(--shadow-lg) !important;
+  position: relative !important;
+}
+
+.device-simulator {
+  background: var(--muted) !important;
+  border: 2px solid var(--border) !important;
+  border-radius: var(--radius-xl) !important;
+  padding: 2rem !important;
+  margin: 2rem auto !important;
+  position: relative !important;
+  overflow: hidden !important;
+  transition: all 0.3s ease !important;
+}
+
+.device-frame {
+  background: var(--background) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius) !important;
+  overflow: hidden !important;
+  position: relative !important;
+  margin: 0 auto !important;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+  box-shadow: var(--shadow-xl) !important;
+}
+
+/* Device-specific frames */
+.device-frame.mobile {
+  max-width: 430px !important;
+  aspect-ratio: 430/932 !important;
+}
+
+.device-frame.tablet {
+  max-width: 834px !important;
+  aspect-ratio: 834/1194 !important;
+}
+
+.device-frame.desktop {
+  max-width: 1280px !important;
+  aspect-ratio: 16/10 !important;
+}
+
+.device-frame.tv {
+  max-width: 100% !important;
+  aspect-ratio: 16/9 !important;
+  border: 4px solid var(--accent) !important;
+}
+
+.device-frame.tv::before {
+  content: "📺 Smart TV Safe Area" !important;
+  position: absolute !important;
+  top: -2rem !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  background: var(--accent) !important;
+  color: var(--accent-foreground) !important;
+  padding: 0.25rem 0.75rem !important;
+  border-radius: var(--radius) !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  z-index: 10 !important;
+}
+
+.device-content {
+  width: 100% !important;
+  height: 100% !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* Safe area indicators */
+.safe-area-overlay {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  pointer-events: none !important;
+  z-index: 5 !important;
+}
+
+.safe-area-overlay.tv {
+  border: 48px solid oklch(from var(--accent) l c h / 0.1) !important;
+  border-top-width: 27px !important;
+  border-bottom-width: 27px !important;
+}
+
+.safe-area-overlay.mobile-portrait {
+  border-top: 59px solid oklch(from var(--primary) l c h / 0.1) !important;
+  border-bottom: 34px solid oklch(from var(--primary) l c h / 0.1) !important;
+}
+
+/* Platform selector */
+.platform-selector {
+  display: flex !important;
+  gap: 0.5rem !important;
+  flex-wrap: wrap !important;
+  margin-bottom: 2rem !important;
+  padding: 1rem !important;
+  background: var(--muted) !important;
+  border-radius: var(--radius-lg) !important;
+  border: 1px solid var(--border) !important;
+}
+
+.platform-option {
+  background: var(--card) !important;
+  color: var(--card-foreground) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius) !important;
+  padding: 0.75rem 1.25rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+}
+
+.platform-option:hover {
+  background: var(--secondary) !important;
+  color: var(--secondary-foreground) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: var(--shadow) !important;
+}
+
+.platform-option.active {
+  background: var(--primary) !important;
+  color: var(--primary-foreground) !important;
+  border-color: var(--primary) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+
+/* Device info display */
+.device-info {
+  background: var(--card) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius) !important;
+  padding: 1rem !important;
+  margin-top: 1rem !important;
+  font-family: var(--font-mono) !important;
+  font-size: 0.875rem !important;
+}
+
+.device-info-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+  gap: 1rem !important;
+}
+
+.info-item {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+}
+
+.info-label {
+  color: var(--muted-foreground) !important;
+  font-weight: 500 !important;
+}
+
+.info-value {
+  color: var(--accent) !important;
+  font-weight: 600 !important;
+}
+
+/* Responsive video player demo */
+.demo-video-player {
+  background: #000 !important;
+  border-radius: var(--radius) !important;
+  overflow: hidden !important;
+  position: relative !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 200px !important;
+}
+
+.video-area {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%) !important;
+  position: relative !important;
+  width: 100% !important;
+  aspect-ratio: 16/9 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.play-button {
+  background: var(--primary) !important;
+  color: var(--primary-foreground) !important;
+  border: none !important;
+  border-radius: 50% !important;
+  padding: 1rem !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+.play-button:hover {
+  background: oklch(from var(--primary) l c h / 0.9) !important;
+  transform: scale(1.1) !important;
+}
+
+.controls-bar {
+  background: linear-gradient(to top, rgba(0,0,0,0.8), transparent) !important;
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  padding: 1rem !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 1rem !important;
+}
+
+.control-button {
+  background: transparent !important;
+  color: white !important;
+  border: 2px solid transparent !important;
+  border-radius: var(--radius) !important;
+  padding: 0.5rem !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.control-button:hover {
+  background: oklch(from var(--accent) l c h / 0.2) !important;
+  border-color: var(--accent) !important;
+}
+
+.control-button.focused {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 2px oklch(from var(--accent) l c h / 0.3) !important;
+}
+
+.progress-bar {
+  flex: 1 !important;
+  height: 4px !important;
+  background: rgba(255,255,255,0.3) !important;
+  border-radius: 2px !important;
+  overflow: hidden !important;
+}
+
+.progress-fill {
+  background: var(--accent) !important;
+  height: 100% !important;
+  width: 30% !important;
+  transition: width 0.3s ease !important;
+}
+
+/* TV-specific optimizations */
+.tv-mode .control-button {
+  padding: 1rem !important;
+  font-size: 1.125rem !important;
+  min-width: 64px !important;
+  min-height: 64px !important;
+}
+
+.tv-mode .play-button {
+  padding: 2rem !important;
+  font-size: 2rem !important;
+}
+
+.tv-mode .controls-bar {
+  padding: 2rem !important;
+  gap: 2rem !important;
+}
+
+/* Orientation controls */
+.orientation-controls {
+  display: flex !important;
+  gap: 0.5rem !important;
+  margin-top: 1rem !important;
+}
+
+.orientation-btn {
+  background: var(--muted) !important;
+  color: var(--muted-foreground) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius) !important;
+  padding: 0.5rem 1rem !important;
+  font-size: 0.875rem !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.orientation-btn:hover {
+  background: var(--secondary) !important;
+  color: var(--secondary-foreground) !important;
+}
+
+.orientation-btn.active {
+  background: var(--accent) !important;
+  color: var(--accent-foreground) !important;
+  border-color: var(--accent) !important;
+}
+
+/* Specification tables */
+.spec-table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  margin-top: 1rem !important;
+  font-family: var(--font-mono) !important;
+  font-size: 0.875rem !important;
+}
+
+.spec-table th,
+.spec-table td {
+  padding: 0.75rem !important;
+  text-align: left !important;
+  border-bottom: 1px solid var(--border) !important;
+}
+
+.spec-table th {
+  background: var(--muted) !important;
+  color: var(--foreground) !important;
+  font-weight: 600 !important;
+}
+
+.spec-table td {
+  color: var(--muted-foreground) !important;
+}
+
+.spec-table .highlight {
+  color: var(--accent) !important;
+  font-weight: 600 !important;
+}
+
+/* Performance indicators */
+.performance-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)) !important;
+  gap: 1rem !important;
+  margin-top: 1.5rem !important;
+}
+
+.performance-card {
+  background: var(--card) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius) !important;
+  padding: 1.5rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.performance-card:hover {
+  border-color: var(--accent) !important;
+  box-shadow: var(--shadow) !important;
+}
+
+.performance-metric {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  margin: 0.5rem 0 !important;
+}
+
+.metric-name {
+  color: var(--muted-foreground) !important;
+  font-size: 0.875rem !important;
+}
+
+.metric-value {
+  color: var(--accent) !important;
+  font-weight: 600 !important;
+  font-family: var(--font-mono) !important;
+}
+
+/* Responsive breakpoint indicators */
+.breakpoint-indicator {
+  position: fixed !important;
+  bottom: 1rem !important;
+  right: 1rem !important;
+  background: var(--card) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius) !important;
+  padding: 0.5rem 1rem !important;
+  font-family: var(--font-mono) !important;
+  font-size: 0.75rem !important;
+  color: var(--muted-foreground) !important;
+  z-index: 1000 !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+@media (max-width: 768px) {
+  .breakpoint-indicator::after {
+    content: " • Mobile" !important;
+    color: var(--accent) !important;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .breakpoint-indicator::after {
+    content: " • Tablet" !important;
+    color: var(--primary) !important;
+  }
+}
+
+@media (min-width: 1025px) {
+  .breakpoint-indicator::after {
+    content: " • Desktop" !important;
+    color: var(--chart-3) !important;
+  }
+}

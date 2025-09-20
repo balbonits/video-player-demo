@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 1: Foundation & Setup Plan - Video Player Demo</title>
+    <link rel="stylesheet" href="../shared-styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <i data-lucide="play-circle" class="nav-icon"></i>
+                <span>Video Player Demo</span>
+            </div>
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">
+                    <i data-lucide="home"></i>
+                    <span>Home</span>
+                </a>
+                <a href="design.html" class="nav-link">
+                    <i data-lucide="palette"></i>
+                    <span>Design</span>
+                </a>
+                <a href="technical.html" class="nav-link">
+                    <i data-lucide="code"></i>
+                    <span>Technical</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <header class="page-header">
+            <div class="header-content">
+                <div class="header-badge">
+                    <i data-lucide="layers"></i>
+                    <span>Foundation Planning</span>
+                </div>
+                <h1 class="page-title">Phase 1: Foundation & Setup Plan</h1>
+                <p class="page-description">
+                    Comprehensive foundation setup for dual Next.js implementations with performance optimization focus
+                </p>
+                <div class="header-meta">
+                    <div class="meta-item">
+                        <i data-lucide="user"></i>
+                        <span>Phase Lead: Morgan (Team Lead)</span>
+                    </div>
+                    <div class="meta-item">
+                        <i data-lucide="clock"></i>
+                        <span>Duration: Day 1-2 (16 hours)</span>
+                    </div>
+                    <div class="meta-item status-ready">
+                        <i data-lucide="check-circle"></i>
+                        <span>Status: Planning Complete, Ready for Implementation</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <section class="content-section">
+            <div class="section-header">
+                <h2><i data-lucide="target"></i>Phase Overview & Objectives</h2>
+            </div>
+
+            <div class="objectives-grid">
+                <div class="objective-card">
+                    <div class="objective-header">
+                        <i data-lucide="settings"></i>
+                        <h3>Project Setup</h3>
+                    </div>
+                    <p>Initialize dual Next.js implementations (Pages + App Router)</p>
+                </div>
+                <div class="objective-card">
+                    <div class="objective-header">
+                        <i data-lucide="terminal"></i>
+                        <h3>Development Environment</h3>
+                    </div>
+                    <p>Configure TypeScript strict mode, testing frameworks</p>
+                </div>
+                <div class="objective-card">
+                    <div class="objective-header">
+                        <i data-lucide="layers-3"></i>
+                        <h3>Architecture Foundation</h3>
+                    </div>
+                    <p>Establish Redux store, component structure, monorepo</p>
+                </div>
+                <div class="objective-card">
+                    <div class="objective-header">
+                        <i data-lucide="shield-check"></i>
+                        <h3>Quality Infrastructure</h3>
+                    </div>
+                    <p>Set up testing, linting, CI/CD pipeline</p>
+                </div>
+                <div class="objective-card">
+                    <div class="objective-header">
+                        <i data-lucide="graduation-cap"></i>
+                        <h3>Learning Framework</h3>
+                    </div>
+                    <p>Ensure each step teaches Next.js patterns to John</p>
+                </div>
+            </div>
+
+            <div class="success-criteria">
+                <h3><i data-lucide="check-square"></i>Success Criteria</h3>
+                <div class="criteria-list">
+                    <div class="criteria-item completed">
+                        <i data-lucide="check"></i>
+                        <span>Documentation structure complete and comprehensive</span>
+                    </div>
+                    <div class="criteria-item">
+                        <i data-lucide="square"></i>
+                        <span>Both Next.js projects initialized with proper configuration</span>
+                    </div>
+                    <div class="criteria-item">
+                        <i data-lucide="square"></i>
+                        <span>TypeScript strict mode configured and working</span>
+                    </div>
+                    <div class="criteria-item">
+                        <i data-lucide="square"></i>
+                        <span>Redux Toolkit store configured with Action Creators pattern</span>
+                    </div>
+                    <div class="criteria-item">
+                        <i data-lucide="square"></i>
+                        <span>Basic testing framework operational (Jest + Testing Library)</span>
+                    </div>
+                    <div class="criteria-item">
+                        <i data-lucide="square"></i>
+                        <span>Development environment fully functional</span>
+                    </div>
+                    <div class="criteria-item">
+                        <i data-lucide="square"></i>
+                        <span>All team personas aligned and ready for implementation</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <div class="section-header">
+                <h2><i data-lucide="list-ordered"></i>Detailed Implementation Steps</h2>
+            </div>
+
+            <div class="implementation-steps">
+                <div class="step-card">
+                    <div class="step-header">
+                        <div class="step-number">1</div>
+                        <div class="step-info">
+                            <h3>Monorepo Architecture Setup</h3>
+                            <div class="step-meta">
+                                <span class="owner">Owner: Alex (Engineer) + Casey (Release)</span>
+                                <span class="duration">Duration: 2 hours</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step-content">
+                        <p class="learning-focus"><strong>Learning Focus:</strong> Modern monorepo patterns with Turborepo</p>
+
+                        <div class="code-section">
+                            <h4>Technical Implementation Plan:</h4>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span>bash</span>
+                                    <button class="copy-button" onclick="copyCode(this)">
+                                        <i data-lucide="copy"></i>
+                                    </button>
+                                </div>
+                                <pre><code># Initialize Turborepo structure
+npx create-turbo@latest video-player-demo --example with-tailwind
+
+# Configure workspace structure
+mkdir -p apps/{web-player-pages,web-player-app,ios-player,android-player,roku-player,tizen-player,vizio-player}
+mkdir -p packages/{player-core,ui-components,shared-utils,mobile-shared}
+mkdir -p tools/{build-scripts,testing,deployment}</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="learning-points">
+                            <h4>Learning Objectives for John:</h4>
+                            <ul>
+                                <li><strong>Why monorepo?</strong> Code sharing across platforms, consistent tooling, atomic commits</li>
+                                <li><strong>Turborepo benefits:</strong> Intelligent caching, parallel execution, dependency management</li>
+                                <li><strong>Workspace organization:</strong> Logical separation of apps vs packages vs tools</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-header">
+                        <div class="step-number">2</div>
+                        <div class="step-info">
+                            <h3>Next.js Pages Router Setup (Primary)</h3>
+                            <div class="step-meta">
+                                <span class="owner">Owner: Alex (Engineer)</span>
+                                <span class="duration">Duration: 3 hours</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step-content">
+                        <p class="learning-focus"><strong>Learning Focus:</strong> Next.js fundamentals, TypeScript integration, project structure</p>
+
+                        <div class="code-section">
+                            <h4>TypeScript Strict Configuration:</h4>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span>json</span>
+                                    <button class="copy-button" onclick="copyCode(this)">
+                                        <i data-lucide="copy"></i>
+                                    </button>
+                                </div>
+                                <pre><code>// tsconfig.json
+{
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true
+  }
+}</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="learning-points">
+                            <h4>Learning Discussion Points:</h4>
+                            <ul>
+                                <li><strong>Pages Router fundamentals:</strong> File-based routing, API routes, built-in optimizations</li>
+                                <li><strong>TypeScript strict benefits:</strong> Early error detection, better IntelliSense, enterprise quality</li>
+                                <li><strong>Next.js conventions:</strong> Page components, API structure, public assets</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-header">
+                        <div class="step-number">3</div>
+                        <div class="step-info">
+                            <h3>Redux Toolkit Configuration</h3>
+                            <div class="step-meta">
+                                <span class="owner">Owner: Alex (Engineer)</span>
+                                <span class="duration">Duration: 3 hours</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step-content">
+                        <p class="learning-focus"><strong>Learning Focus:</strong> Modern Redux patterns, Action Creators, TypeScript integration</p>
+
+                        <div class="code-section">
+                            <h4>Store Architecture Implementation:</h4>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span>typescript</span>
+                                    <button class="copy-button" onclick="copyCode(this)">
+                                        <i data-lucide="copy"></i>
+                                    </button>
+                                </div>
+                                <pre><code>// lib/store/index.ts - Main store configuration
+import { configureStore } from '@reduxjs/toolkit'
+import { persistStore, persistReducer } from 'redux-persist'
+import storage from 'redux-persist/lib/storage'
+
+import playerSlice from './slices/playerSlice'
+import videoSlice from './slices/videoSlice'
+import uiSlice from './slices/uiSlice'
+import accessibilitySlice from './slices/accessibilitySlice'
+import analyticsSlice from './slices/analyticsSlice'
+
+const persistConfig = {
+  key: 'video-player-demo',
+  storage,
+  whitelist: ['accessibility', 'ui'] // Only persist user preferences
+}
+
+export const makeStore = () => {
+  return configureStore({
+    reducer: persistedReducer,
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware({
+        serializableCheck: {
+          ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+        },
+      }),
+    devTools: process.env.NODE_ENV !== 'production',
+  })
+}</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="learning-points">
+                            <h4>Learning Discussion Points:</h4>
+                            <ul>
+                                <li><strong>Why Redux Toolkit?</strong> Reduces boilerplate, built-in best practices, excellent TypeScript support</li>
+                                <li><strong>Action Creators pattern:</strong> Predictable state updates, easier testing, clear API</li>
+                                <li><strong>Persistence strategy:</strong> What to persist vs. what to keep ephemeral</li>
+                                <li><strong>DevTools integration:</strong> Time-travel debugging, action replay, state inspection</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-header">
+                        <div class="step-number">4</div>
+                        <div class="step-info">
+                            <h3>Testing Framework Setup</h3>
+                            <div class="step-meta">
+                                <span class="owner">Owner: Sam (QA)</span>
+                                <span class="duration">Duration: 4 hours</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step-content">
+                        <p class="learning-focus"><strong>Learning Focus:</strong> TDD methodology, enterprise testing practices</p>
+
+                        <div class="code-section">
+                            <h4>Jest + Testing Library Configuration:</h4>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span>typescript</span>
+                                    <button class="copy-button" onclick="copyCode(this)">
+                                        <i data-lucide="copy"></i>
+                                    </button>
+                                </div>
+                                <pre><code>// jest.config.js
+export default {
+  preset: 'ts-jest',
+  testEnvironment: 'jsdom',
+  setupFilesAfterEnv: ['<rootDir>/src/test/setup.ts'],
+
+  moduleNameMapping: {
+    '^@/(.*)$': '<rootDir>/src/$1',
+  },
+
+  // 90% coverage requirement
+  coverageThreshold: {
+    global: {
+      branches: 90,
+      functions: 90,
+      lines: 90,
+      statements: 90,
+    },
+    './src/components/VideoPlayer/': {
+      branches: 95,
+      functions: 95,
+      lines: 95,
+      statements: 95,
+    },
+  },
+}</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="learning-points">
+                            <h4>Learning Discussion Points:</h4>
+                            <ul>
+                                <li><strong>TDD Benefits:</strong> Design through testing, better architecture, fewer bugs</li>
+                                <li><strong>Testing Library philosophy:</strong> Test behavior, not implementation details</li>
+                                <li><strong>Coverage goals:</strong> Why 90% vs 100%, what shouldn't be tested</li>
+                                <li><strong>Mock strategies:</strong> When to mock, when to use real implementations</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-header">
+                        <div class="step-number">5</div>
+                        <div class="step-info">
+                            <h3>Basic Component Architecture</h3>
+                            <div class="step-meta">
+                                <span class="owner">Owner: Alex (Engineer) + Riley (UX)</span>
+                                <span class="duration">Duration: 3 hours</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step-content">
+                        <p class="learning-focus"><strong>Learning Focus:</strong> Component composition, accessibility integration, design system</p>
+
+                        <div class="architecture-overview">
+                            <h4>Component Hierarchy Design:</h4>
+                            <div class="component-tree">
+                                <div class="component-node root">
+                                    <i data-lucide="play-circle"></i>
+                                    <span>VideoPlayer</span>
+                                    <div class="component-details">Main container, coordinate all sub-components</div>
+                                </div>
+                                <div class="component-children">
+                                    <div class="component-node">
+                                        <i data-lucide="monitor"></i>
+                                        <span>VideoContainer</span>
+                                        <div class="component-details">Video element wrapper, overlays, loading states</div>
+                                    </div>
+                                    <div class="component-node">
+                                        <i data-lucide="play"></i>
+                                        <span>PlayerControls</span>
+                                        <div class="component-details">Control bar with playback controls</div>
+                                    </div>
+                                    <div class="component-node">
+                                        <i data-lucide="settings"></i>
+                                        <span>SettingsPanel</span>
+                                        <div class="component-details">Quality, captions, accessibility options</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="learning-points">
+                            <h4>Learning Discussion Points:</h4>
+                            <ul>
+                                <li><strong>Component composition:</strong> How to break down complex UI into manageable pieces</li>
+                                <li><strong>Props vs state:</strong> What belongs in component state vs Redux</li>
+                                <li><strong>Accessibility integration:</strong> Building accessibility in from the start</li>
+                                <li><strong>Performance considerations:</strong> Re-render optimization, memo usage</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-header">
+                        <div class="step-number">6</div>
+                        <div class="step-info">
+                            <h3>Development Workflow Setup</h3>
+                            <div class="step-meta">
+                                <span class="owner">Owner: Casey (Release)</span>
+                                <span class="duration">Duration: 1 hour</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step-content">
+                        <p class="learning-focus"><strong>Learning Focus:</strong> Professional development tooling, CI/CD basics</p>
+
+                        <div class="workflow-setup">
+                            <h4>Git Workflow Configuration:</h4>
+                            <div class="workflow-items">
+                                <div class="workflow-item">
+                                    <i data-lucide="git-branch"></i>
+                                    <div>
+                                        <strong>Branch Strategy</strong>
+                                        <p>Feature branches with conventional commits</p>
+                                    </div>
+                                </div>
+                                <div class="workflow-item">
+                                    <i data-lucide="shield-check"></i>
+                                    <div>
+                                        <strong>Quality Gates</strong>
+                                        <p>Pre-commit hooks, automated testing</p>
+                                    </div>
+                                </div>
+                                <div class="workflow-item">
+                                    <i data-lucide="zap"></i>
+                                    <div>
+                                        <strong>CI/CD Pipeline</strong>
+                                        <p>Automated builds, testing, deployment</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="learning-points">
+                            <h4>Learning Discussion Points:</h4>
+                            <ul>
+                                <li><strong>Git workflow strategy:</strong> Feature branches, conventional commits, automated validation</li>
+                                <li><strong>Code quality gates:</strong> Pre-commit hooks, automated testing, continuous integration</li>
+                                <li><strong>Professional practices:</strong> Why these standards matter for enterprise development</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <div class="section-header">
+                <h2><i data-lucide="check-circle"></i>Phase 1 Success Validation</h2>
+            </div>
+
+            <div class="validation-grid">
+                <div class="validation-category">
+                    <h3><i data-lucide="settings"></i>Technical Validation</h3>
+                    <div class="validation-list">
+                        <div class="validation-item">
+                            <i data-lucide="square"></i>
+                            <span>Project Structure: Monorepo properly configured with Turborepo</span>
+                        </div>
+                        <div class="validation-item">
+                            <i data-lucide="square"></i>
+                            <span>Next.js Setup: Pages Router project initialized with TypeScript</span>
+                        </div>
+                        <div class="validation-item">
+                            <i data-lucide="square"></i>
+                            <span>Build System: Successfully builds with zero TypeScript errors</span>
+                        </div>
+                        <div class="validation-item">
+                            <i data-lucide="square"></i>
+                            <span>Testing Framework: Jest runs with 90% coverage target configured</span>
+                        </div>
+                        <div class="validation-item">
+                            <i data-lucide="square"></i>
+                            <span>Code Quality: ESLint + Prettier configured and passing</span>
+                        </div>
+                        <div class="validation-item">
+                            <i data-lucide="square"></i>
+                            <span>Redux Store: Basic store configuration with persistence</span>
+                        </div>
+                        <div class="validation-item">
+                            <i data-lucide="square"></i>
+                            <span>Development Server: Runs successfully on localhost:3000</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="validation-category">
+                    <h3><i data-lucide="graduation-cap"></i>Learning Validation</h3>
+                    <div class="validation-list">
+                        <div class="validation-item">
+                            <i data-lucide="square"></i>
+                            <span>John understands monorepo benefits and structure</span>
+                        </div>
+                        <div class="validation-item">
+                            <i data-lucide="square"></i>
+                            <span>John understands Next.js Pages Router fundamentals</span>
+                        </div>
+                        <div class="validation-item">
+                            <i data-lucide="square"></i>
+                            <span>John understands TypeScript strict mode implications</span>
+                        </div>
+                        <div class="validation-item">
+                            <i data-lucide="square"></i>
+                            <span>John understands Redux Toolkit patterns and benefits</span>
+                        </div>
+                        <div class="validation-item">
+                            <i data-lucide="square"></i>
+                            <span>John understands testing strategy and TDD approach</span>
+                        </div>
+                        <div class="validation-item">
+                            <i data-lucide="square"></i>
+                            <span>John understands development workflow and quality gates</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <div class="section-header">
+                <h2><i data-lucide="alert-triangle"></i>Risks & Mitigation</h2>
+            </div>
+
+            <div class="risks-grid">
+                <div class="risk-card">
+                    <div class="risk-header technical">
+                        <i data-lucide="code"></i>
+                        <h3>Technical Risks</h3>
+                    </div>
+                    <div class="risk-item">
+                        <h4>TypeScript strict mode configuration complexity</h4>
+                        <p><strong>Mitigation:</strong> Start with basic strict config, incrementally add rules</p>
+                        <p><strong>Owner:</strong> Alex, escalation to Morgan</p>
+                    </div>
+                    <div class="risk-item">
+                        <h4>Redux setup complexity affecting timeline</h4>
+                        <p><strong>Mitigation:</strong> Use Redux Toolkit templates, focus on essential slices first</p>
+                        <p><strong>Owner:</strong> Alex, validation by Sam</p>
+                    </div>
+                </div>
+
+                <div class="risk-card">
+                    <div class="risk-header learning">
+                        <i data-lucide="brain"></i>
+                        <h3>Learning Risks</h3>
+                    </div>
+                    <div class="risk-item">
+                        <h4>Too much new information affecting implementation speed</h4>
+                        <p><strong>Mitigation:</strong> Focus on core concepts first, detailed patterns during implementation</p>
+                        <p><strong>Owner:</strong> Morgan, coordination with all personas</p>
+                    </div>
+                </div>
+
+                <div class="risk-card">
+                    <div class="risk-header timeline">
+                        <i data-lucide="clock"></i>
+                        <h3>Timeline Risks</h3>
+                    </div>
+                    <div class="risk-item">
+                        <h4>Phase 1 taking longer than planned due to setup complexity</h4>
+                        <p><strong>Mitigation:</strong> Prioritize working setup over perfect configuration</p>
+                        <p><strong>Owner:</strong> Morgan, with team input</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section final-section">
+            <div class="section-header">
+                <h2><i data-lucide="arrow-right"></i>Next Phase Preparation</h2>
+            </div>
+
+            <div class="readiness-checklist">
+                <h3>Phase 2 Readiness Requirements</h3>
+                <div class="readiness-items">
+                    <div class="readiness-item ready">
+                        <i data-lucide="check-circle"></i>
+                        <span>Development environment functional and tested</span>
+                    </div>
+                    <div class="readiness-item ready">
+                        <i data-lucide="check-circle"></i>
+                        <span>Team understanding of architecture and patterns</span>
+                    </div>
+                    <div class="readiness-item ready">
+                        <i data-lucide="check-circle"></i>
+                        <span>Quality gates operational (linting, testing, TypeScript)</span>
+                    </div>
+                    <div class="readiness-item ready">
+                        <i data-lucide="check-circle"></i>
+                        <span>Documentation current and accessible</span>
+                    </div>
+                    <div class="readiness-item">
+                        <i data-lucide="clock"></i>
+                        <span>John's approval of foundation approach and setup</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="handoff-note">
+                <div class="note-header">
+                    <i data-lucide="user"></i>
+                    <strong>Morgan (Team Lead)</strong>
+                </div>
+                <p>
+                    "Once Phase 1 is complete and validated, we'll hand off to Phase 2 with a solid foundation for rapid feature development. All subsequent implementation will build on these carefully established patterns and quality standards."
+                </p>
+                <div class="important-note">
+                    <i data-lucide="alert-circle"></i>
+                    <strong>No implementation begins until these plans are approved and documented!</strong>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Video Player Demo</h3>
+                <p>Professional video streaming showcase for Smart TV and OTT platforms</p>
+            </div>
+            <div class="footer-section">
+                <h3>Documentation</h3>
+                <a href="../index.html">Project Overview</a>
+                <a href="design.html">Design System</a>
+                <a href="technical.html">Technical Specs</a>
+            </div>
+            <div class="footer-section">
+                <h3>Contact</h3>
+                <p>John Dilig - Frontend Developer</p>
+                <a href="https://jdilig.me" target="_blank">Portfolio</a>
+                <a href="https://github.com/balbonits" target="_blank">GitHub</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 John Dilig. Built with performance optimization for FOX Corporation requirements.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Copy code functionality
+        function copyCode(button) {
+            const codeBlock = button.closest('.code-block').querySelector('pre code');
+            const text = codeBlock.textContent;
+
+            navigator.clipboard.writeText(text).then(() => {
+                const icon = button.querySelector('i');
+                icon.setAttribute('data-lucide', 'check');
+                lucide.createIcons();
+
+                setTimeout(() => {
+                    icon.setAttribute('data-lucide', 'copy');
+                    lucide.createIcons();
+                }, 2000);
+            });
+        }
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

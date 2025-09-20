@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Design Viewer - Viewport Specifications</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="theme_viewport_viewer.css">
+</head>
+<body class="viewport-container">
+
+    <!-- Header -->
+    <header class="viewer-panel">
+        <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-3">
+                <i data-lucide="monitor" class="w-8 h-8 text-primary"></i>
+                <h1 class="text-3xl font-bold text-foreground">Responsive Design Viewer</h1>
+            </div>
+            <div class="flex items-center gap-2 text-sm text-muted-foreground">
+                <i data-lucide="ruler" class="w-4 h-4"></i>
+                <span>Riley (UX) • Cross-Platform Viewport Testing</span>
+            </div>
+        </div>
+
+        <p class="text-lg text-muted-foreground mb-6">
+            Interactive viewport testing and responsive design validation for video player across all target platforms
+        </p>
+
+        <!-- Current Viewport Info -->
+        <div class="device-info">
+            <div class="device-info-grid">
+                <div class="info-item">
+                    <span class="info-label">Current Viewport:</span>
+                    <span class="info-value" id="current-viewport">1920 × 1080</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Device Pixel Ratio:</span>
+                    <span class="info-value" id="current-dpr">1x</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Orientation:</span>
+                    <span class="info-value" id="current-orientation">Landscape</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Platform:</span>
+                    <span class="info-value" id="current-platform">Smart TV</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Platform Selector -->
+    <div class="viewer-panel">
+        <h2 class="text-2xl font-bold text-foreground mb-4 flex items-center gap-2">
+            <i data-lucide="grid-3x3" class="w-6 h-6 text-primary"></i>
+            Platform & Device Selection
+        </h2>
+
+        <div class="platform-selector">
+            <button class="platform-option" data-platform="mobile" data-device="iphone-14">
+                <i data-lucide="smartphone" class="w-4 h-4"></i>
+                <span>iPhone 14</span>
+                <small class="text-xs opacity-75">393×852</small>
+            </button>
+            <button class="platform-option" data-platform="mobile" data-device="pixel-7">
+                <i data-lucide="smartphone" class="w-4 h-4"></i>
+                <span>Pixel 7</span>
+                <small class="text-xs opacity-75">412×915</small>
+            </button>
+            <button class="platform-option" data-platform="tablet" data-device="ipad-air">
+                <i data-lucide="tablet" class="w-4 h-4"></i>
+                <span>iPad Air</span>
+                <small class="text-xs opacity-75">820×1180</small>
+            </button>
+            <button class="platform-option" data-platform="desktop" data-device="macbook-air">
+                <i data-lucide="laptop" class="w-4 h-4"></i>
+                <span>MacBook Air</span>
+                <small class="text-xs opacity-75">1280×800</small>
+            </button>
+            <button class="platform-option" data-platform="desktop" data-device="desktop-fhd">
+                <i data-lucide="monitor" class="w-4 h-4"></i>
+                <span>Desktop FHD</span>
+                <small class="text-xs opacity-75">1920×1080</small>
+            </button>
+            <button class="platform-option active" data-platform="tv" data-device="smart-tv">
+                <i data-lucide="tv" class="w-4 h-4"></i>
+                <span>Smart TV</span>
+                <small class="text-xs opacity-75">1920×1080</small>
+            </button>
+            <button class="platform-option" data-platform="tv" data-device="smart-tv-4k">
+                <i data-lucide="tv" class="w-4 h-4"></i>
+                <span>Smart TV 4K</span>
+                <small class="text-xs opacity-75">3840×2160</small>
+            </button>
+            <button class="platform-option" data-platform="responsive" data-device="responsive">
+                <i data-lucide="layout" class="w-4 h-4"></i>
+                <span>Responsive</span>
+                <small class="text-xs opacity-75">All sizes</small>
+            </button>
+        </div>
+
+        <!-- Orientation Controls -->
+        <div class="orientation-controls">
+            <span class="text-sm font-medium text-foreground mr-3">Orientation:</span>
+            <button class="orientation-btn active" data-orientation="landscape">
+                <i data-lucide="monitor" class="w-4 h-4 inline mr-1"></i>
+                Landscape
+            </button>
+            <button class="orientation-btn" data-orientation="portrait">
+                <i data-lucide="smartphone" class="w-4 h-4 inline mr-1"></i>
+                Portrait
+            </button>
+            <button class="orientation-btn" data-orientation="auto">
+                <i data-lucide="rotate-cw" class="w-4 h-4 inline mr-1"></i>
+                Auto
+            </button>
+        </div>
+    </div>
+
+    <!-- Live Device Simulator -->
+    <div class="viewer-panel">
+        <h2 class="text-2xl font-bold text-foreground mb-4 flex items-center gap-2">
+            <i data-lucide="smartphone" class="w-6 h-6 text-accent"></i>
+            Live Device Simulator
+        </h2>
+
+        <div class="device-simulator">
+            <div class="device-frame tv" id="device-frame">
+                <!-- Safe Area Overlay -->
+                <div class="safe-area-overlay tv" id="safe-area-overlay"></div>
+
+                <!-- Device Content -->
+                <div class="device-content">
+                    <div class="demo-video-player tv-mode" id="demo-player">
+                        <!-- Video Area -->
+                        <div class="video-area">
+                            <button class="play-button" id="play-btn">
+                                <i data-lucide="play" class="w-8 h-8"></i>
+                            </button>
+                        </div>
+
+                        <!-- Controls Bar -->
+                        <div class="controls-bar">
+                            <button class="control-button focused" tabindex="1">
+                                <i data-lucide="pause" class="w-6 h-6"></i>
+                            </button>
+                            <button class="control-button" tabindex="2">
+                                <i data-lucide="volume-2" class="w-6 h-6"></i>
+                            </button>
+                            <div class="progress-bar">
+                                <div class="progress-fill"></div>
+                            </div>
+                            <button class="control-button" tabindex="3">
+                                <i data-lucide="settings" class="w-6 h-6"></i>
+                            </button>
+                            <button class="control-button" tabindex="4">
+                                <i data-lucide="maximize" class="w-6 h-6"></i>
+                            </button>
+                        </div>
+
+                        <!-- TV Navigation Hint -->
+                        <div class="absolute bottom-20 left-1/2 transform -translate-x-1/2 text-white text-sm font-mono bg-black bg-opacity-60 px-3 py-1 rounded" id="nav-hint">
+                            Use D-pad ↑↓←→ • Enter to select • Back to exit
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Device Info Display -->
+            <div class="device-info mt-4">
+                <div class="device-info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Device:</span>
+                        <span class="info-value" id="device-name">Smart TV (Samsung Tizen)</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Resolution:</span>
+                        <span class="info-value" id="device-resolution">1920 × 1080</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Safe Area:</span>
+                        <span class="info-value" id="device-safe-area">48px H, 27px V</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">DPR:</span>
+                        <span class="info-value" id="device-dpr">1x</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Input Method:</span>
+                        <span class="info-value" id="device-input">D-pad Remote</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Performance Target:</span>
+                        <span class="info-value" id="device-performance">< 150MB, 30fps</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Technical Specifications -->
+    <div class="viewer-panel">
+        <h2 class="text-2xl font-bold text-foreground mb-4 flex items-center gap-2">
+            <i data-lucide="cpu" class="w-6 h-6 text-chart-3"></i>
+            Technical Specifications & Constraints
+        </h2>
+
+        <div class="grid lg:grid-cols-2 gap-6">
+            <!-- Performance Constraints -->
+            <div class="performance-card">
+                <h3 class="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                    <i data-lucide="gauge" class="w-5 h-5 text-accent"></i>
+                    Performance Constraints
+                </h3>
+                <div id="performance-metrics">
+                    <div class="performance-metric">
+                        <span class="metric-name">Memory Usage</span>
+                        <span class="metric-value">< 150MB</span>
+                    </div>
+                    <div class="performance-metric">
+                        <span class="metric-name">CPU Usage</span>
+                        <span class="metric-value">< 30%</span>
+                    </div>
+                    <div class="performance-metric">
+                        <span class="metric-name">Frame Rate</span>
+                        <span class="metric-value">30fps UI</span>
+                    </div>
+                    <div class="performance-metric">
+                        <span class="metric-name">Response Time</span>
+                        <span class="metric-value">< 200ms</span>
+                    </div>
+                    <div class="performance-metric">
+                        <span class="metric-name">Network Latency</span>
+                        <span class="metric-value">Variable</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Platform Specifications -->
+            <div class="performance-card">
+                <h3 class="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                    <i data-lucide="tv" class="w-5 h-5 text-primary"></i>
+                    Smart TV Specifications
+                </h3>
+                <div id="platform-specs">
+                    <div class="performance-metric">
+                        <span class="metric-name">Roku Development</span>
+                        <span class="metric-value">BrightScript</span>
+                    </div>
+                    <div class="performance-metric">
+                        <span class="metric-name">Samsung Tizen</span>
+                        <span class="metric-value">HTML5/JS</span>
+                    </div>
+                    <div class="performance-metric">
+                        <span class="metric-name">LG webOS</span>
+                        <span class="metric-value">React.js</span>
+                    </div>
+                    <div class="performance-metric">
+                        <span class="metric-name">Market Share</span>
+                        <span class="metric-value">79% US</span>
+                    </div>
+                    <div class="performance-metric">
+                        <span class="metric-name">Global Units</span>
+                        <span class="metric-value">900M+</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Viewport Specifications Table -->
+        <div class="mt-6">
+            <h3 class="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+                <i data-lucide="table" class="w-5 h-5 text-chart-4"></i>
+                Complete Viewport Matrix
+            </h3>
+            <div class="overflow-x-auto">
+                <table class="spec-table">
+                    <thead>
+                        <tr>
+                            <th>Platform</th>
+                            <th>Device</th>
+                            <th>Resolution</th>
+                            <th>DPR</th>
+                            <th>Safe Area</th>
+                            <th>Input Method</th>
+                        </tr>
+                    </thead>
+                    <tbody id="viewport-table">
+                        <tr>
+                            <td>Smart TV</td>
+                            <td class="highlight">Samsung Tizen FHD</td>
+                            <td class="highlight">1920 × 1080</td>
+                            <td>1x</td>
+                            <td class="highlight">40px H, 22px V</td>
+                            <td>D-pad Remote</td>
+                        </tr>
+                        <tr>
+                            <td>Smart TV</td>
+                            <td>LG webOS UHD</td>
+                            <td>3840 × 2160</td>
+                            <td>1x</td>
+                            <td>45px H, 25px V</td>
+                            <td>D-pad Remote</td>
+                        </tr>
+                        <tr>
+                            <td>Smart TV</td>
+                            <td>Roku Ultra</td>
+                            <td>1920 × 1080</td>
+                            <td>1x</td>
+                            <td>48px H, 27px V</td>
+                            <td>D-pad Remote</td>
+                        </tr>
+                        <tr>
+                            <td>Mobile</td>
+                            <td>iPhone 14</td>
+                            <td>393 × 852</td>
+                            <td>3x</td>
+                            <td>59px T, 34px B</td>
+                            <td>Touch</td>
+                        </tr>
+                        <tr>
+                            <td>Mobile</td>
+                            <td>Pixel 7</td>
+                            <td>412 × 915</td>
+                            <td>2.625x</td>
+                            <td>24px T, 48px B</td>
+                            <td>Touch</td>
+                        </tr>
+                        <tr>
+                            <td>Tablet</td>
+                            <td>iPad Air</td>
+                            <td>820 × 1180</td>
+                            <td>2x</td>
+                            <td>24px T, 20px B</td>
+                            <td>Touch</td>
+                        </tr>
+                        <tr>
+                            <td>Desktop</td>
+                            <td>MacBook Air 13"</td>
+                            <td>1280 × 800</td>
+                            <td>2x</td>
+                            <td>None</td>
+                            <td>Mouse + Keyboard</td>
+                        </tr>
+                        <tr>
+                            <td>Desktop</td>
+                            <td>Desktop FHD</td>
+                            <td>1920 × 1080</td>
+                            <td>1x</td>
+                            <td>None</td>
+                            <td>Mouse + Keyboard</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- CSS Media Queries Reference -->
+    <div class="viewer-panel">
+        <h2 class="text-2xl font-bold text-foreground mb-4 flex items-center gap-2">
+            <i data-lucide="code" class="w-6 h-6 text-chart-2"></i>
+            Responsive CSS Implementation
+        </h2>
+
+        <div class="bg-muted border border-border rounded-lg p-4">
+            <h3 class="text-lg font-semibold text-foreground mb-3">Generated Media Queries</h3>
+            <pre class="text-sm font-mono text-muted-foreground overflow-x-auto" id="css-output">
+/* Mobile First Approach */
+@media (min-width: 375px) {
+  .video-player { font-size: 14px; }
+  .control-button { min-width: 44px; min-height: 44px; }
+}
+
+@media (min-width: 768px) {
+  .video-player { font-size: 16px; }
+  .control-button { min-width: 48px; min-height: 48px; }
+}
+
+@media (min-width: 1920px) {
+  /* Smart TV optimizations */
+  .video-player { font-size: 24px; }
+  .control-button { min-width: 64px; min-height: 64px; }
+  .video-player {
+    margin: 27px 48px; /* TV safe area */
+    max-width: calc(100% - 96px);
+  }
+}
+
+/* TV-specific detection */
+@media (device-type: tv),
+       (min-width: 1920px) and (min-height: 1080px) {
+  .video-player {
+    --tv-safe-horizontal: 48px;
+    --tv-safe-vertical: 27px;
+    --tv-button-size: 64px;
+    --tv-focus-width: 4px;
+  }
+}</pre>
+        </div>
+    </div>
+
+    <!-- FOX Application Benefits -->
+    <div class="viewer-panel">
+        <h2 class="text-2xl font-bold text-foreground mb-4 flex items-center gap-2">
+            <i data-lucide="target" class="w-6 h-6 text-accent"></i>
+            FOX Corporation OTT Strategy Benefits
+        </h2>
+
+        <div class="performance-grid">
+            <div class="performance-card">
+                <h3 class="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+                    <i data-lucide="tv" class="w-5 h-5 text-primary"></i>
+                    OTT Market Opportunity
+                </h3>
+                <div class="performance-metric">
+                    <span class="metric-name">Global Smart TVs</span>
+                    <span class="metric-value">900M+ units</span>
+                </div>
+                <div class="performance-metric">
+                    <span class="metric-name">US Household Adoption</span>
+                    <span class="metric-value">79% (↑13% since 2020)</span>
+                </div>
+                <div class="performance-metric">
+                    <span class="metric-name">Android TV Market Share</span>
+                    <span class="metric-value">40% global</span>
+                </div>
+                <div class="performance-metric">
+                    <span class="metric-name">Samsung Tizen Share</span>
+                    <span class="metric-value">19% global</span>
+                </div>
+            </div>
+
+            <div class="performance-card">
+                <h3 class="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+                    <i data-lucide="zap" class="w-5 h-5 text-accent"></i>
+                    Performance Excellence
+                </h3>
+                <div class="performance-metric">
+                    <span class="metric-name">Cross-Platform Support</span>
+                    <span class="metric-value">8 platforms</span>
+                </div>
+                <div class="performance-metric">
+                    <span class="metric-name">Accessibility Compliance</span>
+                    <span class="metric-value">WCAG 2.1 AA</span>
+                </div>
+                <div class="performance-metric">
+                    <span class="metric-name">Performance Optimization</span>
+                    <span class="metric-value">TV-hardware aware</span>
+                </div>
+                <div class="performance-metric">
+                    <span class="metric-name">Development Speed</span>
+                    <span class="metric-value">10x faster design</span>
+                </div>
+            </div>
+
+            <div class="performance-card">
+                <h3 class="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+                    <i data-lucide="code" class="w-5 h-5 text-chart-3"></i>
+                    Technical Expertise
+                </h3>
+                <div class="performance-metric">
+                    <span class="metric-name">HLS Streaming</span>
+                    <span class="metric-value">Advanced implementation</span>
+                </div>
+                <div class="performance-metric">
+                    <span class="metric-name">React/TypeScript</span>
+                    <span class="metric-value">Enterprise grade</span>
+                </div>
+                <div class="performance-metric">
+                    <span class="metric-name">Smart TV Navigation</span>
+                    <span class="metric-value">D-pad optimized</span>
+                </div>
+                <div class="performance-metric">
+                    <span class="metric-name">Performance Budget</span>
+                    <span class="metric-value">Memory conscious</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Current Breakpoint Indicator -->
+    <div class="breakpoint-indicator" id="breakpoint-indicator">
+        Current viewport: <span id="live-viewport">1920×1080</span>
+    </div>
+
+    <!-- Footer -->
+    <footer class="viewer-panel">
+        <div class="text-center">
+            <p class="text-sm text-muted-foreground mb-2">
+                <strong>Riley (UX):</strong> "Cross-platform responsive design ensures optimal user experience across 900+ million Smart TV devices and all web platforms."
+            </p>
+            <p class="text-xs text-muted-foreground">
+                Perfect demonstration of scalable video player architecture for FOX Corporation's OTT streaming platforms
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Device specifications database
+        const deviceSpecs = {
+            'iphone-14': {
+                name: 'iPhone 14',
+                platform: 'iOS Mobile',
+                resolution: '393 × 852',
+                dpr: '3x',
+                safeArea: '59px T, 34px B',
+                input: 'Touch',
+                performance: '< 50MB, 60fps',
+                class: 'mobile',
+                width: 393,
+                height: 852
+            },
+            'pixel-7': {
+                name: 'Pixel 7',
+                platform: 'Android Mobile',
+                resolution: '412 × 915',
+                dpr: '2.625x',
+                safeArea: '24px T, 48px B',
+                input: 'Touch',
+                performance: '< 50MB, 60fps',
+                class: 'mobile',
+                width: 412,
+                height: 915
+            },
+            'ipad-air': {
+                name: 'iPad Air',
+                platform: 'iOS Tablet',
+                resolution: '820 × 1180',
+                dpr: '2x',
+                safeArea: '24px T, 20px B',
+                input: 'Touch',
+                performance: '< 100MB, 60fps',
+                class: 'tablet',
+                width: 820,
+                height: 1180
+            },
+            'macbook-air': {
+                name: 'MacBook Air 13"',
+                platform: 'macOS Desktop',
+                resolution: '1280 × 800',
+                dpr: '2x',
+                safeArea: 'None',
+                input: 'Mouse + Keyboard',
+                performance: '< 200MB, 60fps',
+                class: 'desktop',
+                width: 1280,
+                height: 800
+            },
+            'desktop-fhd': {
+                name: 'Desktop FHD',
+                platform: 'Windows/Linux Desktop',
+                resolution: '1920 × 1080',
+                dpr: '1x',
+                safeArea: 'None',
+                input: 'Mouse + Keyboard',
+                performance: '< 300MB, 60fps',
+                class: 'desktop',
+                width: 1920,
+                height: 1080
+            },
+            'smart-tv': {
+                name: 'Smart TV (Samsung Tizen)',
+                platform: 'Smart TV',
+                resolution: '1920 × 1080',
+                dpr: '1x',
+                safeArea: '48px H, 27px V',
+                input: 'D-pad Remote',
+                performance: '< 150MB, 30fps',
+                class: 'tv',
+                width: 1920,
+                height: 1080
+            },
+            'smart-tv-4k': {
+                name: 'Smart TV 4K',
+                platform: 'Smart TV 4K',
+                resolution: '3840 × 2160',
+                dpr: '1x',
+                safeArea: '96px H, 54px V',
+                input: 'D-pad Remote',
+                performance: '< 200MB, 30fps',
+                class: 'tv',
+                width: 3840,
+                height: 2160
+            }
+        };
+
+        let currentDevice = 'smart-tv';
+        let currentOrientation = 'landscape';
+
+        // Platform selector handling
+        function setupPlatformSelector() {
+            document.querySelectorAll('.platform-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    // Remove active from all options
+                    document.querySelectorAll('.platform-option').forEach(opt => {
+                        opt.classList.remove('active');
+                    });
+
+                    // Add active to clicked option
+                    option.classList.add('active');
+
+                    // Update current device
+                    currentDevice = option.dataset.device;
+                    updateDeviceSimulator();
+                });
+            });
+        }
+
+        // Orientation controls
+        function setupOrientationControls() {
+            document.querySelectorAll('.orientation-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Remove active from all buttons
+                    document.querySelectorAll('.orientation-btn').forEach(b => {
+                        b.classList.remove('active');
+                    });
+
+                    // Add active to clicked button
+                    btn.classList.add('active');
+
+                    // Update orientation
+                    currentOrientation = btn.dataset.orientation;
+                    updateDeviceSimulator();
+                });
+            });
+        }
+
+        // Update device simulator
+        function updateDeviceSimulator() {
+            const device = deviceSpecs[currentDevice];
+            if (!device) return;
+
+            const frame = document.getElementById('device-frame');
+            const safeArea = document.getElementById('safe-area-overlay');
+            const player = document.getElementById('demo-player');
+            const navHint = document.getElementById('nav-hint');
+
+            // Update device frame
+            frame.className = `device-frame ${device.class}`;
+
+            // Handle orientation for mobile/tablet
+            if ((device.class === 'mobile' || device.class === 'tablet') && currentOrientation === 'portrait') {
+                frame.style.aspectRatio = `${device.height}/${device.width}`;
+                frame.style.maxWidth = `${Math.min(device.height, 600)}px`;
+            } else {
+                frame.style.aspectRatio = `${device.width}/${device.height}`;
+                frame.style.maxWidth = device.class === 'tv' ? '100%' : `${Math.min(device.width, 800)}px`;
+            }
+
+            // Update safe area overlay
+            safeArea.className = `safe-area-overlay ${device.class}`;
+            if (device.class === 'mobile' && currentOrientation === 'portrait') {
+                safeArea.className += ' mobile-portrait';
+            }
+
+            // Update player mode
+            player.className = `demo-video-player ${device.class === 'tv' ? 'tv-mode' : ''}`;
+
+            // Show/hide navigation hint
+            navHint.style.display = device.class === 'tv' ? 'block' : 'none';
+
+            // Update device info
+            updateDeviceInfo(device);
+
+            // Update CSS output
+            updateCSSOutput(device);
+        }
+
+        // Update device info display
+        function updateDeviceInfo(device) {
+            document.getElementById('device-name').textContent = device.name;
+            document.getElementById('device-resolution').textContent = device.resolution;
+            document.getElementById('device-safe-area').textContent = device.safeArea;
+            document.getElementById('device-dpr').textContent = device.dpr;
+            document.getElementById('device-input').textContent = device.input;
+            document.getElementById('device-performance').textContent = device.performance;
+
+            // Update header info
+            document.getElementById('current-viewport').textContent = device.resolution;
+            document.getElementById('current-dpr').textContent = device.dpr;
+            document.getElementById('current-orientation').textContent =
+                currentOrientation.charAt(0).toUpperCase() + currentOrientation.slice(1);
+            document.getElementById('current-platform').textContent = device.platform;
+        }
+
+        // Update CSS output based on current device
+        function updateCSSOutput(device) {
+            const cssOutput = document.getElementById('css-output');
+
+            let css = `/* Generated for ${device.name} */\n`;
+
+            if (device.class === 'mobile') {
+                css += `@media (max-width: 768px) {\n`;
+                css += `  .video-player { font-size: 14px; }\n`;
+                css += `  .control-button { min-width: 44px; min-height: 44px; }\n`;
+                css += `  .touch-target { min-width: 56px; min-height: 56px; }\n`;
+                css += `}\n\n`;
+            } else if (device.class === 'tablet') {
+                css += `@media (min-width: 768px) and (max-width: 1024px) {\n`;
+                css += `  .video-player { font-size: 16px; }\n`;
+                css += `  .control-button { min-width: 48px; min-height: 48px; }\n`;
+                css += `}\n\n`;
+            } else if (device.class === 'tv') {
+                css += `@media (min-width: 1920px) {\n`;
+                css += `  .video-player { font-size: 24px; }\n`;
+                css += `  .control-button { min-width: 64px; min-height: 64px; }\n`;
+                css += `  .video-player {\n`;
+                css += `    margin: 27px 48px; /* TV safe area */\n`;
+                css += `    max-width: calc(100% - 96px);\n`;
+                css += `  }\n`;
+                css += `}\n\n`;
+                css += `/* TV-specific optimizations */\n`;
+                css += `@media (device-type: tv) {\n`;
+                css += `  .video-player {\n`;
+                css += `    --tv-safe-horizontal: 48px;\n`;
+                css += `    --tv-safe-vertical: 27px;\n`;
+                css += `    --tv-button-size: 64px;\n`;
+                css += `    --tv-focus-width: 4px;\n`;
+                css += `  }\n`;
+                css += `}\n`;
+            } else {
+                css += `@media (min-width: 1024px) {\n`;
+                css += `  .video-player { font-size: 16px; }\n`;
+                css += `  .control-button { min-width: 48px; min-height: 48px; }\n`;
+                css += `}\n\n`;
+            }
+
+            cssOutput.textContent = css;
+        }
+
+        // Update live viewport indicator
+        function updateLiveViewport() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            document.getElementById('live-viewport').textContent = `${width}×${height}`;
+        }
+
+        // Focus management for TV mode
+        let currentFocus = 0;
+        const controlButtons = document.querySelectorAll('.control-button');
+
+        function updateFocus() {
+            controlButtons.forEach((btn, index) => {
+                btn.classList.toggle('focused', index === currentFocus);
+            });
+        }
+
+        // Keyboard navigation for demo
+        document.addEventListener('keydown', (e) => {
+            if (currentDevice.includes('tv')) {
+                switch(e.key) {
+                    case 'ArrowLeft':
+                        currentFocus = Math.max(0, currentFocus - 1);
+                        updateFocus();
+                        e.preventDefault();
+                        break;
+                    case 'ArrowRight':
+                        currentFocus = Math.min(controlButtons.length - 1, currentFocus + 1);
+                        updateFocus();
+                        e.preventDefault();
+                        break;
+                    case 'Enter':
+                        controlButtons[currentFocus].click();
+                        e.preventDefault();
+                        break;
+                }
+            }
+        });
+
+        // Play button functionality
+        document.getElementById('play-btn').addEventListener('click', () => {
+            const playBtn = document.getElementById('play-btn');
+            const icon = playBtn.querySelector('i');
+
+            if (icon.getAttribute('data-lucide') === 'play') {
+                icon.setAttribute('data-lucide', 'pause');
+            } else {
+                icon.setAttribute('data-lucide', 'play');
+            }
+
+            lucide.createIcons();
+        });
+
+        // Initialize everything
+        function init() {
+            setupPlatformSelector();
+            setupOrientationControls();
+            updateDeviceSimulator();
+            updateLiveViewport();
+
+            // Update live viewport on resize
+            window.addEventListener('resize', updateLiveViewport);
+
+            // Auto refresh icons
+            setInterval(() => {
+                lucide.createIcons();
+            }, 3000);
+        }
+
+        // Start the application
+        init();
+    </script>
+
+</body>
+</html>

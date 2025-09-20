@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Coverage Specifications - QA Engineering Documentation</title>
+    <link rel="stylesheet" href="../shared-styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            /* QA Executive Theme */
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --info: #3b82f6;
+
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-tertiary: #f1f5f9;
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --border-light: #f1f5f9;
+        }
+
+        .coverage-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .coverage-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .coverage-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .coverage-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .coverage-percentage {
+            font-size: 1.5rem;
+            font-weight: 700;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            color: white;
+        }
+
+        .coverage-95 { background: var(--success); }
+        .coverage-90 { background: var(--info); }
+        .coverage-85 { background: var(--warning); }
+
+        .test-matrix {
+            background: var(--bg-secondary);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .matrix-header {
+            font-weight: 600;
+            color: var(--text-primary);
+            padding: 0.75rem;
+            background: var(--bg-tertiary);
+            border-radius: 0.5rem;
+            text-align: center;
+        }
+
+        .matrix-row {
+            display: contents;
+        }
+
+        .matrix-cell {
+            padding: 0.75rem;
+            text-align: center;
+            border-radius: 0.375rem;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-light);
+        }
+
+        .test-type-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin: 0.125rem;
+        }
+
+        .badge-unit { background: #dbeafe; color: #1e40af; }
+        .badge-integration { background: #d1fae5; color: #065f46; }
+        .badge-e2e { background: #fef3c7; color: #92400e; }
+        .badge-performance { background: #fecaca; color: #991b1b; }
+        .badge-accessibility { background: #e0e7ff; color: #3730a3; }
+
+        .code-coverage-chart {
+            height: 300px;
+            margin: 2rem 0;
+        }
+
+        .test-scenario-list {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            margin: 1rem 0;
+        }
+
+        .scenario-item {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .scenario-item:last-child {
+            border-bottom: none;
+        }
+
+        .scenario-description {
+            flex: 1;
+            color: var(--text-primary);
+        }
+
+        .scenario-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .status-implemented { background: #d1fae5; color: #065f46; }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-critical { background: #fecaca; color: #991b1b; }
+
+        .quality-gates {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .gates-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .gate-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .gate-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 1.125rem;
+        }
+
+        .gate-description {
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .testing-pyramid {
+            text-align: center;
+            margin: 3rem 0;
+        }
+
+        .pyramid-container {
+            display: inline-block;
+            position: relative;
+        }
+
+        .pyramid-level {
+            display: block;
+            margin: 0.5rem auto;
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            color: white;
+            font-weight: 600;
+            position: relative;
+        }
+
+        .pyramid-e2e {
+            width: 200px;
+            background: var(--danger);
+        }
+
+        .pyramid-integration {
+            width: 300px;
+            background: var(--warning);
+        }
+
+        .pyramid-unit {
+            width: 400px;
+            background: var(--success);
+        }
+
+        .chart-container {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .chart-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .platform-testing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .platform-card {
+            background: var(--bg-primary);
+            border: 2px solid var(--border);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .platform-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+        }
+
+        .platform-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .platform-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .platform-coverage {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .accessibility-compliance {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .compliance-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 1rem;
+        }
+
+        .wcag-badge {
+            display: inline-block;
+            background: #10b981;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            font-size: 1.125rem;
+            margin: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .coverage-grid,
+            .platform-testing-grid,
+            .gates-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .matrix-grid {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+
+            .matrix-cell {
+                text-align: left;
+            }
+
+            .pyramid-e2e { width: 150px; }
+            .pyramid-integration { width: 200px; }
+            .pyramid-unit { width: 250px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="document-header">
+            <div class="header-content">
+                <h1 class="document-title">
+                    🧪 Test Coverage Specifications
+                </h1>
+                <div class="header-meta">
+                    <div class="meta-item">
+                        <strong>QA Engineer:</strong> Sam
+                    </div>
+                    <div class="meta-item">
+                        <strong>Coverage Target:</strong> 90% Overall, 95% Critical
+                    </div>
+                    <div class="meta-item">
+                        <strong>Compliance:</strong> WCAG 2.1 AA
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <nav class="document-nav">
+            <ul>
+                <li><a href="#overview">Coverage Overview</a></li>
+                <li><a href="#matrix">Test Matrix</a></li>
+                <li><a href="#specifications">Specifications</a></li>
+                <li><a href="#platforms">Cross-Platform</a></li>
+                <li><a href="#accessibility">Accessibility</a></li>
+                <li><a href="#automation">Automation</a></li>
+            </ul>
+        </nav>
+
+        <main class="document-content">
+            <section id="overview" class="content-section">
+                <h2>📊 Test Coverage Overview</h2>
+
+                <div class="coverage-grid">
+                    <div class="coverage-card">
+                        <div class="coverage-header">
+                            <h3 class="coverage-title">HLS Streaming</h3>
+                            <span class="coverage-percentage coverage-95">95%</span>
+                        </div>
+                        <p>Critical component requiring comprehensive coverage for adaptive streaming, quality selection, and error handling.</p>
+                        <div class="test-type-badge badge-unit">Unit</div>
+                        <div class="test-type-badge badge-integration">Integration</div>
+                        <div class="test-type-badge badge-e2e">E2E</div>
+                        <div class="test-type-badge badge-performance">Performance</div>
+                    </div>
+
+                    <div class="coverage-card">
+                        <div class="coverage-header">
+                            <h3 class="coverage-title">Smart TV Navigation</h3>
+                            <span class="coverage-percentage coverage-95">95%</span>
+                        </div>
+                        <p>Critical for Smart TV platforms with D-pad navigation and spatial focus management testing.</p>
+                        <div class="test-type-badge badge-unit">Unit</div>
+                        <div class="test-type-badge badge-integration">Integration</div>
+                        <div class="test-type-badge badge-e2e">E2E</div>
+                        <div class="test-type-badge badge-accessibility">A11y</div>
+                    </div>
+
+                    <div class="coverage-card">
+                        <div class="coverage-header">
+                            <h3 class="coverage-title">Video Controls</h3>
+                            <span class="coverage-percentage coverage-95">95%</span>
+                        </div>
+                        <p>User interaction critical components requiring extensive testing across all input methods.</p>
+                        <div class="test-type-badge badge-unit">Unit</div>
+                        <div class="test-type-badge badge-integration">Integration</div>
+                        <div class="test-type-badge badge-e2e">E2E</div>
+                        <div class="test-type-badge badge-accessibility">A11y</div>
+                    </div>
+
+                    <div class="coverage-card">
+                        <div class="coverage-header">
+                            <h3 class="coverage-title">Responsive Design</h3>
+                            <span class="coverage-percentage coverage-90">90%</span>
+                        </div>
+                        <p>Cross-platform consistency validation across desktop, mobile, and Smart TV viewports.</p>
+                        <div class="test-type-badge badge-integration">Integration</div>
+                        <div class="test-type-badge badge-e2e">E2E</div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <h3 class="chart-title">Test Coverage Distribution</h3>
+                    <canvas id="coverageChart" class="code-coverage-chart"></canvas>
+                </div>
+            </section>
+
+            <section id="matrix" class="content-section">
+                <h2>🎯 Test Coverage Matrix</h2>
+
+                <div class="test-matrix">
+                    <div class="matrix-grid">
+                        <div class="matrix-header">Component</div>
+                        <div class="matrix-header">Coverage</div>
+                        <div class="matrix-header">Test Types</div>
+                        <div class="matrix-header">Scenarios</div>
+                        <div class="matrix-header">Edge Cases</div>
+
+                        <div class="matrix-row">
+                            <div class="matrix-cell"><strong>HLS Streaming</strong></div>
+                            <div class="matrix-cell">95%</div>
+                            <div class="matrix-cell">4 Types</div>
+                            <div class="matrix-cell">18</div>
+                            <div class="matrix-cell">12</div>
+                        </div>
+
+                        <div class="matrix-row">
+                            <div class="matrix-cell"><strong>Smart TV Navigation</strong></div>
+                            <div class="matrix-cell">95%</div>
+                            <div class="matrix-cell">4 Types</div>
+                            <div class="matrix-cell">15</div>
+                            <div class="matrix-cell">8</div>
+                        </div>
+
+                        <div class="matrix-row">
+                            <div class="matrix-cell"><strong>Video Controls</strong></div>
+                            <div class="matrix-cell">95%</div>
+                            <div class="matrix-cell">4 Types</div>
+                            <div class="matrix-cell">22</div>
+                            <div class="matrix-cell">10</div>
+                        </div>
+
+                        <div class="matrix-row">
+                            <div class="matrix-cell"><strong>Responsive Design</strong></div>
+                            <div class="matrix-cell">90%</div>
+                            <div class="matrix-cell">3 Types</div>
+                            <div class="matrix-cell">12</div>
+                            <div class="matrix-cell">6</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testing-pyramid">
+                    <h3>Test Pyramid Strategy</h3>
+                    <div class="pyramid-container">
+                        <div class="pyramid-level pyramid-e2e">E2E Tests (10%)</div>
+                        <div class="pyramid-level pyramid-integration">Integration Tests (30%)</div>
+                        <div class="pyramid-level pyramid-unit">Unit Tests (60%)</div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="specifications" class="content-section">
+                <h2>🎬 HLS Streaming Test Specifications</h2>
+
+                <div class="test-scenario-list">
+                    <div class="scenario-item">
+                        <div class="scenario-description">
+                            <strong>HLS.js Initialization:</strong> Configure HLS with Smart TV performance requirements
+                        </div>
+                        <span class="scenario-status status-implemented">Implemented</span>
+                    </div>
+                    <div class="scenario-item">
+                        <div class="scenario-description">
+                            <strong>Quality Level Detection:</strong> Parse HLS manifest and extract available qualities
+                        </div>
+                        <span class="scenario-status status-implemented">Implemented</span>
+                    </div>
+                    <div class="scenario-item">
+                        <div class="scenario-description">
+                            <strong>Safari Native HLS Fallback:</strong> Detect Safari and use native HLS support
+                        </div>
+                        <span class="scenario-status status-implemented">Implemented</span>
+                    </div>
+                    <div class="scenario-item">
+                        <div class="scenario-description">
+                            <strong>Error Handling:</strong> Graceful error recovery with user-friendly messages
+                        </div>
+                        <span class="scenario-status status-critical">Critical</span>
+                    </div>
+                    <div class="scenario-item">
+                        <div class="scenario-description">
+                            <strong>Quality Selection:</strong> Manual quality override with persistence
+                        </div>
+                        <span class="scenario-status status-implemented">Implemented</span>
+                    </div>
+                    <div class="scenario-item">
+                        <div class="scenario-description">
+                            <strong>Adaptive Mode:</strong> Return to automatic quality selection
+                        </div>
+                        <span class="scenario-status status-implemented">Implemented</span>
+                    </div>
+                    <div class="scenario-item">
+                        <div class="scenario-description">
+                            <strong>Analytics Tracking:</strong> Quality change events for performance monitoring
+                        </div>
+                        <span class="scenario-status status-pending">Pending</span>
+                    </div>
+                    <div class="scenario-item">
+                        <div class="scenario-description">
+                            <strong>Network Recovery:</strong> Retry logic with exponential backoff
+                        </div>
+                        <span class="scenario-status status-critical">Critical</span>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <h3 class="chart-title">Test Scenario Progress</h3>
+                    <canvas id="scenarioChart" style="height: 300px;"></canvas>
+                </div>
+            </section>
+
+            <section id="platforms" class="content-section">
+                <h2>📱 Cross-Platform Testing</h2>
+
+                <div class="platform-testing-grid">
+                    <div class="platform-card">
+                        <div class="platform-icon">🖥️</div>
+                        <div class="platform-name">Desktop</div>
+                        <div class="platform-coverage">95%</div>
+                        <p>Chrome, Firefox, Safari, Edge testing with keyboard and mouse interaction validation.</p>
+                    </div>
+
+                    <div class="platform-card">
+                        <div class="platform-icon">📱</div>
+                        <div class="platform-name">Mobile</div>
+                        <div class="platform-coverage">90%</div>
+                        <p>Touch gestures, Picture-in-Picture support, and responsive design validation.</p>
+                    </div>
+
+                    <div class="platform-card">
+                        <div class="platform-icon">📺</div>
+                        <div class="platform-name">Smart TV</div>
+                        <div class="platform-coverage">95%</div>
+                        <p>D-pad navigation, memory constraints, and TV-specific optimization testing.</p>
+                    </div>
+
+                    <div class="platform-card">
+                        <div class="platform-icon">🎮</div>
+                        <div class="platform-name">Roku</div>
+                        <div class="platform-coverage">85%</div>
+                        <p>Platform-specific optimizations and 100MB memory limit validation.</p>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <h3 class="chart-title">Platform Test Coverage</h3>
+                    <canvas id="platformChart" style="height: 400px;"></canvas>
+                </div>
+            </section>
+
+            <section id="accessibility" class="content-section">
+                <h2>♿ Accessibility Testing</h2>
+
+                <div class="accessibility-compliance">
+                    <h3 class="compliance-title">WCAG 2.1 AA Compliance</h3>
+                    <div class="wcag-badge">100% Compliance Target</div>
+                    <div class="wcag-badge">Zero Violations Policy</div>
+                    <div class="wcag-badge">Screen Reader Compatible</div>
+                </div>
+
+                <div class="test-scenario-list">
+                    <div class="scenario-item">
+                        <div class="scenario-description">
+                            <strong>Axe-core Validation:</strong> Automated accessibility testing with WCAG 2.1 AA rules
+                        </div>
+                        <span class="scenario-status status-implemented">Implemented</span>
+                    </div>
+                    <div class="scenario-item">
+                        <div class="scenario-description">
+                            <strong>Color Contrast:</strong> 4.5:1 ratio for normal text, 3:1 for large text
+                        </div>
+                        <span class="scenario-status status-implemented">Implemented</span>
+                    </div>
+                    <div class="scenario-item">
+                        <div class="scenario-description">
+                            <strong>Keyboard Navigation:</strong> Complete functionality via keyboard only
+                        </div>
+                        <span class="scenario-status status-critical">Critical</span>
+                    </div>
+                    <div class="scenario-item">
+                        <div class="scenario-description">
+                            <strong>Screen Reader Support:</strong> ARIA labels and state announcements
+                        </div>
+                        <span class="scenario-status status-critical">Critical</span>
+                    </div>
+                    <div class="scenario-item">
+                        <div class="scenario-description">
+                            <strong>Focus Management:</strong> Prevent keyboard traps in modal dialogs
+                        </div>
+                        <span class="scenario-status status-implemented">Implemented</span>
+                    </div>
+                    <div class="scenario-item">
+                        <div class="scenario-description">
+                            <strong>Caption Customization:</strong> Real-time appearance changes with persistence
+                        </div>
+                        <span class="scenario-status status-pending">Pending</span>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <h3 class="chart-title">Accessibility Test Categories</h3>
+                    <canvas id="accessibilityChart" style="height: 300px;"></canvas>
+                </div>
+            </section>
+
+            <section id="automation" class="content-section">
+                <h2>🔄 Test Automation Strategy</h2>
+
+                <div class="quality-gates">
+                    <h3>Quality Gates & Success Criteria</h3>
+                    <div class="gates-grid">
+                        <div class="gate-item">
+                            <div class="gate-title">Deployment Blocking</div>
+                            <div class="gate-description">
+                                90% minimum coverage, zero accessibility violations, <5% performance regression, 100% critical journeys pass
+                            </div>
+                        </div>
+
+                        <div class="gate-item">
+                            <div class="gate-title">Warning Thresholds</div>
+                            <div class="gate-description">
+                                <95% critical coverage, 2-5% performance degradation, new accessibility issues, cross-browser inconsistencies
+                            </div>
+                        </div>
+
+                        <div class="gate-item">
+                            <div class="gate-title">Success Validation</div>
+                            <div class="gate-description">
+                                All tests passing, WCAG compliance, performance targets met, cross-platform validated, Smart TV functional
+                            </div>
+                        </div>
+
+                        <div class="gate-item">
+                            <div class="gate-title">Interview Ready</div>
+                            <div class="gate-description">
+                                Flawless demo execution, edge cases handled, performance monitoring active, professional documentation complete
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="test-matrix">
+                    <h3>CI/CD Testing Pipeline</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                        <div style="background: var(--bg-primary); padding: 1rem; border-radius: 0.5rem; border: 1px solid var(--border);">
+                            <h4 style="color: var(--success); margin-bottom: 0.5rem;">Unit Tests</h4>
+                            <p style="margin: 0; font-size: 0.9rem;">Jest + Testing Library<br>Every commit<br>90% coverage<br>&lt;2 min execution</p>
+                        </div>
+                        <div style="background: var(--bg-primary); padding: 1rem; border-radius: 0.5rem; border: 1px solid var(--border);">
+                            <h4 style="color: var(--warning); margin-bottom: 0.5rem;">Integration Tests</h4>
+                            <p style="margin: 0; font-size: 0.9rem;">Testing Library + MSW<br>Every PR<br>Component interactions<br>&lt;5 min execution</p>
+                        </div>
+                        <div style="background: var(--bg-primary); padding: 1rem; border-radius: 0.5rem; border: 1px solid var(--border);">
+                            <h4 style="color: var(--danger); margin-bottom: 0.5rem;">E2E Tests</h4>
+                            <p style="margin: 0; font-size: 0.9rem;">Playwright multi-browser<br>Every deployment<br>Critical user journeys<br>&lt;15 min execution</p>
+                        </div>
+                        <div style="background: var(--bg-primary); padding: 1rem; border-radius: 0.5rem; border: 1px solid var(--border);">
+                            <h4 style="color: var(--info); margin-bottom: 0.5rem;">Accessibility Tests</h4>
+                            <p style="margin: 0; font-size: 0.9rem;">Axe-core integration<br>Zero violations<br>Screen reader testing<br>Manual validation</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <h3 class="chart-title">Test Execution Timeline</h3>
+                    <canvas id="timelineChart" style="height: 300px;"></canvas>
+                </div>
+            </section>
+        </main>
+
+        <footer class="document-footer">
+            <div class="footer-content">
+                <p><strong>Sam's Testing Mission:</strong> Ensure comprehensive test coverage for every product requirement defined by Jordan, with automated validation of 90% code coverage, zero accessibility violations, and complete user journey validation across all platforms.</p>
+                <p>This collaborative approach between Product and QA ensures that our video player demo not only meets all functional requirements but exceeds enterprise quality standards that FOX Corporation expects from senior engineering candidates.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Coverage Distribution Chart
+        const coverageCtx = document.getElementById('coverageChart').getContext('2d');
+        new Chart(coverageCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['HLS Streaming', 'Smart TV Navigation', 'Video Controls', 'Responsive Design'],
+                datasets: [{
+                    data: [95, 95, 95, 90],
+                    backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444'],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            font: { size: 12 }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Test Scenario Progress Chart
+        const scenarioCtx = document.getElementById('scenarioChart').getContext('2d');
+        new Chart(scenarioCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Implemented', 'Critical', 'Pending'],
+                datasets: [{
+                    label: 'Test Scenarios',
+                    data: [5, 2, 1],
+                    backgroundColor: ['#10b981', '#ef4444', '#f59e0b'],
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { stepSize: 1 }
+                    }
+                }
+            }
+        });
+
+        // Platform Coverage Chart
+        const platformCtx = document.getElementById('platformChart').getContext('2d');
+        new Chart(platformCtx, {
+            type: 'radar',
+            data: {
+                labels: ['Desktop', 'Mobile', 'Smart TV', 'Roku', 'Cross-Browser', 'Performance'],
+                datasets: [{
+                    label: 'Test Coverage %',
+                    data: [95, 90, 95, 85, 92, 88],
+                    backgroundColor: 'rgba(37, 99, 235, 0.2)',
+                    borderColor: '#2563eb',
+                    borderWidth: 2,
+                    pointBackgroundColor: '#2563eb',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            stepSize: 20
+                        }
+                    }
+                }
+            }
+        });
+
+        // Accessibility Test Categories Chart
+        const accessibilityCtx = document.getElementById('accessibilityChart').getContext('2d');
+        new Chart(accessibilityCtx, {
+            type: 'polarArea',
+            data: {
+                labels: ['Color Contrast', 'Keyboard Nav', 'Screen Reader', 'Focus Management', 'ARIA Labels'],
+                datasets: [{
+                    data: [100, 95, 90, 100, 95],
+                    backgroundColor: [
+                        '#10b981',
+                        '#3b82f6',
+                        '#f59e0b',
+                        '#8b5cf6',
+                        '#ef4444'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // Test Execution Timeline Chart
+        const timelineCtx = document.getElementById('timelineChart').getContext('2d');
+        new Chart(timelineCtx, {
+            type: 'line',
+            data: {
+                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Release'],
+                datasets: [{
+                    label: 'Unit Tests',
+                    data: [60, 75, 85, 90, 92],
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    tension: 0.4
+                }, {
+                    label: 'Integration Tests',
+                    data: [40, 60, 75, 85, 88],
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    tension: 0.4
+                }, {
+                    label: 'E2E Tests',
+                    data: [20, 40, 60, 80, 85],
+                    borderColor: '#f59e0b',
+                    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

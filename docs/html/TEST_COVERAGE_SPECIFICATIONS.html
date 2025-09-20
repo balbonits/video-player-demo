@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Coverage Specifications - 90% Coverage Target</title>
+    <link rel="stylesheet" href="../shared-styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css">
+    <style>
+        .qa-executive {
+            --primary: #e11d48;
+            --primary-dark: #be185d;
+            --accent: #3b82f6;
+            --success: #059669;
+            --warning: #d97706;
+            --danger: #dc2626;
+            --bg-primary: #fff1f2;
+            --bg-secondary: #fef2f2;
+            --text-primary: #881337;
+            --text-secondary: #be185d;
+            --border: #fda4af;
+            --shadow: rgba(244, 63, 94, 0.1);
+        }
+
+        .coverage-matrix {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .coverage-card {
+            background: var(--bg-secondary);
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            position: relative;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .coverage-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px var(--shadow);
+        }
+
+        .coverage-badge {
+            position: absolute;
+            top: -10px;
+            right: 20px;
+            background: var(--primary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+
+        .coverage-progress {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+
+        .coverage-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success), var(--primary));
+            border-radius: 4px;
+            transition: width 0.8s ease;
+        }
+
+        .test-pyramid {
+            background: var(--bg-secondary);
+            border: 2px solid var(--accent);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .pyramid-layer {
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            color: white;
+            padding: 1rem 2rem;
+            margin: 0.5rem auto;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .pyramid-layer:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .pyramid-layer.e2e { width: 80%; }
+        .pyramid-layer.integration { width: 60%; }
+        .pyramid-layer.unit { width: 40%; }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .metric-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 0.5rem 0;
+        }
+
+        .metric-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .test-scenario {
+            background: #f8fafc;
+            border-left: 4px solid var(--accent);
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .scenario-title {
+            font-weight: bold;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .quality-gate {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            margin: 0.5rem 0;
+            border-left: 4px solid var(--success);
+        }
+
+        .quality-gate.warning {
+            border-left-color: var(--warning);
+        }
+
+        .quality-gate.blocking {
+            border-left-color: var(--danger);
+        }
+
+        .gate-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 0.75rem;
+            border-radius: 50%;
+        }
+
+        .gate-icon.success { background: var(--success); }
+        .gate-icon.warning { background: var(--warning); }
+        .gate-icon.blocking { background: var(--danger); }
+
+        .interactive-chart {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .chart-button {
+            padding: 0.5rem 1rem;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .chart-button:hover {
+            background: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .chart-button.active {
+            background: var(--primary);
+        }
+    </style>
+</head>
+<body class="qa-executive">
+    <div class="container">
+        <header class="header">
+            <div class="header-content">
+                <h1>🧪 Test Coverage Specifications</h1>
+                <div class="meta-info">
+                    <span class="author">QA Engineer: Sam</span>
+                    <span class="collaboration">Collaboration: Jordan (Product)</span>
+                    <span class="coverage-target">Target: 90% Coverage</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="content">
+            <!-- Executive Summary -->
+            <section class="section">
+                <h2>📊 Coverage Overview</h2>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">90%</div>
+                        <div class="metric-label">Overall Coverage Target</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">95%</div>
+                        <div class="metric-label">Critical Components</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">67</div>
+                        <div class="metric-label">Total Test Scenarios</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">36</div>
+                        <div class="metric-label">Edge Cases Covered</div>
+                    </div>
+                </div>
+
+                <div class="interactive-chart">
+                    <h3>Test Coverage Distribution</h3>
+                    <div class="chart-controls">
+                        <button class="chart-button active" onclick="showCoverageChart('overall')">Overall Coverage</button>
+                        <button class="chart-button" onclick="showCoverageChart('components')">Component Coverage</button>
+                        <button class="chart-button" onclick="showCoverageChart('types')">Test Types</button>
+                    </div>
+                    <canvas id="coverageChart" width="400" height="200"></canvas>
+                </div>
+            </section>
+
+            <!-- Test Pyramid -->
+            <section class="section">
+                <h2>🔺 Testing Strategy Pyramid</h2>
+                <div class="test-pyramid">
+                    <h3>Test Distribution Strategy</h3>
+                    <div class="pyramid-layer e2e" onclick="showTestDetails('e2e')">E2E Tests (10%)</div>
+                    <div class="pyramid-layer integration" onclick="showTestDetails('integration')">Integration (30%)</div>
+                    <div class="pyramid-layer unit" onclick="showTestDetails('unit')">Unit Tests (60%)</div>
+                    <p style="margin-top: 1.5rem; color: var(--text-secondary);">
+                        Click layers to view detailed test specifications
+                    </p>
+                </div>
+            </section>
+
+            <!-- Coverage Matrix -->
+            <section class="section">
+                <h2>📋 Test Coverage Matrix</h2>
+                <div class="coverage-matrix">
+                    <div class="coverage-card">
+                        <div class="coverage-badge">95%</div>
+                        <h3>HLS Streaming (FR-001)</h3>
+                        <p><strong>Requirement:</strong> Adaptive HLS video streaming with quality selection</p>
+                        <div class="coverage-progress">
+                            <div class="coverage-fill" style="width: 95%"></div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--text-secondary);">
+                            <span>18 scenarios</span>
+                            <span>12 edge cases</span>
+                        </div>
+                        <div style="margin-top: 1rem;">
+                            <span class="badge">Unit</span>
+                            <span class="badge">Integration</span>
+                            <span class="badge">E2E</span>
+                            <span class="badge">Performance</span>
+                        </div>
+                    </div>
+
+                    <div class="coverage-card">
+                        <div class="coverage-badge">95%</div>
+                        <h3>Smart TV Navigation (FR-002)</h3>
+                        <p><strong>Requirement:</strong> Spatial navigation optimized for Smart TV remote controls</p>
+                        <div class="coverage-progress">
+                            <div class="coverage-fill" style="width: 95%"></div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--text-secondary);">
+                            <span>15 scenarios</span>
+                            <span>8 edge cases</span>
+                        </div>
+                        <div style="margin-top: 1rem;">
+                            <span class="badge">Unit</span>
+                            <span class="badge">Integration</span>
+                            <span class="badge">E2E</span>
+                            <span class="badge">Accessibility</span>
+                        </div>
+                    </div>
+
+                    <div class="coverage-card">
+                        <div class="coverage-badge">95%</div>
+                        <h3>Video Controls (FR-003)</h3>
+                        <p><strong>Requirement:</strong> Comprehensive video playback controls with cross-platform optimization</p>
+                        <div class="coverage-progress">
+                            <div class="coverage-fill" style="width: 95%"></div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--text-secondary);">
+                            <span>22 scenarios</span>
+                            <span>10 edge cases</span>
+                        </div>
+                        <div style="margin-top: 1rem;">
+                            <span class="badge">Unit</span>
+                            <span class="badge">Integration</span>
+                            <span class="badge">E2E</span>
+                            <span class="badge">Accessibility</span>
+                        </div>
+                    </div>
+
+                    <div class="coverage-card">
+                        <div class="coverage-badge">90%</div>
+                        <h3>Responsive Design (FR-004)</h3>
+                        <p><strong>Requirement:</strong> Consistent user experience across all target platforms and viewports</p>
+                        <div class="coverage-progress">
+                            <div class="coverage-fill" style="width: 90%"></div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--text-secondary);">
+                            <span>12 scenarios</span>
+                            <span>6 edge cases</span>
+                        </div>
+                        <div style="margin-top: 1rem;">
+                            <span class="badge">Integration</span>
+                            <span class="badge">E2E</span>
+                            <span class="badge">Visual Regression</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- HLS Streaming Tests -->
+            <section class="section">
+                <h2>🎬 HLS Streaming Test Specifications</h2>
+
+                <div class="test-scenario">
+                    <div class="scenario-title">Unit Test Requirements - HLS Integration</div>
+                    <p>Testing HLS.js integration with 95% coverage targeting Smart TV performance requirements</p>
+                </div>
+
+                <div class="code-block">
+                    <h4>HLS Initialization Testing</h4>
+                    <pre><code class="language-typescript">// HLS.js integration testing - 95% coverage
+describe('HLS Video Player Integration', () => {
+  describe('HLS Initialization', () => {
+    it('should initialize HLS.js with correct configuration for Smart TV', () => {
+      const expectedConfig = {
+        enableWorker: true,
+        lowLatencyMode: false,
+        backBufferLength: 90,
+        maxBufferLength: 300,
+        startLevel: -1,
+        capLevelToPlayerSize: true
+      }
+
+      const hls = initializeHLSPlayer(mockVideoElement, mockHLSUrl, 'smartTV')
+      expect(hls.config).toMatchObject(expectedConfig)
+    })
+
+    it('should handle HLS manifest parsing and quality level detection', async () => {
+      const mockManifest = createMockHLSManifest(['1080p', '720p', '480p'])
+      const { result } = renderHook(() => useVideoPlayer())
+
+      await act(async () => {
+        result.current.initializeVideo(mockHLSUrl)
+      })
+
+      expect(result.current.availableQualities).toEqual(['1080p', '720p', '480p'])
+    })
+  })
+})</code></pre>
+                </div>
+
+                <div class="test-scenario">
+                    <div class="scenario-title">Integration Test Requirements - HLS + Redux</div>
+                    <p>Integration testing between HLS player and Redux state management</p>
+                </div>
+
+                <div class="code-block">
+                    <h4>HLS-Redux Integration Testing</h4>
+                    <pre><code class="language-typescript">// Integration testing between HLS player and Redux state management
+describe('HLS Player Redux Integration', () => {
+  it('should sync HLS events with Redux store state', async () => {
+    const store = createMockStore()
+    const { getByTestId } = render(
+      &lt;Provider store={store}&gt;
+        &lt;VideoPlayer src={mockHLSUrl} /&gt;
+      &lt;/Provider&gt;
+    )
+
+    // Simulate HLS events
+    fireHLSEvent('MANIFEST_PARSED', { levels: mockQualityLevels })
+    fireHLSEvent('LEVEL_LOADED', { level: 0 })
+
+    await waitFor(() => {
+      const state = store.getState()
+      expect(state.player.availableQualities).toEqual(['1080p', '720p', '480p'])
+      expect(state.player.currentQuality).toBe('1080p')
+    })
+  })
+})</code></pre>
+                </div>
+            </section>
+
+            <!-- Cross-Platform Testing -->
+            <section class="section">
+                <h2>📱 Cross-Platform Test Specifications</h2>
+
+                <div class="interactive-chart">
+                    <h3>Platform Coverage Analysis</h3>
+                    <div class="chart-controls">
+                        <button class="chart-button active" onclick="showPlatformChart('coverage')">Coverage by Platform</button>
+                        <button class="chart-button" onclick="showPlatformChart('performance')">Performance Metrics</button>
+                        <button class="chart-button" onclick="showPlatformChart('accessibility')">Accessibility Scores</button>
+                    </div>
+                    <canvas id="platformChart" width="400" height="200"></canvas>
+                </div>
+
+                <div class="test-scenario">
+                    <div class="scenario-title">Mobile Platform Testing Requirements</div>
+                    <p>Touch interaction testing and mobile-specific feature validation</p>
+                </div>
+
+                <div class="code-block">
+                    <h4>Mobile Touch Interaction Testing</h4>
+                    <pre><code class="language-typescript">describe('Mobile Video Player Testing', () => {
+  describe('Touch Interaction', () => {
+    it('should support touch gestures for video control', async () => {
+      const { getByTestId } = render(&lt;VideoPlayer src={mockUrl} /&gt;)
+      const videoContainer = getByTestId('video-container')
+
+      // Single tap to play/pause
+      fireEvent.touchStart(videoContainer)
+      fireEvent.touchEnd(videoContainer)
+
+      await waitFor(() => {
+        expect(mockVideoElement.play).toHaveBeenCalled()
+      })
+
+      // Swipe right for seek forward
+      fireEvent.touchStart(videoContainer, { touches: [{ clientX: 100, clientY: 100 }] })
+      fireEvent.touchMove(videoContainer, { touches: [{ clientX: 150, clientY: 100 }] })
+      fireEvent.touchEnd(videoContainer)
+
+      await waitFor(() => {
+        expect(mockVideoElement.currentTime).toBeGreaterThan(10) // 10s seek
+      })
+    })
+
+    it('should have appropriate touch target sizes (56px minimum)', () => {
+      const { container } = render(&lt;VideoPlayer src={mockUrl} /&gt;)
+      const buttons = container.querySelectorAll('button')
+
+      buttons.forEach(button => {
+        const styles = getComputedStyle(button)
+        const width = parseInt(styles.width)
+        const height = parseInt(styles.height)
+
+        expect(width).toBeGreaterThanOrEqual(56)
+        expect(height).toBeGreaterThanOrEqual(56)
+      })
+    })
+  })
+})</code></pre>
+                </div>
+            </section>
+
+            <!-- Accessibility Testing -->
+            <section class="section">
+                <h2>♿ Accessibility Test Specifications</h2>
+
+                <div class="test-scenario">
+                    <div class="scenario-title">WCAG 2.1 AA Compliance Testing</div>
+                    <p>Comprehensive accessibility testing - 100% WCAG compliance</p>
+                </div>
+
+                <div class="code-block">
+                    <h4>Automated Accessibility Validation</h4>
+                    <pre><code class="language-typescript">describe('Accessibility Compliance Testing', () => {
+  describe('Automated Accessibility Validation', () => {
+    it('should have zero accessibility violations', async () => {
+      const { container } = render(&lt;VideoPlayer src={mockUrl} /&gt;)
+      const results = await axe(container, {
+        rules: {
+          'color-contrast': { enabled: true },
+          'keyboard-navigation': { enabled: true },
+          'focus-management': { enabled: true },
+          'aria-labels': { enabled: true }
+        },
+        tags: ['wcag2a', 'wcag2aa', 'wcag21aa']
+      })
+
+      expect(results).toHaveNoViolations()
+    })
+
+    it('should meet color contrast requirements for all UI elements', async () => {
+      const { container } = render(&lt;VideoPlayer src={mockUrl} /&gt;)
+      const buttons = container.querySelectorAll('button')
+
+      buttons.forEach(button => {
+        const styles = getComputedStyle(button)
+        const contrastRatio = calculateContrastRatio(
+          styles.color,
+          styles.backgroundColor
+        )
+
+        const fontSize = parseInt(styles.fontSize)
+        const minimumContrast = fontSize >= 18 ? 3 : 4.5
+
+        expect(contrastRatio).toBeGreaterThanOrEqual(minimumContrast)
+      })
+    })
+  })
+})</code></pre>
+                </div>
+            </section>
+
+            <!-- Quality Gates -->
+            <section class="section">
+                <h2>🎯 Quality Gates & Success Criteria</h2>
+
+                <div style="margin: 1.5rem 0;">
+                    <h3>Deployment Blocking Gates</h3>
+                    <div class="quality-gate blocking">
+                        <div class="gate-icon blocking"></div>
+                        <div>
+                            <strong>Test Coverage: 90% minimum</strong>
+                            <p>Blocks deployment if overall coverage falls below 90%</p>
+                        </div>
+                    </div>
+                    <div class="quality-gate blocking">
+                        <div class="gate-icon blocking"></div>
+                        <div>
+                            <strong>Accessibility Violations: 0 WCAG violations</strong>
+                            <p>Zero tolerance for WCAG 2.1 AA compliance failures</p>
+                        </div>
+                    </div>
+                    <div class="quality-gate blocking">
+                        <div class="gate-icon blocking"></div>
+                        <div>
+                            <strong>Performance Regression: &lt;5% degradation</strong>
+                            <p>Performance must not degrade more than 5% from baseline</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin: 1.5rem 0;">
+                    <h3>Warning Thresholds</h3>
+                    <div class="quality-gate warning">
+                        <div class="gate-icon warning"></div>
+                        <div>
+                            <strong>Critical Component Coverage: &lt;95%</strong>
+                            <p>Triggers warning for critical components below 95% coverage</p>
+                        </div>
+                    </div>
+                    <div class="quality-gate warning">
+                        <div class="gate-icon warning"></div>
+                        <div>
+                            <strong>Performance Degradation: 2-5%</strong>
+                            <p>Performance degradation between 2-5% triggers investigation</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin: 1.5rem 0;">
+                    <h3>Success Validation</h3>
+                    <div class="quality-gate success">
+                        <div class="gate-icon success"></div>
+                        <div>
+                            <strong>Ready for Demo</strong>
+                            <p>All tests passing, zero accessibility violations, performance targets met</p>
+                        </div>
+                    </div>
+                    <div class="quality-gate success">
+                        <div class="gate-icon success"></div>
+                        <div>
+                            <strong>Ready for Interview</strong>
+                            <p>Demo runs flawlessly, all edge cases handled, monitoring active</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Product-QA Collaboration -->
+            <section class="section">
+                <h2>🤝 Product-QA Collaboration Framework</h2>
+
+                <div class="interactive-chart">
+                    <h3>Requirements to Test Case Translation</h3>
+                    <canvas id="collaborationChart" width="400" height="200"></canvas>
+                </div>
+
+                <div class="test-scenario">
+                    <div class="scenario-title">Collaboration Process</div>
+                    <p>Structured approach to translating product requirements into comprehensive test coverage</p>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                    <div class="step-card">
+                        <h4>1. Requirements Definition</h4>
+                        <p>Jordan defines acceptance criteria using Given-When-Then format</p>
+                    </div>
+                    <div class="step-card">
+                        <h4>2. Test Case Translation</h4>
+                        <p>Sam translates acceptance criteria to specific test cases</p>
+                    </div>
+                    <div class="step-card">
+                        <h4>3. Edge Case Identification</h4>
+                        <p>Sam identifies edge cases and error scenarios</p>
+                    </div>
+                    <div class="step-card">
+                        <h4>4. Business Validation</h4>
+                        <p>Jordan validates edge cases against business requirements</p>
+                    </div>
+                    <div class="step-card">
+                        <h4>5. Implementation</h4>
+                        <p>Sam implements comprehensive test coverage</p>
+                    </div>
+                    <div class="step-card">
+                        <h4>6. Final Validation</h4>
+                        <p>Jordan validates test scenarios cover all user needs</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p><strong>Sam's Testing Mission:</strong> Ensure comprehensive test coverage for every product requirement defined by Jordan, with automated validation of 90% code coverage, zero accessibility violations, and complete user journey validation across all platforms.</p>
+        </footer>
+    </div>
+
+    <script>
+        let currentChart = null;
+        let currentPlatformChart = null;
+        let collaborationChart = null;
+
+        function initializeCharts() {
+            // Initialize coverage chart
+            showCoverageChart('overall');
+
+            // Initialize platform chart
+            showPlatformChart('coverage');
+
+            // Initialize collaboration chart
+            initializeCollaborationChart();
+        }
+
+        function showCoverageChart(type) {
+            // Update button states
+            document.querySelectorAll('.chart-controls .chart-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            const ctx = document.getElementById('coverageChart').getContext('2d');
+
+            if (currentChart) {
+                currentChart.destroy();
+            }
+
+            let data, options;
+
+            switch(type) {
+                case 'overall':
+                    data = {
+                        labels: ['Unit Tests', 'Integration Tests', 'E2E Tests', 'Accessibility Tests'],
+                        datasets: [{
+                            label: 'Coverage %',
+                            data: [92, 88, 85, 100],
+                            backgroundColor: [
+                                'rgba(59, 130, 246, 0.8)',
+                                'rgba(16, 185, 129, 0.8)',
+                                'rgba(245, 158, 11, 0.8)',
+                                'rgba(239, 68, 68, 0.8)'
+                            ],
+                            borderColor: [
+                                'rgb(59, 130, 246)',
+                                'rgb(16, 185, 129)',
+                                'rgb(245, 158, 11)',
+                                'rgb(239, 68, 68)'
+                            ],
+                            borderWidth: 2
+                        }]
+                    };
+                    options = {
+                        responsive: true,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Overall Test Coverage by Type'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100,
+                                ticks: {
+                                    callback: function(value) {
+                                        return value + '%';
+                                    }
+                                }
+                            }
+                        }
+                    };
+                    break;
+
+                case 'components':
+                    data = {
+                        labels: ['HLS Streaming', 'Smart TV Navigation', 'Video Controls', 'Responsive Design'],
+                        datasets: [{
+                            label: 'Coverage %',
+                            data: [95, 95, 95, 90],
+                            backgroundColor: 'rgba(225, 29, 72, 0.8)',
+                            borderColor: 'rgb(225, 29, 72)',
+                            borderWidth: 2
+                        }]
+                    };
+                    options = {
+                        responsive: true,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Component-Specific Coverage'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100,
+                                ticks: {
+                                    callback: function(value) {
+                                        return value + '%';
+                                    }
+                                }
+                            }
+                        }
+                    };
+                    break;
+
+                case 'types':
+                    data = {
+                        labels: ['Unit', 'Integration', 'E2E', 'Accessibility', 'Performance', 'Visual Regression'],
+                        datasets: [{
+                            data: [60, 30, 10, 100, 85, 75],
+                            backgroundColor: [
+                                '#3b82f6',
+                                '#10b981',
+                                '#f59e0b',
+                                '#ef4444',
+                                '#8b5cf6',
+                                '#06b6d4'
+                            ]
+                        }]
+                    };
+                    options = {
+                        responsive: true,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Test Type Distribution'
+                            }
+                        }
+                    };
+                    currentChart = new Chart(ctx, {
+                        type: 'doughnut',
+                        data: data,
+                        options: options
+                    });
+                    return;
+            }
+
+            currentChart = new Chart(ctx, {
+                type: 'bar',
+                data: data,
+                options: options
+            });
+        }
+
+        function showPlatformChart(type) {
+            // Update button states
+            document.querySelectorAll('#platformChart').parent().querySelectorAll('.chart-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            const ctx = document.getElementById('platformChart').getContext('2d');
+
+            if (currentPlatformChart) {
+                currentPlatformChart.destroy();
+            }
+
+            let data, options;
+
+            switch(type) {
+                case 'coverage':
+                    data = {
+                        labels: ['Desktop', 'Mobile', 'Smart TV', 'Roku', 'Tizen', 'webOS'],
+                        datasets: [{
+                            label: 'Test Coverage %',
+                            data: [95, 92, 90, 88, 85, 85],
+                            backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                            borderColor: 'rgb(59, 130, 246)',
+                            borderWidth: 2
+                        }]
+                    };
+                    break;
+
+                case 'performance':
+                    data = {
+                        labels: ['Desktop', 'Mobile', 'Smart TV', 'Roku', 'Tizen', 'webOS'],
+                        datasets: [{
+                            label: 'Performance Score',
+                            data: [98, 95, 88, 85, 82, 84],
+                            backgroundColor: 'rgba(16, 185, 129, 0.8)',
+                            borderColor: 'rgb(16, 185, 129)',
+                            borderWidth: 2
+                        }]
+                    };
+                    break;
+
+                case 'accessibility':
+                    data = {
+                        labels: ['Desktop', 'Mobile', 'Smart TV', 'Roku', 'Tizen', 'webOS'],
+                        datasets: [{
+                            label: 'Accessibility Score',
+                            data: [100, 100, 95, 92, 90, 92],
+                            backgroundColor: 'rgba(225, 29, 72, 0.8)',
+                            borderColor: 'rgb(225, 29, 72)',
+                            borderWidth: 2
+                        }]
+                    };
+                    break;
+            }
+
+            options = {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: type.charAt(0).toUpperCase() + type.slice(1) + ' by Platform'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                }
+            };
+
+            currentPlatformChart = new Chart(ctx, {
+                type: 'bar',
+                data: data,
+                options: options
+            });
+        }
+
+        function initializeCollaborationChart() {
+            const ctx = document.getElementById('collaborationChart').getContext('2d');
+
+            const data = {
+                labels: ['Requirements', 'Test Cases', 'Edge Cases', 'Validation', 'Implementation', 'Review'],
+                datasets: [{
+                    label: 'Jordan (Product)',
+                    data: [100, 20, 30, 80, 10, 90],
+                    backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                    borderColor: 'rgb(59, 130, 246)',
+                    borderWidth: 2
+                }, {
+                    label: 'Sam (QA)',
+                    data: [20, 100, 90, 40, 100, 80],
+                    backgroundColor: 'rgba(225, 29, 72, 0.8)',
+                    borderColor: 'rgb(225, 29, 72)',
+                    borderWidth: 2
+                }]
+            };
+
+            collaborationChart = new Chart(ctx, {
+                type: 'radar',
+                data: data,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Product-QA Collaboration Matrix'
+                        }
+                    },
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        function showTestDetails(layer) {
+            const details = {
+                'unit': 'Unit Tests (60%): Component logic, hooks, Redux reducers, utility functions. Fast execution, high coverage.',
+                'integration': 'Integration Tests (30%): Component interaction, Redux flow, HLS integration, cross-component communication.',
+                'e2e': 'E2E Tests (10%): Complete user journeys, cross-platform validation, real browser testing.'
+            };
+
+            alert(details[layer]);
+        }
+
+        // Initialize charts when page loads
+        document.addEventListener('DOMContentLoaded', initializeCharts);
+    </script>
+</body>
+</html>

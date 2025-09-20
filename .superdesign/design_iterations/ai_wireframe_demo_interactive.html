@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Wireframing Demo - Interactive Demonstration</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="theme_ai_wireframe.css">
+</head>
+<body class="ai-demo-container">
+
+    <!-- Header -->
+    <header class="demo-section">
+        <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-3">
+                <i data-lucide="brain-circuit" class="w-8 h-8 text-accent"></i>
+                <h1 class="text-3xl font-bold text-foreground">AI Wireframing Demo</h1>
+            </div>
+            <div class="flex items-center gap-2 text-sm text-muted-foreground">
+                <i data-lucide="users" class="w-4 h-4"></i>
+                <span>Riley (UX) • John's Video Player Demo</span>
+            </div>
+        </div>
+
+        <p class="text-lg text-muted-foreground mb-4">
+            Interactive demonstration of AI-powered wireframing using Frame0 + Superdesign MCP Servers
+        </p>
+
+        <div class="flex gap-3">
+            <div class="flex items-center gap-2 text-sm">
+                <div class="w-3 h-3 bg-primary rounded-full"></div>
+                <span class="text-foreground">Frame0 MCP Connected</span>
+            </div>
+            <div class="flex items-center gap-2 text-sm">
+                <div class="w-3 h-3 bg-accent rounded-full"></div>
+                <span class="text-foreground">Superdesign MCP Connected</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <div class="nav-tabs">
+        <button class="nav-tab active" data-tab="frame0">
+            <i data-lucide="grid-3x3" class="w-4 h-4 inline mr-2"></i>
+            Frame0 Demo
+        </button>
+        <button class="nav-tab" data-tab="superdesign">
+            <i data-lucide="code" class="w-4 h-4 inline mr-2"></i>
+            Superdesign Demo
+        </button>
+        <button class="nav-tab" data-tab="combined">
+            <i data-lucide="workflow" class="w-4 h-4 inline mr-2"></i>
+            Combined Workflow
+        </button>
+        <button class="nav-tab" data-tab="comparison">
+            <i data-lucide="bar-chart-3" class="w-4 h-4 inline mr-2"></i>
+            Tool Comparison
+        </button>
+    </div>
+
+    <!-- Frame0 Demo Section -->
+    <div id="frame0-section" class="tab-content">
+        <div class="demo-section">
+            <h2 class="text-2xl font-bold text-foreground mb-4 flex items-center gap-2">
+                <i data-lucide="grid-3x3" class="w-6 h-6 text-primary"></i>
+                Frame0 - ASCII Wireframe Generation
+            </h2>
+
+            <!-- Interactive Prompt Area -->
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-foreground mb-2">Natural Language Prompt:</label>
+                <div class="relative">
+                    <textarea
+                        id="frame0-prompt"
+                        class="w-full h-24 bg-input border border-border rounded-lg p-3 text-foreground font-mono text-sm resize-none"
+                        placeholder="Describe your video player wireframe requirements..."
+                    >Create a desktop video player wireframe with these specifications:
+- 16:9 aspect ratio video container
+- Centered play button overlay on video
+- Bottom control bar with: play/pause, progress bar, volume control, settings, fullscreen
+- WCAG 2.1 AA accessibility focus indicators
+- Tab order numbers for keyboard navigation
+- Smart TV D-pad navigation flow indicators</textarea>
+                </div>
+                <div class="flex gap-2 mt-3">
+                    <button class="tech-button" onclick="generateFrame0Wireframe()">
+                        <i data-lucide="play" class="w-4 h-4 inline mr-2"></i>
+                        Generate Wireframe
+                    </button>
+                    <button class="tech-button secondary" onclick="loadFrame0Example()">
+                        <i data-lucide="lightbulb" class="w-4 h-4 inline mr-2"></i>
+                        Load Example
+                    </button>
+                    <button class="tech-button secondary" onclick="clearFrame0()">
+                        <i data-lucide="x" class="w-4 h-4 inline mr-2"></i>
+                        Clear
+                    </button>
+                </div>
+            </div>
+
+            <!-- Generated Wireframe Display -->
+            <div class="interactive-wireframe" id="frame0-output">
+                <div class="wireframe-ascii" id="frame0-wireframe">
+Click "Generate Wireframe" to see AI-generated ASCII wireframe appear here...
+                </div>
+            </div>
+
+            <!-- Frame0 Features -->
+            <div class="grid md:grid-cols-2 gap-4 mt-6">
+                <div class="demo-section">
+                    <h3 class="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+                        <i data-lucide="zap" class="w-5 h-5 text-accent"></i>
+                        Frame0 Advantages
+                    </h3>
+                    <ul class="space-y-2 text-sm text-muted-foreground">
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>
+                            <span>Rapid layout creation (seconds vs hours)</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>
+                            <span>Natural language input processing</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>
+                            <span>Built-in accessibility indicators</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>
+                            <span>Platform-specific variations</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="demo-section">
+                    <h3 class="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+                        <i data-lucide="target" class="w-5 h-5 text-primary"></i>
+                        Generated Elements
+                    </h3>
+                    <ul class="space-y-2 text-sm text-muted-foreground">
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="layout" class="w-4 h-4 text-primary mt-0.5 flex-shrink-0"></i>
+                            <span>Video container with aspect ratio</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="navigation" class="w-4 h-4 text-primary mt-0.5 flex-shrink-0"></i>
+                            <span>Control bar with all elements</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="focus" class="w-4 h-4 text-primary mt-0.5 flex-shrink-0"></i>
+                            <span>Focus indicators and tab order</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="gamepad-2" class="w-4 h-4 text-primary mt-0.5 flex-shrink-0"></i>
+                            <span>D-pad navigation patterns</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Superdesign Demo Section -->
+    <div id="superdesign-section" class="tab-content" style="display: none;">
+        <div class="demo-section">
+            <h2 class="text-2xl font-bold text-foreground mb-4 flex items-center gap-2">
+                <i data-lucide="code" class="w-6 h-6 text-accent"></i>
+                Superdesign - Component Specifications
+            </h2>
+
+            <!-- Interactive Component Generator -->
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-foreground mb-2">Component Requirements:</label>
+                <div class="relative">
+                    <textarea
+                        id="superdesign-prompt"
+                        class="w-full h-24 bg-input border border-border rounded-lg p-3 text-foreground font-mono text-sm resize-none"
+                        placeholder="Describe your React component specifications..."
+                    >Generate detailed React TypeScript component specifications for a video player control bar with:
+- Play/pause button with accessibility
+- Progress bar with seek functionality
+- Volume control with slider and mute
+- Settings dropdown with Smart TV navigation
+- Fullscreen toggle with keyboard shortcuts
+- All components must support 90% test coverage
+- WCAG 2.1 AA compliance built-in</textarea>
+                </div>
+                <div class="flex gap-2 mt-3">
+                    <button class="tech-button accent" onclick="generateSuperdesignSpecs()">
+                        <i data-lucide="code" class="w-4 h-4 inline mr-2"></i>
+                        Generate Specs
+                    </button>
+                    <button class="tech-button secondary" onclick="loadSuperdesignExample()">
+                        <i data-lucide="package" class="w-4 h-4 inline mr-2"></i>
+                        Load Example
+                    </button>
+                    <button class="tech-button secondary" onclick="clearSuperdesign()">
+                        <i data-lucide="x" class="w-4 h-4 inline mr-2"></i>
+                        Clear
+                    </button>
+                </div>
+            </div>
+
+            <!-- Generated Component Specs Display -->
+            <div class="interactive-wireframe" id="superdesign-output">
+                <div class="code-display" id="superdesign-specs">
+Click "Generate Specs" to see AI-generated TypeScript component specifications appear here...
+                </div>
+            </div>
+
+            <!-- Superdesign Features -->
+            <div class="grid md:grid-cols-2 gap-4 mt-6">
+                <div class="demo-section">
+                    <h3 class="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+                        <i data-lucide="rocket" class="w-5 h-5 text-accent"></i>
+                        Superdesign Advantages
+                    </h3>
+                    <ul class="space-y-2 text-sm text-muted-foreground">
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>
+                            <span>Complete React TypeScript specifications</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>
+                            <span>Built-in accessibility compliance</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>
+                            <span>Testing requirements included</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>
+                            <span>Cross-platform optimizations</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="demo-section">
+                    <h3 class="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+                        <i data-lucide="cpu" class="w-5 h-5 text-primary"></i>
+                        Generated Specifications
+                    </h3>
+                    <ul class="space-y-2 text-sm text-muted-foreground">
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="code-2" class="w-4 h-4 text-primary mt-0.5 flex-shrink-0"></i>
+                            <span>TypeScript interfaces and props</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="palette" class="w-4 h-4 text-primary mt-0.5 flex-shrink-0"></i>
+                            <span>Styling specifications</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="accessibility" class="w-4 h-4 text-primary mt-0.5 flex-shrink-0"></i>
+                            <span>Accessibility implementation</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="test-tube" class="w-4 h-4 text-primary mt-0.5 flex-shrink-0"></i>
+                            <span>Testing scenarios and coverage</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Combined Workflow Section -->
+    <div id="combined-section" class="tab-content" style="display: none;">
+        <div class="demo-section">
+            <h2 class="text-2xl font-bold text-foreground mb-4 flex items-center gap-2">
+                <i data-lucide="workflow" class="w-6 h-6 text-primary"></i>
+                Combined AI Workflow Demonstration
+            </h2>
+
+            <div class="grid lg:grid-cols-2 gap-6">
+                <!-- Step 1: Frame0 -->
+                <div class="demo-section">
+                    <h3 class="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+                        <span class="bg-primary text-primary-foreground w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold">1</span>
+                        Frame0 Layout Generation
+                    </h3>
+                    <div class="wireframe-ascii text-xs">
+Smart TV Video Player (1920 x 1080):
+
+┌─────────────────────────────────────────────────────────────┐
+│ ◄─ 48px Safe ─► FOX Video Player Demo ◄─ 48px Safe ─►      │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│     ┌─────────────────────────────────────────────────┐    │
+│     │               VIDEO CONTENT                     │    │
+│     │               (TV Optimized)                    │    │
+│     │                                                 │    │
+│     │           [🔵 PLAY BUTTON]                      │    │
+│     │             (Focused State)                     │    │
+│     │                                                 │    │
+│     └─────────────────────────────────────────────────┘    │
+│                                                             │
+│     ┌─ TV Control Bar ──────────────────────────────┐      │
+│     │ [▶️] [🔊] [▮▮▮▮▮▮░░░] [⚙️] [📺]               │      │
+│     │ (1)  (2)      (3)      (4)   (5)              │      │
+│     │  🔵   ○        ○       ○     ○                │      │
+│     └─────────────────────────────────────────────────┘      │
+│                                                             │
+│     Use D-pad ↑↓←→ • Enter to select • Back to exit       │
+└─────────────────────────────────────────────────────────────┘
+                    </div>
+                </div>
+
+                <!-- Step 2: Superdesign -->
+                <div class="demo-section">
+                    <h3 class="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+                        <span class="bg-accent text-accent-foreground w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold">2</span>
+                        Superdesign Component Specs
+                    </h3>
+                    <div class="code-display text-xs">
+// TV-Optimized Component Specifications
+const smartTVComponents = {
+  TVPlayButton: {
+    design: {
+      size: '80px x 80px (large for TV)',
+      focusState: 'Blue ring + scale(1.15)',
+      colors: 'High contrast white on dark',
+      accessibility: 'WCAG 2.1 AA compliant'
+    },
+    performance: {
+      updateFrequency: '30fps for TV hardware',
+      memory: '< 150MB total usage',
+      response: '< 200ms for D-pad input'
+    }
+  }
+}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Workflow Benefits -->
+            <div class="mt-6">
+                <h3 class="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                    <i data-lucide="trending-up" class="w-5 h-5 text-accent"></i>
+                    AI Workflow Benefits
+                </h3>
+                <div class="grid md:grid-cols-3 gap-4">
+                    <div class="demo-section">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i data-lucide="clock" class="w-5 h-5 text-primary"></i>
+                            <span class="font-semibold text-foreground">Speed</span>
+                        </div>
+                        <p class="text-sm text-muted-foreground">10x faster than traditional wireframing methods</p>
+                    </div>
+                    <div class="demo-section">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i data-lucide="shield-check" class="w-5 h-5 text-accent"></i>
+                            <span class="font-semibold text-foreground">Quality</span>
+                        </div>
+                        <p class="text-sm text-muted-foreground">Built-in accessibility and testing requirements</p>
+                    </div>
+                    <div class="demo-section">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i data-lucide="link" class="w-5 h-5 text-chart-3"></i>
+                            <span class="font-semibold text-foreground">Pipeline</span>
+                        </div>
+                        <p class="text-sm text-muted-foreground">Seamless design-to-code transition</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tool Comparison Section -->
+    <div id="comparison-section" class="tab-content" style="display: none;">
+        <div class="demo-section">
+            <h2 class="text-2xl font-bold text-foreground mb-4 flex items-center gap-2">
+                <i data-lucide="bar-chart-3" class="w-6 h-6 text-chart-2"></i>
+                AI Tool Comparison & Performance Metrics
+            </h2>
+
+            <!-- Comparison Table -->
+            <div class="overflow-x-auto mb-6">
+                <table class="w-full border-collapse">
+                    <thead>
+                        <tr class="border-b-2 border-border">
+                            <th class="text-left p-4 text-foreground font-semibold">Feature</th>
+                            <th class="text-left p-4 text-primary font-semibold">Frame0</th>
+                            <th class="text-left p-4 text-accent font-semibold">Superdesign</th>
+                            <th class="text-left p-4 text-chart-3 font-semibold">Traditional</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm">
+                        <tr class="border-b border-border">
+                            <td class="p-4 text-foreground font-medium">Speed</td>
+                            <td class="p-4 text-muted-foreground">Seconds</td>
+                            <td class="p-4 text-muted-foreground">Minutes</td>
+                            <td class="p-4 text-muted-foreground">Hours</td>
+                        </tr>
+                        <tr class="border-b border-border">
+                            <td class="p-4 text-foreground font-medium">Input Method</td>
+                            <td class="p-4 text-muted-foreground">Natural Language</td>
+                            <td class="p-4 text-muted-foreground">Natural Language</td>
+                            <td class="p-4 text-muted-foreground">Manual Drawing</td>
+                        </tr>
+                        <tr class="border-b border-border">
+                            <td class="p-4 text-foreground font-medium">Output</td>
+                            <td class="p-4 text-muted-foreground">ASCII Wireframes</td>
+                            <td class="p-4 text-muted-foreground">Code Specifications</td>
+                            <td class="p-4 text-muted-foreground">Static Images</td>
+                        </tr>
+                        <tr class="border-b border-border">
+                            <td class="p-4 text-foreground font-medium">Accessibility</td>
+                            <td class="p-4 text-muted-foreground">Built-in Indicators</td>
+                            <td class="p-4 text-muted-foreground">WCAG Compliance</td>
+                            <td class="p-4 text-muted-foreground">Manual Addition</td>
+                        </tr>
+                        <tr class="border-b border-border">
+                            <td class="p-4 text-foreground font-medium">Iteration</td>
+                            <td class="p-4 text-muted-foreground">Instant</td>
+                            <td class="p-4 text-muted-foreground">Rapid</td>
+                            <td class="p-4 text-muted-foreground">Time-consuming</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Performance Metrics -->
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="demo-section">
+                    <h3 class="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                        <i data-lucide="gauge" class="w-5 h-5 text-primary"></i>
+                        Performance Impact
+                    </h3>
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm text-foreground">Design Speed Improvement</span>
+                                <span class="text-sm font-bold text-accent">10x faster</span>
+                            </div>
+                            <div class="w-full bg-muted rounded-full h-2">
+                                <div class="bg-accent h-2 rounded-full" style="width: 90%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm text-foreground">Accessibility Coverage</span>
+                                <span class="text-sm font-bold text-primary">95%</span>
+                            </div>
+                            <div class="w-full bg-muted rounded-full h-2">
+                                <div class="bg-primary h-2 rounded-full" style="width: 95%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm text-foreground">Implementation Readiness</span>
+                                <span class="text-sm font-bold text-chart-3">85%</span>
+                            </div>
+                            <div class="w-full bg-muted rounded-full h-2">
+                                <div class="bg-chart-3 h-2 rounded-full" style="width: 85%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="demo-section">
+                    <h3 class="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                        <i data-lucide="target" class="w-5 h-5 text-accent"></i>
+                        FOX Application Benefits
+                    </h3>
+                    <ul class="space-y-3 text-sm">
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="zap" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>
+                            <span class="text-muted-foreground">Rapid prototyping for tight deadlines</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="shield" class="w-4 h-4 text-primary mt-0.5 flex-shrink-0"></i>
+                            <span class="text-muted-foreground">Built-in accessibility compliance</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="tv" class="w-4 h-4 text-chart-3 mt-0.5 flex-shrink-0"></i>
+                            <span class="text-muted-foreground">Smart TV optimization expertise</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="code" class="w-4 h-4 text-chart-4 mt-0.5 flex-shrink-0"></i>
+                            <span class="text-muted-foreground">Implementation-ready specifications</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="demo-section">
+        <div class="text-center">
+            <p class="text-sm text-muted-foreground mb-2">
+                <strong>Riley (UX):</strong> "AI-assisted wireframing enables 10x faster delivery while maintaining enterprise quality standards."
+            </p>
+            <p class="text-xs text-muted-foreground">
+                Demo ready for FOX Corporation technical interviews • Built with Superdesign MCP + Frame0 MCP
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Tab switching functionality
+        const tabs = document.querySelectorAll('.nav-tab');
+        const sections = document.querySelectorAll('.tab-content');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs
+                tabs.forEach(t => t.classList.remove('active'));
+                // Hide all sections
+                sections.forEach(s => s.style.display = 'none');
+
+                // Add active class to clicked tab
+                tab.classList.add('active');
+                // Show corresponding section
+                const targetSection = tab.dataset.tab + '-section';
+                document.getElementById(targetSection).style.display = 'block';
+            });
+        });
+
+        // Frame0 Functions
+        function generateFrame0Wireframe() {
+            const prompt = document.getElementById('frame0-prompt').value;
+            const output = document.getElementById('frame0-wireframe');
+
+            // Simulate AI generation with animation
+            output.textContent = 'Generating wireframe...';
+
+            setTimeout(() => {
+                output.textContent = `Desktop Video Player Wireframe Generated:
+
+┌─────────────────────────────────────────────────────────────┐
+│ Video Player Demo - Desktop Interface                       │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │                                                     │   │
+│  │                 VIDEO AREA                          │   │ ← 16:9 Container
+│  │               (1280 x 720)                          │   │
+│  │                                                     │   │
+│  │              [▶️ PLAY BUTTON]                       │   │ ← Centered Overlay
+│  │                (Tab: 1)                             │   │
+│  │                                                     │   │
+│  │  Loading: [████████░░░] 80%    [CC] [HD] 1080p     │   │ ← Status Overlays
+│  └─────────────────────────────────────────────────────┘   │
+│                                                             │
+│  ┌─ Control Bar ──────────────────────────────────────┐    │
+│  │                                                    │    │
+│  │ [▶️] [🔊] [▮▮▮▮▮▮▮▮░░░] [⚙️] [📺] [⛶]          │    │ ← Controls
+│  │ (2)  (3)        (4)       (5)   (6)   (7)         │    │   Tab Order
+│  │                                                    │    │
+│  │ Time: 12:34 / 25:46          Quality: Auto (1080p) │    │ ← Status Info
+│  └────────────────────────────────────────────────────┘    │
+│                                                             │
+│  Focus Indicators: 3px blue outline on focused elements    │ ← A11y Notes
+│  D-pad: ←→ between controls, ↑↓ video/controls/settings    │
+└─────────────────────────────────────────────────────────────┘
+
+Accessibility Features:
+- ARIA labels on all interactive elements
+- Logical tab order (1-7)
+- Focus indicators clearly visible
+- Keyboard shortcuts documented`;
+            }, 1500);
+        }
+
+        function loadFrame0Example() {
+            document.getElementById('frame0-prompt').value = `Create a Smart TV video player wireframe with TV-safe margins, large D-pad navigation indicators, focused element highlighting, and 1920x1080 layout optimized for couch viewing distance.`;
+        }
+
+        function clearFrame0() {
+            document.getElementById('frame0-prompt').value = '';
+            document.getElementById('frame0-wireframe').textContent = 'Click "Generate Wireframe" to see AI-generated ASCII wireframe appear here...';
+        }
+
+        // Superdesign Functions
+        function generateSuperdesignSpecs() {
+            const prompt = document.getElementById('superdesign-prompt').value;
+            const output = document.getElementById('superdesign-specs');
+
+            // Simulate AI generation with animation
+            output.textContent = 'Generating component specifications...';
+
+            setTimeout(() => {
+                output.textContent = `// Superdesign Generated Component Specifications
+
+interface VideoPlayerControlsProps {
+  isPlaying: boolean
+  currentTime: number
+  duration: number
+  volume: number
+  isMuted: boolean
+  quality: string
+  isFullscreen: boolean
+  onPlay: () => void
+  onPause: () => void
+  onSeek: (time: number) => void
+  onVolumeChange: (volume: number) => void
+  onMuteToggle: () => void
+  onQualityChange: (quality: string) => void
+  onFullscreenToggle: () => void
+  className?: string
+}
+
+// Component Architecture Specification
+const componentSpecs = {
+  PlayPauseButton: {
+    purpose: 'Toggle video playback state',
+    accessibility: {
+      ariaLabel: 'isPlaying ? "Pause video" : "Play video"',
+      keyboardShortcut: 'Spacebar',
+      focusIndicator: '3px blue outline',
+      screenReader: 'Announces state changes'
+    },
+    styling: {
+      size: '48px desktop, 56px mobile, 64px TV',
+      colors: 'Primary accent on dark background',
+      hover: 'Scale 1.1 transform, background highlight',
+      disabled: 'Opacity 0.5, no pointer events'
+    },
+    testing: {
+      unit: 'Click handlers, state changes, accessibility',
+      integration: 'Redux integration, keyboard shortcuts',
+      coverage: '95% requirement'
+    }
+  },
+
+  ProgressBar: {
+    purpose: 'Display video progress and enable seeking',
+    accessibility: {
+      ariaLabel: '"Video progress: {currentTime} of {duration}"',
+      role: 'slider',
+      ariaValueNow: 'currentTime',
+      ariaValueMin: '0',
+      ariaValueMax: 'duration'
+    },
+    interaction: {
+      click: 'Seek to clicked position',
+      drag: 'Scrub through video',
+      keyboard: 'Arrow keys for fine seek control',
+      touch: 'Large touch target for mobile'
+    },
+    performance: {
+      updateFrequency: '30fps maximum for TV hardware',
+      smoothing: 'CSS transitions for progress updates',
+      memory: 'Efficient DOM updates'
+    }
+  }
+}
+
+// Testing Requirements
+const testingSpecs = {
+  coverage: '90% minimum across all components',
+  accessibility: 'Axe-core validation on every build',
+  performance: 'Lighthouse CI with 95+ scores',
+  crossPlatform: 'Playwright tests on desktop/mobile/TV'
+}`;
+            }, 2000);
+        }
+
+        function loadSuperdesignExample() {
+            document.getElementById('superdesign-prompt').value = `Generate comprehensive React TypeScript specifications for mobile video player with touch-optimized controls, gesture handlers, and iOS/Android platform adaptations.`;
+        }
+
+        function clearSuperdesign() {
+            document.getElementById('superdesign-prompt').value = '';
+            document.getElementById('superdesign-specs').textContent = 'Click "Generate Specs" to see AI-generated TypeScript component specifications appear here...';
+        }
+
+        // Auto-refresh icons after dynamic content
+        setInterval(() => {
+            lucide.createIcons();
+        }, 2000);
+    </script>
+
+</body>
+</html>

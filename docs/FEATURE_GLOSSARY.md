@@ -1,9 +1,11 @@
-# 📚 Universal Video Player Feature Glossary
+# Video Player Feature Glossary - FOX Corporation Standards
 
-**Compiled by:** Morgan (Team Lead) with input from all personas
-**Source:** John's comprehensive feature research across all platforms
-**Purpose:** Definitive reference for feature selection and video player framework development
-**Context:** Competing with JW Player - understanding enterprise video player requirements
+## Executive Product Overview
+
+**Product Manager**: Jordan
+**Business Context**: FOX Corporation streaming technology terminology and requirements
+**Strategic Purpose**: Align feature definitions with enterprise streaming standards
+**Target Audience**: FOX hiring managers and technical stakeholders
 
 ---
 

@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📺 OTT Platforms & Smart TV Development Guide - FOX Streaming Demo</title>
+    <link rel="stylesheet" href="../shared-styles.css">
+    <style>
+        .platform-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .platform-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .platform-card:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(79, 172, 254, 0.1);
+        }
+
+        .platform-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .platform-logo {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .chromecast-logo { background: linear-gradient(135deg, #4285f4 0%, #34a853 100%); }
+        .appletv-logo { background: linear-gradient(135deg, #000000 0%, #333333 100%); }
+        .firetv-logo { background: linear-gradient(135deg, #ff9900 0%, #ff6600 100%); }
+        .roku-logo { background: linear-gradient(135deg, #662d91 0%, #9c4aa4 100%); }
+        .tizen-logo { background: linear-gradient(135deg, #1f2937 0%, #374151 100%); }
+        .webos-logo { background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); }
+        .androidtv-logo { background: linear-gradient(135deg, #34a853 0%, #4285f4 100%); }
+        .playstation-logo { background: linear-gradient(135deg, #003791 0%, #0070d1 100%); }
+        .xbox-logo { background: linear-gradient(135deg, #107c10 0%, #00bcf2 100%); }
+
+        .platform-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .platform-category {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        .tech-specs {
+            background: var(--surface-color);
+            border-radius: 6px;
+            padding: 16px;
+            margin: 16px 0;
+        }
+
+        .tech-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tech-row:last-child {
+            border-bottom: none;
+        }
+
+        .tech-label {
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .tech-value {
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 13px;
+        }
+
+        .capabilities-list {
+            list-style: none;
+            padding: 0;
+            margin: 12px 0;
+        }
+
+        .capabilities-list li {
+            padding: 4px 0;
+            position: relative;
+            padding-left: 20px;
+            font-size: 14px;
+        }
+
+        .capabilities-list li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--success-color);
+            font-weight: bold;
+        }
+
+        .fox-support {
+            background: linear-gradient(135deg, rgba(79, 172, 254, 0.1) 0%, rgba(79, 172, 254, 0.05) 100%);
+            border: 1px solid rgba(79, 172, 254, 0.2);
+            border-radius: 6px;
+            padding: 12px;
+            margin: 16px 0;
+        }
+
+        .fox-support h5 {
+            color: var(--accent-color);
+            margin: 0 0 8px 0;
+            font-size: 14px;
+        }
+
+        .support-status {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .status-full { background: rgba(34, 197, 94, 0.1); color: #22c55e; }
+        .status-limited { background: rgba(251, 191, 36, 0.1); color: #f59e0b; }
+        .status-none { background: rgba(107, 114, 128, 0.1); color: #6b7280; }
+
+        .performance-matrix {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .performance-card {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .performance-title {
+            color: var(--accent-color);
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .constraint-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .constraint-item:last-child {
+            border-bottom: none;
+        }
+
+        .constraint-value {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--accent-color);
+        }
+
+        .architecture-diagram {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 24px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .diagram-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 16px 0;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .diagram-box {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px 16px;
+            min-width: 120px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .diagram-arrow {
+            font-size: 20px;
+            color: var(--accent-color);
+        }
+
+        .code-snippet {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 16px;
+            margin: 16px 0;
+            font-family: var(--font-mono);
+            font-size: 13px;
+            overflow-x: auto;
+        }
+
+        .priority-tier {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .tier-1 { background: rgba(34, 197, 94, 0.1); color: #22c55e; }
+        .tier-2 { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+        .tier-3 { background: rgba(107, 114, 128, 0.1); color: #6b7280; }
+
+        .interactive-demo {
+            background: var(--surface-color);
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin: 16px 0;
+        }
+
+        .demo-button {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin: 4px;
+        }
+
+        .demo-button:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 768px) {
+            .platform-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .performance-matrix {
+                grid-template-columns: 1fr;
+            }
+
+            .diagram-row {
+                flex-direction: column;
+            }
+
+            .diagram-arrow {
+                transform: rotate(90deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="nav-container">
+                <div class="logo">
+                    <span class="logo-icon">🎬</span>
+                    <span class="logo-text">FOX Video Player Demo</span>
+                </div>
+                <nav class="nav-links">
+                    <a href="../index.html">Home</a>
+                    <a href="technical-architecture.html">Technical</a>
+                    <a href="design-specifications.html">Design</a>
+                    <a href="ott-platforms-guide.html" class="active">OTT Platforms</a>
+                    <a href="validated-content-sources.html">Content Sources</a>
+                </nav>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="hero-section">
+                <h1 class="hero-title">📺 Comprehensive OTT Platforms & Smart TV Development Guide</h1>
+                <p class="hero-subtitle">
+                    Complete technical guide for OTT platforms, Smart TV development, and cross-platform video streaming with performance optimization focus
+                </p>
+                <div class="hero-meta">
+                    <span class="meta-item">🏗️ Lead Engineer: Alex (Performance Optimization Specialist)</span>
+                    <span class="meta-item">📅 Research Date: September 19, 2024</span>
+                    <span class="meta-item">🎯 Focus: FOX Corporation platform support requirements</span>
+                </div>
+            </div>
+
+            <section class="content-section">
+                <h2 class="section-title">🎯 Executive Summary</h2>
+                <p>This comprehensive guide documents the technical landscape of Over-The-Top (OTT) platforms and Smart TV development, with specific focus on video streaming capabilities, performance constraints, and implementation strategies. The research emphasizes performance optimization requirements critical for FOX Corporation's shared codebase architecture.</p>
+
+                <div class="architecture-diagram">
+                    <h3>Platform Categories Overview</h3>
+                    <div class="diagram-row">
+                        <div class="diagram-box">Cast Devices<br><small>Chromecast, Apple TV, Fire TV, Roku</small></div>
+                        <div class="diagram-arrow">→</div>
+                        <div class="diagram-box">Gaming Consoles<br><small>PlayStation, Xbox, Nintendo Switch</small></div>
+                    </div>
+                    <div class="diagram-row">
+                        <div class="diagram-arrow">↓</div>
+                    </div>
+                    <div class="diagram-row">
+                        <div class="diagram-box">Smart TV Platforms<br><small>Tizen, webOS, Android TV, Roku TV</small></div>
+                        <div class="diagram-arrow">→</div>
+                        <div class="diagram-box">Mobile Platforms<br><small>Android WebView, iOS WKWebView, React Native</small></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <h2 class="section-title">🏗️ Cast Devices</h2>
+
+                <div class="platform-grid">
+                    <div class="platform-card">
+                        <div class="platform-header">
+                            <div class="platform-logo chromecast-logo">G</div>
+                            <div>
+                                <h3 class="platform-title">Google Chromecast</h3>
+                                <p class="platform-category">Cast Device</p>
+                            </div>
+                        </div>
+
+                        <div class="tech-specs">
+                            <div class="tech-row">
+                                <span class="tech-label">Runtime</span>
+                                <span class="tech-value">Chrome Browser (Chromium-based)</span>
+                            </div>
+                            <div class="tech-row">
+                                <span class="tech-label">WebView</span>
+                                <span class="tech-value">Chrome Embedded Framework (CEF)</span>
+                            </div>
+                            <div class="tech-row">
+                                <span class="tech-label">Formats</span>
+                                <span class="tech-value">HLS, DASH, MP4, WebM</span>
+                            </div>
+                            <div class="tech-row">
+                                <span class="tech-label">DRM</span>
+                                <span class="tech-value">Widevine L3</span>
+                            </div>
+                            <div class="tech-row">
+                                <span class="tech-label">Memory</span>
+                                <span class="tech-value">512MB-1GB RAM</span>
+                            </div>
+                        </div>
+
+                        <h5>Video Streaming Capabilities</h5>
+                        <ul class="capabilities-list">
+                            <li>4K UHD (3840x2160) max resolution</li>
+                            <li>H.264, H.265/HEVC, VP9 codecs</li>
+                            <li>Adaptive bitrate streaming</li>
+                            <li>20 Mbps max bitrate</li>
+                        </ul>
+
+                        <div class="fox-support">
+                            <div class="support-status status-full">Full Support</div>
+                            <h5>FOX Corporation Integration</h5>
+                            <p>Custom Cast receiver apps for FOX Sports, FOX News, FOX Now with live streaming, VOD, closed captions, and multi-language audio support.</p>
+                        </div>
+
+                        <div class="interactive-demo">
+                            <h4>🚀 Test Chromecast</h4>
+                            <button class="demo-button" onclick="testPlatform('chromecast')">Simulate Cast</button>
+                            <button class="demo-button" onclick="analyzePlatform('chromecast')">Analyze Performance</button>
+                        </div>
+                    </div>
+
+                    <div class="platform-card">
+                        <div class="platform-header">
+                            <div class="platform-logo appletv-logo">🍎</div>
+                            <div>
+                                <h3 class="platform-title">Apple TV</h3>
+                                <p class="platform-category">Cast Device</p>
+                            </div>
+                        </div>
+
+                        <div class="tech-specs">
+                            <div class="tech-row">
+                                <span class="tech-label">Runtime</span>
+                                <span class="tech-value">tvOS (iOS derivative)</span>
+                            </div>
+                            <div class="tech-row">
+                                <span class="tech-label">WebView</span>
+                                <span class="tech-value">WKWebView (Safari WebKit)</span>
+                            </div>
+                            <div class="tech-row">
+                                <span class="tech-label">Formats</span>
+                                <span class="tech-value">HLS (native), MP4, MOV</span>
+                            </div>
+                            <div class="tech-row">
+                                <span class="tech-label">DRM</span>
+                                <span class="tech-value">FairPlay Streaming</span>
+                            </div>
+                            <div class="tech-row">
+                                <span class="tech-label">Memory</span>
+                                <span class="tech-value">3GB RAM (Apple TV 4K)</span>
+                            </div>
+                        </div>
+
+                        <h5>Video Streaming Capabilities</h5>
+                        <ul class="capabilities-list">
+                            <li>4K HDR (4096x2160) max resolution</li>
+                            <li>H.264, H.265/HEVC, VP9 (limited) codecs</li>
+                            <li>Dolby Vision and Dolby Atmos</li>
+                            <li>Hardware decoding optimization</li>
+                        </ul>
+
+                        <div class="fox-support">
+                            <div class="support-status status-full">Full Support</div>
+                            <h5>FOX Corporation Integration</h5>
+                            <p>Native tvOS applications for major FOX properties with Swift-based apps, 4K HDR content, Dolby Vision/Atmos, and AirPlay integration.</p>
+                        </div>
+
+                        <div class="interactive-demo">
+                            <h4>🍎 Test Apple TV</h4>
+                            <button class="demo-button" onclick="testPlatform('appletv')">Simulate tvOS</button>
+                            <button class="demo-button" onclick="analyzePlatform('appletv')">Analyze Performance</button>
+                        </div>
+                    </div>
+
+                    <div class="platform-card">
+                        <div class="platform-header">
+                            <div class="platform-logo firetv-logo">🔥</div>
+                            <div>
+                                <h3 class="platform-title">Amazon Fire TV</h3>
+                                <p class="platform-category">Cast Device</p>
+                            </div>
+                        </div>
+
+                        <div class="tech-specs">
+                            <div class="tech-row">
+                                <span class="tech-label">Runtime</span>
+                                <span class="tech-value">Fire OS (Android derivative)</span>
+                            </div>
+                            <div class="tech-row">
+                                <span class="tech-label">WebView</span>
+                                <span class="tech-value">Chrome-based WebView</span>
+                            </div>
+                            <div class="tech-row">
+                                <span class="tech-label">Formats</span>
+                                <span class="tech-value">HLS, DASH, MP4, WebM</span>
+                            </div>
+                            <div class="tech-row">
+                                <span class="tech-label">DRM</span>
+                                <span class="tech-value">Widevine L1/L3, PlayReady</span>
+                            </div>
+                            <div class="tech-row">
+                                <span class="tech-label">Memory</span>
+                                <span class="tech-value">1.5-2GB RAM</span>
+                            </div>
+                        </div>
+
+                        <h5>Video Streaming Capabilities</h5>
+                        <ul class="capabilities-list">
+                            <li>4K UHD (3840x2160) max resolution</li>
+                            <li>H.264, H.265/HEVC, VP9 codecs</li>
+                            <li>HDR10, HDR10+ support</li>
+                            <li>Alexa voice control integration</li>
+                        </ul>
+
+                        <div class="fox-support">
+                            <div class="support-status status-full">Full Support</div>
+                            <h5>FOX Corporation Integration</h5>
+                            <p>Native Android applications with Java/Kotlin apps using ExoPlayer for video, voice control via Alexa, and 4K HDR streaming.</p>
+                        </div>
+
+                        <div class="interactive-demo">
+                            <h4>🔥 Test Fire TV</h4>
+                            <button class="demo-button" onclick="testPlatform('firetv')">Simulate Fire OS</button>
+                            <button class="demo-button" onclick="analyzePlatform('firetv')">Analyze Performance</button>
+                        </div>
+                    </div>
+
+                    <div class="platform-card">
+                        <div class="platform-header">
+                            <div class="platform-logo roku-logo">R</div>
+                            <div>
+                                <h3 class="platform-title">Roku Streaming Devices</h3>
+                                <p class="platform-category">Cast Device</p>
+                            </div>
+                        </div>
+
+                        <div class="tech-specs">
+                            <div class="tech-row">
+                                <span class="tech-label">Runtime</span>
+                                <span class="tech-value">Roku OS (proprietary)</span>
+                            </div>
+                            <div class="tech-row">
+                                <span class="tech-label">Language</span>
+                                <span class="tech-value">BrightScript (proprietary)</span>
+                            </div>
+                            <div class="tech-row">
+                                <span class="tech-label">Formats</span>
+                                <span class="tech-value">HLS, DASH, MP4, MKV</span>
+                            </div>
+                            <div class="tech-row">
+                                <span class="tech-label">DRM</span>
+                                <span class="tech-value">Widevine L3, PlayReady</span>
+                            </div>
+                            <div class="tech-row">
+                                <span class="tech-label">Memory</span>
+                                <span class="tech-value">256MB-1GB RAM</span>
+                            </div>
+                        </div>
+
+                        <h5>Performance Considerations</h5>
+                        <ul class="capabilities-list">
+                            <li>Severe memory constraints (256MB-1GB)</li>
+                            <li>Significant CPU limitations</li>
+                            <li>Critical network optimization required</li>
+                            <li>BrightScript development complexity</li>
+                        </ul>
+
+                        <div class="fox-support">
+                            <div class="support-status status-full">Full Support</div>
+                            <h5>FOX Corporation Integration</h5>
+                            <p>Dedicated Roku channels for all major FOX properties with BrightScript-based channels, custom UI, live TV, VOD, and personalized recommendations.</p>
+                        </div>
+
+                        <div class="interactive-demo">
+                            <h4>📺 Test Roku</h4>
+                            <button class="demo-button" onclick="testPlatform('roku')">Simulate BrightScript</button>
+                            <button class="demo-button" onclick="analyzePlatform('roku')">Analyze Constraints</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <h2 class="section-title">🎮 Gaming Consoles</h2>
+
+                <div class="platform-grid">
+                    <div class="platform-card">
+                        <div class="platform-header">
+                            <div class="platform-logo playstation-logo">PS</div>
+                            <div>
+                                <h3 class="platform-title">Sony PlayStation (PS4/PS5)</h3>
+                                <p class="platform-category">Gaming Console</p>
+                            </div>
+                        </div>
+
+                        <div class="tech-specs">
+                            <div class="tech-row">
+                                <span class="tech-label">Runtime</span>
+                                <span class="tech-value">PlayStation OS (FreeBSD derivative)</span>
+                            </div>
+                            <div class="tech-row">
+                                <span class="tech-label">WebView</span>
+                                <span class="tech-value">WebKit-based browser</span>
+                            </div>
+                            <div class="tech-row">
+                                <span class="tech-label">Formats</span>
+                                <span class="tech-value">HLS, DASH, MP4, WebM</span>
+                            </div>
+                            <div class="tech-row">
+                                <span class="tech-label">DRM</span>
+                                <span class="tech-value">Widevine L1, PlayReady</span>
+                            </div>
+                            <div class="tech-row">
+                                <span class="tech-label">Memory</span>
+                                <span class="tech-value">8GB GDDR5 (PS4) / 16GB GDDR6 (PS5)</span>
+                            </div>
+                        </div>
+
+                        <h5>Video Streaming Capabilities</h5>
+                        <ul class="capabilities-list">
+                            <li>4K UHD (PS4 Pro/PS5) max resolution</li>
+                            <li>H.264, H.265/HEVC (PS5) codecs</li>
+                            <li>HDR10 (PS4 Pro/PS5) support</li>
+                            <li>Hardware decoding with GPU acceleration</li>
+                        </ul>
+
+                        <div class="fox-support">
+                            <div class="support-status status-limited">Limited Support</div>
+                            <h5>FOX Corporation Integration</h5>
+                            <p>Limited direct FOX app presence, relies on YouTube TV and Hulu integrations. Primarily through third-party app ecosystems.</p>
+                        </div>
+                    </div>
+
+                    <div class="platform-card">
+                        <div class="platform-header">
+                            <div class="platform-logo xbox-logo">X</div>
+                            <div>
+                                <h3 class="platform-title">Microsoft Xbox (One/Series X|S)</h3>
+                                <p class="platform-category">Gaming Console</p>
+                            </div>
+                        </div>
+
+                        <div class="tech-specs">
+                            <div class="tech-row">
+                                <span class="tech-label">Runtime</span>
+                                <span class="tech-value">Xbox OS (Windows kernel)</span>
+                            </div>
+                            <div class="tech-row">
+                                <span class="tech-label">WebView</span>
+                                <span class="tech-value">Microsoft Edge WebView2</span>
+                            </div>
+                            <div class="tech-row">
+                                <span class="tech-label">Formats</span>
+                                <span class="tech-value">HLS, DASH, MP4, AVI, MKV</span>
+                            </div>
+                            <div class="tech-row">
+                                <span class="tech-label">DRM</span>
+                                <span class="tech-value">PlayReady, Widevine L1</span>
+                            </div>
+                            <div class="tech-row">
+                                <span class="tech-label">Memory</span>
+                                <span class="tech-value">8GB DDR3 (One) / 16GB GDDR6 (Series X)</span>
+                            </div>
+                        </div>
+
+                        <h5>Video Streaming Capabilities</h5>
+                        <ul class="capabilities-list">
+                            <li>4K UHD (Xbox One X/Series X) max resolution</li>
+                            <li>H.264, H.265/HEVC, AV1 (Series X/S) codecs</li>
+                            <li>HDR10, Dolby Vision (Series X/S) support</li>
+                            <li>Dolby Atmos audio support</li>
+                        </ul>
+
+                        <div class="fox-support">
+                            <div class="support-status status-limited">Limited Support</div>
+                            <h5>FOX Corporation Integration</h5>
+                            <p>Limited native app presence. Focus on browser-based access and third-party integrations through Microsoft Store partnerships.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <h2 class="section-title">📱 Smart TV Platforms</h2>
+
+                <div class="platform-grid">
+                    <div class="platform-card">
+                        <div class="platform-header">
+                            <div class="platform-logo tizen-logo">T</div>
+                            <div>
+                                <h3 class="platform-title">Samsung Tizen</h3>
+                                <p class="platform-category">Smart TV Platform</p>
+                            </div>
+                        </div>
+
+                        <div class="tech-specs">
+                            <div class="tech-row">
+                                <span class="tech-label">Runtime</span>
+                                <span class="tech-value">Tizen OS (Linux-based)</span>
+                            </div>
+                            <div class="tech-row">
+                                <span class="tech-label">WebView</span>
+                                <span class="tech-value">Samsung WebKit (Chromium-based)</span>
+                            </div>
+                            <div class="tech-row">
+                                <span class="tech-label">Formats</span>
+                                <span class="tech-value">HLS, DASH, MP4, WebM</span>
+                            </div>
+                            <div class="tech-row">
+                                <span class="tech-label">DRM</span>
+                                <span class="tech-value">Widevine L1/L3, PlayReady</span>
+                            </div>
+                            <div class="tech-row">
+                                <span class="tech-label">Memory</span>
+                                <span class="tech-value">1.5-4GB RAM</span>
+                            </div>
+                        </div>
+
+                        <h5>Performance Characteristics</h5>
+                        <ul class="capabilities-list">
+                            <li>8K UHD (premium models) max resolution</li>
+                            <li>H.264, H.265/HEVC, VP9, AV1 (2022+ models)</li>
+                            <li>HDR10, HDR10+, Dolby Vision (premium)</li>
+                            <li>Bixby voice control integration</li>
+                        </ul>
+
+                        <div class="fox-support">
+                            <div class="support-status status-full">Full Support</div>
+                            <h5>FOX Corporation Integration</h5>
+                            <p>Native Tizen applications for Samsung Smart TVs with JavaScript-based web applications, 4K/8K streaming, HDR support, and voice control integration.</p>
+                        </div>
+                    </div>
+
+                    <div class="platform-card">
+                        <div class="platform-header">
+                            <div class="platform-logo webos-logo">W</div>
+                            <div>
+                                <h3 class="platform-title">LG webOS</h3>
+                                <p class="platform-category">Smart TV Platform</p>
+                            </div>
+                        </div>
+
+                        <div class="tech-specs">
+                            <div class="tech-row">
+                                <span class="tech-label">Runtime</span>
+                                <span class="tech-value">webOS (Linux-based)</span>
+                            </div>
+                            <div class="tech-row">
+                                <span class="tech-label">WebView</span>
+                                <span class="tech-value">Chromium-based WebKit</span>
+                            </div>
+                            <div class="tech-row">
+                                <span class="tech-label">Formats</span>
+                                <span class="tech-value">HLS, DASH, MP4, WebM</span>
+                            </div>
+                            <div class="tech-row">
+                                <span class="tech-label">DRM</span>
+                                <span class="tech-value">Widevine L1/L3, PlayReady</span>
+                            </div>
+                            <div class="tech-row">
+                                <span class="tech-label">Memory</span>
+                                <span class="tech-value">2-4GB RAM</span>
+                            </div>
+                        </div>
+
+                        <h5>Development Advantages</h5>
+                        <ul class="capabilities-list">
+                            <li>Enact React-based framework</li>
+                            <li>8K UHD (premium models) support</li>
+                            <li>Dolby Vision and Dolby Atmos</li>
+                            <li>Magic Remote and AI ThinQ integration</li>
+                        </ul>
+
+                        <div class="fox-support">
+                            <div class="support-status status-full">Full Support</div>
+                            <h5>FOX Corporation Integration</h5>
+                            <p>Native webOS applications with Enact-based React applications, Magic Remote support, AI ThinQ integration, and Dolby Vision capability.</p>
+                        </div>
+                    </div>
+
+                    <div class="platform-card">
+                        <div class="platform-header">
+                            <div class="platform-logo androidtv-logo">A</div>
+                            <div>
+                                <h3 class="platform-title">Android TV / Google TV</h3>
+                                <p class="platform-category">Smart TV Platform</p>
+                            </div>
+                        </div>
+
+                        <div class="tech-specs">
+                            <div class="tech-row">
+                                <span class="tech-label">Runtime</span>
+                                <span class="tech-value">Android TV OS</span>
+                            </div>
+                            <div class="tech-row">
+                                <span class="tech-label">WebView</span>
+                                <span class="tech-value">Chrome WebView</span>
+                            </div>
+                            <div class="tech-row">
+                                <span class="tech-label">Formats</span>
+                                <span class="tech-value">HLS, DASH, MP4, WebM, MKV</span>
+                            </div>
+                            <div class="tech-row">
+                                <span class="tech-label">DRM</span>
+                                <span class="tech-value">Widevine L1/L3, PlayReady</span>
+                            </div>
+                            <div class="tech-row">
+                                <span class="tech-label">Memory</span>
+                                <span class="tech-value">1-4GB RAM</span>
+                            </div>
+                        </div>
+
+                        <h5>Integration Benefits</h5>
+                        <ul class="capabilities-list">
+                            <li>ExoPlayer media library integration</li>
+                            <li>Chromecast built-in functionality</li>
+                            <li>Google Assistant voice control</li>
+                            <li>4K UHD (8K on premium models)</li>
+                        </ul>
+
+                        <div class="fox-support">
+                            <div class="support-status status-full">Full Support</div>
+                            <h5>FOX Corporation Integration</h5>
+                            <p>Native Android TV applications with Kotlin-based apps using ExoPlayer, Chromecast built-in, Google Assistant, and content recommendations.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <h2 class="section-title">⚡ Performance Optimization Matrix</h2>
+
+                <div class="performance-matrix">
+                    <div class="performance-card">
+                        <div class="performance-title">Smart TV Memory Constraints</div>
+                        <div class="constraint-item">
+                            <span>Available for Apps</span>
+                            <span class="constraint-value">200-500MB</span>
+                        </div>
+                        <div class="constraint-item">
+                            <span>Garbage Collection</span>
+                            <span class="constraint-value">Aggressive, frequent GC pauses</span>
+                        </div>
+                        <div class="constraint-item">
+                            <span>Optimization Strategy</span>
+                            <span class="constraint-value">Object pooling, minimize allocation</span>
+                        </div>
+                    </div>
+
+                    <div class="performance-card">
+                        <div class="performance-title">CPU Performance Limits</div>
+                        <div class="constraint-item">
+                            <span>Cores Available</span>
+                            <span class="constraint-value">4-8 cores (shared with system)</span>
+                        </div>
+                        <div class="constraint-item">
+                            <span>Frequency</span>
+                            <span class="constraint-value">1.3-2.0 GHz (throttled)</span>
+                        </div>
+                        <div class="constraint-item">
+                            <span>Optimization Strategy</span>
+                            <span class="constraint-value">Avoid blocking, use requestAnimationFrame</span>
+                        </div>
+                    </div>
+
+                    <div class="performance-card">
+                        <div class="performance-title">Network Considerations</div>
+                        <div class="constraint-item">
+                            <span>Bandwidth Range</span>
+                            <span class="constraint-value">10Mbps-1Gbps (variable)</span>
+                        </div>
+                        <div class="constraint-item">
+                            <span>Latency</span>
+                            <span class="constraint-value">Higher than mobile/desktop</span>
+                        </div>
+                        <div class="constraint-item">
+                            <span>Optimization Strategy</span>
+                            <span class="constraint-value">Conservative buffering, adaptive bitrate</span>
+                        </div>
+                    </div>
+
+                    <div class="performance-card">
+                        <div class="performance-title">Input Response Targets</div>
+                        <div class="constraint-item">
+                            <span>D-pad Navigation</span>
+                            <span class="constraint-value">&lt;200ms response time</span>
+                        </div>
+                        <div class="constraint-item">
+                            <span>Focus Management</span>
+                            <span class="constraint-value">Spatial navigation critical</span>
+                        </div>
+                        <div class="constraint-item">
+                            <span>Optimization Strategy</span>
+                            <span class="constraint-value">Debounce inputs, preload focus states</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <h2 class="section-title">🦊 FOX Corporation Platform Support Analysis</h2>
+
+                <div class="architecture-diagram">
+                    <h3>Platform Priority Matrix</h3>
+                    <div class="diagram-row">
+                        <div class="diagram-box">
+                            <div class="priority-tier tier-1">Tier 1</div>
+                            Web browsers, iOS, Android, Roku, Apple TV<br>
+                            <small>Highest user engagement and revenue</small>
+                        </div>
+                    </div>
+                    <div class="diagram-row">
+                        <div class="diagram-box">
+                            <div class="priority-tier tier-2">Tier 2</div>
+                            Fire TV, Android TV, Samsung Tizen, LG webOS<br>
+                            <small>Growing market share, important for reach</small>
+                        </div>
+                    </div>
+                    <div class="diagram-row">
+                        <div class="diagram-box">
+                            <div class="priority-tier tier-3">Tier 3</div>
+                            Gaming consoles, Cast devices, Vizio, Others<br>
+                            <small>Niche audiences, limited resources</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="code-snippet">
+<strong>FOX Shared Codebase Strategy:</strong>
+
+const foxArchitecture = {
+  core: 'Shared video player library (React-based)',
+  platforms: 'Platform-specific wrappers and optimizations',
+  apis: 'Unified streaming API with platform adapters',
+  drm: 'Multi-DRM abstraction layer',
+
+  performance: {
+    bundleSharing: 'Common components across all platforms',
+    caching: 'Shared CDN and content delivery strategy',
+    optimization: 'Platform-specific performance tuning',
+    monitoring: 'Unified analytics and performance tracking'
+  },
+
+  challenges: {
+    platformDifferences: 'Varying capabilities and constraints',
+    performanceOptimization: 'Smart TV memory/CPU limitations',
+    featureParity: 'Balancing features across platforms',
+    testingComplexity: 'Multiple platform validation'
+  }
+}
+                </div>
+            </section>
+
+            <section class="content-section">
+                <h2 class="section-title">🎯 Implementation Recommendations</h2>
+
+                <div class="performance-matrix">
+                    <div class="performance-card">
+                        <div class="performance-title">For Our Demo Project</div>
+                        <div class="constraint-item">
+                            <span>1. Web (all browsers)</span>
+                            <span class="constraint-value">Primary development target</span>
+                        </div>
+                        <div class="constraint-item">
+                            <span>2. Smart TV simulation</span>
+                            <span class="constraint-value">Playwright-based testing</span>
+                        </div>
+                        <div class="constraint-item">
+                            <span>3. Mobile responsive</span>
+                            <span class="constraint-value">Touch and gesture support</span>
+                        </div>
+                        <div class="constraint-item">
+                            <span>4. Cast integration</span>
+                            <span class="constraint-value">Chromecast support demo</span>
+                        </div>
+                    </div>
+
+                    <div class="performance-card">
+                        <div class="performance-title">For FOX Corporation Interview</div>
+                        <div class="constraint-item">
+                            <span>Shared Codebase Optimization</span>
+                            <span class="constraint-value">Monorepo challenges</span>
+                        </div>
+                        <div class="constraint-item">
+                            <span>Platform-Specific Performance</span>
+                            <span class="constraint-value">Smart TV constraints expertise</span>
+                        </div>
+                        <div class="constraint-item">
+                            <span>Scalable Architecture</span>
+                            <span class="constraint-value">Multi-platform patterns</span>
+                        </div>
+                        <div class="constraint-item">
+                            <span>Performance Monitoring</span>
+                            <span class="constraint-value">Real-time metrics</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="interactive-demo">
+                    <h3>🚀 Platform Performance Simulator</h3>
+                    <p>Test performance characteristics across different OTT platforms</p>
+                    <button class="demo-button" onclick="simulatePerformance('smarttv')">Smart TV Constraints</button>
+                    <button class="demo-button" onclick="simulatePerformance('mobile')">Mobile Optimization</button>
+                    <button class="demo-button" onclick="simulatePerformance('console')">Console Gaming</button>
+                    <button class="demo-button" onclick="simulatePerformance('cast')">Cast Devices</button>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <p>&copy; 2024 John Dilig - Video Player Demo Project</p>
+                <p>Built for FOX Corporation Senior Web Engineer Application</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Add smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add animation to platform cards on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe all platform cards and performance cards
+        document.querySelectorAll('.platform-card, .performance-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(card);
+        });
+
+        // Platform testing functions
+        function testPlatform(platform) {
+            const messages = {
+                chromecast: '🎬 Simulating Chromecast environment:\n• Chrome Embedded Framework\n• 512MB-1GB RAM constraints\n• Cast SDK integration\n• Widevine L3 DRM testing',
+                appletv: '🍎 Simulating Apple TV environment:\n• tvOS/Swift development\n• WKWebView rendering\n• FairPlay DRM integration\n• 4K HDR content testing',
+                firetv: '🔥 Simulating Fire TV environment:\n• Fire OS (Android-based)\n• Alexa voice integration\n• ExoPlayer testing\n• Widevine L1 DRM validation',
+                roku: '📺 Simulating Roku environment:\n• BrightScript development\n• Scene Graph framework\n• Memory constraints (256MB-1GB)\n• Performance optimization testing'
+            };
+
+            alert(messages[platform] || 'Platform simulation not available');
+        }
+
+        function analyzePlatform(platform) {
+            const analyses = {
+                chromecast: '📊 Chromecast Performance Analysis:\n• Memory: 100MB app limit\n• CPU: ARM Cortex-A7/A53\n• Network: Adaptive streaming\n• Optimization: Efficient DOM manipulation',
+                appletv: '📊 Apple TV Performance Analysis:\n• Memory: 3GB available\n• CPU: A12 Bionic chip\n• Network: Hardware acceleration\n• Optimization: Native HLS support',
+                firetv: '📊 Fire TV Performance Analysis:\n• Memory: 1.5-2GB available\n• CPU: ARM Quad-core\n• Network: Game mode support\n• Optimization: Android optimizations',
+                roku: '📊 Roku Performance Analysis:\n• Memory: Severe constraints\n• CPU: Limited processing power\n• Network: Critical optimization\n• Optimization: BrightScript efficiency'
+            };
+
+            alert(analyses[platform] || 'Platform analysis not available');
+        }
+
+        function simulatePerformance(type) {
+            const simulations = {
+                smarttv: '📺 Smart TV Performance Simulation:\n• Memory: <100MB target\n• CPU: <30% usage on ARM\n• Network: Conservative buffering\n• Input: <200ms D-pad response',
+                mobile: '📱 Mobile Performance Simulation:\n• Battery: Optimized usage\n• Network: Connection-aware quality\n• Touch: <100ms response\n• Background: Limited processing',
+                console: '🎮 Gaming Console Simulation:\n• Memory: Shared with games\n• Graphics: Hardware acceleration\n• Audio: Dolby support\n• Integration: Platform ecosystems',
+                cast: '📡 Cast Device Simulation:\n• Receiver apps: Web-based\n• Streaming: Optimized protocols\n• Control: Mobile sender apps\n• Performance: Low-power hardware'
+            };
+
+            alert(simulations[type] || 'Performance simulation not available');
+        }
+
+        // Add hover effects to tech specs
+        document.querySelectorAll('.tech-row').forEach(row => {
+            row.addEventListener('mouseenter', function() {
+                this.style.backgroundColor = 'var(--surface-color)';
+            });
+            row.addEventListener('mouseleave', function() {
+                this.style.backgroundColor = 'transparent';
+            });
+        });
+
+        // Add click interactions for priority tiers
+        document.querySelectorAll('.priority-tier').forEach(tier => {
+            tier.addEventListener('click', function() {
+                const tierInfo = {
+                    'tier-1': 'Tier 1 Platforms:\n• Weekly releases\n• Full feature parity\n• Performance optimization\n• Highest investment',
+                    'tier-2': 'Tier 2 Platforms:\n• Bi-weekly releases\n• Core features\n• Regular updates\n• Moderate investment',
+                    'tier-3': 'Tier 3 Platforms:\n• Monthly releases\n• Basic functionality\n• Maintenance updates\n• Limited investment'
+                };
+
+                const className = Array.from(this.classList).find(c => c.startsWith('tier-'));
+                if (tierInfo[className]) {
+                    alert(tierInfo[className]);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

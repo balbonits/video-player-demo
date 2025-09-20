@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performance Optimization Focus - Video Player Demo</title>
+    <link rel="stylesheet" href="../shared-styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <nav class="breadcrumb">
+            <a href="../index.html" class="breadcrumb-link">
+                <i data-lucide="home"></i>
+                Documentation Home
+            </a>
+            <i data-lucide="chevron-right" class="breadcrumb-separator"></i>
+            <a href="#" class="breadcrumb-link">Specifications</a>
+            <i data-lucide="chevron-right" class="breadcrumb-separator"></i>
+            <span class="breadcrumb-current">Performance Optimization</span>
+        </nav>
+
+        <header class="hero">
+            <div class="hero-content">
+                <div class="hero-badge performance">
+                    <i data-lucide="zap"></i>
+                    FOX Recruiter Requirements
+                </div>
+                <h1 class="hero-title">Performance Optimization Focus</h1>
+                <p class="hero-description">
+                    JavaScript performance optimization expertise for web-based TV/OTT video players,
+                    directly aligned with FOX Corporation's shared/monolith codebase requirements.
+                </p>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <div class="stat-value">Primary</div>
+                        <div class="stat-label">Requirement</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">All TV Apps</div>
+                        <div class="stat-label">Target Platform</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">Shared Codebase</div>
+                        <div class="stat-label">Architecture</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <!-- Mission Section -->
+            <section class="section">
+                <h2 class="section-title">
+                    <i data-lucide="target"></i>
+                    Updated Project Mission
+                </h2>
+
+                <div class="card mission-card">
+                    <div class="mission-header">
+                        <h3>NEW PRIMARY OBJECTIVE: Performance Optimization Expertise</h3>
+                        <div class="mission-badge">FOX Recruiter Feedback</div>
+                    </div>
+
+                    <div class="mission-content">
+                        <div class="mission-points">
+                            <div class="mission-point">
+                                <i data-lucide="users"></i>
+                                <div>
+                                    <strong>Role Focus:</strong>
+                                    <span>JavaScript expert for improving performance on ALL TV apps</span>
+                                </div>
+                            </div>
+                            <div class="mission-point">
+                                <i data-lucide="layers"></i>
+                                <div>
+                                    <strong>Codebase Context:</strong>
+                                    <span>Shared/monolith codebase for multiple TV/OTT applications</span>
+                                </div>
+                            </div>
+                            <div class="mission-point">
+                                <i data-lucide="globe"></i>
+                                <div>
+                                    <strong>Platform:</strong>
+                                    <span>Web-based video players (not native TV apps)</span>
+                                </div>
+                            </div>
+                            <div class="mission-point">
+                                <i data-lucide="zap"></i>
+                                <div>
+                                    <strong>Priority:</strong>
+                                    <span>Performance is "high demand/importance" - PRIMARY requirement</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="strategy-comparison">
+                    <div class="strategy-card before">
+                        <div class="strategy-header">
+                            <i data-lucide="circle"></i>
+                            <h4>Before</h4>
+                        </div>
+                        <div class="strategy-content">
+                            <div class="strategy-item">
+                                <strong>Focus:</strong> Feature-rich video player with accessibility and Smart TV support
+                            </div>
+                            <div class="strategy-item">
+                                <strong>Demonstration:</strong> Modern React patterns and enterprise development
+                            </div>
+                            <div class="strategy-item">
+                                <strong>Emphasis:</strong> Comprehensive functionality across platforms
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="strategy-arrow">
+                        <i data-lucide="arrow-right"></i>
+                    </div>
+
+                    <div class="strategy-card after">
+                        <div class="strategy-header">
+                            <i data-lucide="check-circle"></i>
+                            <h4>After</h4>
+                        </div>
+                        <div class="strategy-content">
+                            <div class="strategy-item">
+                                <strong>Focus:</strong> Performance-optimized video player showcasing JS optimization expertise
+                            </div>
+                            <div class="strategy-item">
+                                <strong>Demonstration:</strong> Advanced performance optimization techniques for TV/OTT
+                            </div>
+                            <div class="strategy-item">
+                                <strong>Emphasis:</strong> Measurable performance improvements and optimization strategies
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Core Performance Areas -->
+            <section class="section">
+                <h2 class="section-title">
+                    <i data-lucide="cpu"></i>
+                    Core Performance Optimization Areas
+                </h2>
+
+                <div class="performance-areas">
+                    <!-- JavaScript Performance -->
+                    <div class="card performance-area">
+                        <div class="area-header">
+                            <i data-lucide="code-2"></i>
+                            <h3>JavaScript Performance Optimization</h3>
+                        </div>
+
+                        <div class="optimization-categories">
+                            <div class="optimization-category">
+                                <h4>Bundle Optimization</h4>
+                                <div class="techniques-grid">
+                                    <div class="technique-item">
+                                        <i data-lucide="package"></i>
+                                        <div>
+                                            <strong>Code Splitting</strong>
+                                            <span>Reduced initial load</span>
+                                        </div>
+                                    </div>
+                                    <div class="technique-item">
+                                        <i data-lucide="scissors"></i>
+                                        <div>
+                                            <strong>Tree Shaking</strong>
+                                            <span>Eliminate dead code</span>
+                                        </div>
+                                    </div>
+                                    <div class="technique-item">
+                                        <i data-lucide="download"></i>
+                                        <div>
+                                            <strong>Dynamic Imports</strong>
+                                            <span>Lazy loading components</span>
+                                        </div>
+                                    </div>
+                                    <div class="technique-item">
+                                        <i data-lucide="bar-chart"></i>
+                                        <div>
+                                            <strong>Bundle Analysis</strong>
+                                            <span>Size monitoring</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="metrics-list">
+                                    <h5>Target Metrics:</h5>
+                                    <div class="metric-item">
+                                        <i data-lucide="target"></i>
+                                        <span>Initial bundle size &lt; 150KB</span>
+                                    </div>
+                                    <div class="metric-item">
+                                        <i data-lucide="target"></i>
+                                        <span>First Load JS &lt; 200KB</span>
+                                    </div>
+                                    <div class="metric-item">
+                                        <i data-lucide="target"></i>
+                                        <span>Route-based chunks &lt; 50KB each</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="optimization-category">
+                                <h4>Runtime Optimization</h4>
+                                <div class="techniques-grid">
+                                    <div class="technique-item">
+                                        <i data-lucide="refresh-cw"></i>
+                                        <div>
+                                            <strong>React.memo</strong>
+                                            <span>Prevent unnecessary re-renders</span>
+                                        </div>
+                                    </div>
+                                    <div class="technique-item">
+                                        <i data-lucide="brain"></i>
+                                        <div>
+                                            <strong>useMemo</strong>
+                                            <span>Cache expensive calculations</span>
+                                        </div>
+                                    </div>
+                                    <div class="technique-item">
+                                        <i data-lucide="link"></i>
+                                        <div>
+                                            <strong>useCallback</strong>
+                                            <span>Function reference stability</span>
+                                        </div>
+                                    </div>
+                                    <div class="technique-item">
+                                        <i data-lucide="timer"></i>
+                                        <div>
+                                            <strong>RAF Throttling</strong>
+                                            <span>Smooth animations</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="metrics-list">
+                                    <h5>Target Metrics:</h5>
+                                    <div class="metric-item">
+                                        <i data-lucide="target"></i>
+                                        <span>Component render time &lt; 16ms (60fps)</span>
+                                    </div>
+                                    <div class="metric-item">
+                                        <i data-lucide="target"></i>
+                                        <span>JavaScript execution time &lt; 50ms</span>
+                                    </div>
+                                    <div class="metric-item">
+                                        <i data-lucide="target"></i>
+                                        <span>Memory usage stable over time</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Video Streaming Performance -->
+                    <div class="card performance-area">
+                        <div class="area-header">
+                            <i data-lucide="video"></i>
+                            <h3>Video Streaming Performance</h3>
+                        </div>
+
+                        <div class="optimization-categories">
+                            <div class="optimization-category">
+                                <h4>HLS Optimization</h4>
+                                <div class="techniques-grid">
+                                    <div class="technique-item">
+                                        <i data-lucide="buffer"></i>
+                                        <div>
+                                            <strong>Intelligent Buffering</strong>
+                                            <span>Smart buffer strategies</span>
+                                        </div>
+                                    </div>
+                                    <div class="technique-item">
+                                        <i data-lucide="trending-up"></i>
+                                        <div>
+                                            <strong>Quality Adaptation</strong>
+                                            <span>Seamless bitrate switching</span>
+                                        </div>
+                                    </div>
+                                    <div class="technique-item">
+                                        <i data-lucide="wifi"></i>
+                                        <div>
+                                            <strong>Network-Aware</strong>
+                                            <span>Connection optimization</span>
+                                        </div>
+                                    </div>
+                                    <div class="technique-item">
+                                        <i data-lucide="hard-drive"></i>
+                                        <div>
+                                            <strong>Memory-Efficient</strong>
+                                            <span>Segment management</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="metrics-list">
+                                    <h5>Target Metrics:</h5>
+                                    <div class="metric-item">
+                                        <i data-lucide="target"></i>
+                                        <span>Time to first frame &lt; 1 second</span>
+                                    </div>
+                                    <div class="metric-item">
+                                        <i data-lucide="target"></i>
+                                        <span>Rebuffering ratio &lt; 1%</span>
+                                    </div>
+                                    <div class="metric-item">
+                                        <i data-lucide="target"></i>
+                                        <span>Quality switch latency &lt; 2 seconds</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Smart TV Optimization -->
+                    <div class="card performance-area">
+                        <div class="area-header">
+                            <i data-lucide="tv"></i>
+                            <h3>Smart TV Optimization</h3>
+                        </div>
+
+                        <div class="optimization-categories">
+                            <div class="optimization-category">
+                                <h4>Hardware Constraints</h4>
+                                <div class="constraints-grid">
+                                    <div class="constraint-item">
+                                        <div class="constraint-header">
+                                            <i data-lucide="hard-drive"></i>
+                                            <strong>Memory Management</strong>
+                                        </div>
+                                        <div class="constraint-details">
+                                            <div class="constraint-target">&lt; 100MB total application</div>
+                                            <div class="constraint-techniques">
+                                                <span>Aggressive cleanup</span>
+                                                <span>Efficient DOM patterns</span>
+                                                <span>Memory leak prevention</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="constraint-item">
+                                        <div class="constraint-header">
+                                            <i data-lucide="cpu"></i>
+                                            <strong>CPU Optimization</strong>
+                                        </div>
+                                        <div class="constraint-details">
+                                            <div class="constraint-target">&lt; 30% average usage</div>
+                                            <div class="constraint-techniques">
+                                                <span>RAF throttling to 30fps</span>
+                                                <span>Event debouncing</span>
+                                                <span>Hardware acceleration</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="constraint-item">
+                                        <div class="constraint-header">
+                                            <i data-lucide="gamepad-2"></i>
+                                            <strong>Input Response</strong>
+                                        </div>
+                                        <div class="constraint-details">
+                                            <div class="constraint-target">&lt; 150ms response time</div>
+                                            <div class="constraint-techniques">
+                                                <span>Optimized event handlers</span>
+                                                <span>Spatial navigation</span>
+                                                <span>Focus management</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Performance Metrics Dashboard -->
+            <section class="section">
+                <h2 class="section-title">
+                    <i data-lucide="bar-chart-3"></i>
+                    Performance Metrics & Monitoring Strategy
+                </h2>
+
+                <div class="metrics-dashboard">
+                    <div class="metrics-category">
+                        <h3>Core Web Vitals</h3>
+                        <div class="vitals-grid">
+                            <div class="vital-item">
+                                <div class="vital-metric">LCP</div>
+                                <div class="vital-target">&lt; 1.5s</div>
+                                <div class="vital-optimization">Image optimization, lazy loading</div>
+                            </div>
+                            <div class="vital-item">
+                                <div class="vital-metric">FID</div>
+                                <div class="vital-target">&lt; 50ms</div>
+                                <div class="vital-optimization">Code splitting, input optimization</div>
+                            </div>
+                            <div class="vital-item">
+                                <div class="vital-metric">CLS</div>
+                                <div class="vital-target">&lt; 0.05</div>
+                                <div class="vital-optimization">Layout stability, size attributes</div>
+                            </div>
+                            <div class="vital-item">
+                                <div class="vital-metric">TTFB</div>
+                                <div class="vital-target">&lt; 500ms</div>
+                                <div class="vital-optimization">CDN, caching, edge functions</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="metrics-category">
+                        <h3>Video-Specific Metrics</h3>
+                        <div class="video-metrics">
+                            <div class="video-metric">
+                                <i data-lucide="play"></i>
+                                <div class="metric-info">
+                                    <div class="metric-name">Time to First Frame</div>
+                                    <div class="metric-target">&lt; 800ms</div>
+                                    <div class="metric-technique">HLS preloading, buffer optimization</div>
+                                </div>
+                            </div>
+                            <div class="video-metric">
+                                <i data-lucide="pause"></i>
+                                <div class="metric-info">
+                                    <div class="metric-name">Rebuffering Ratio</div>
+                                    <div class="metric-target">&lt; 0.5%</div>
+                                    <div class="metric-technique">Intelligent buffering, quality adaptation</div>
+                                </div>
+                            </div>
+                            <div class="video-metric">
+                                <i data-lucide="shuffle"></i>
+                                <div class="metric-info">
+                                    <div class="metric-name">Quality Switch Latency</div>
+                                    <div class="metric-target">&lt; 1.5s</div>
+                                    <div class="metric-technique">Seamless quality transitions</div>
+                                </div>
+                            </div>
+                            <div class="video-metric">
+                                <i data-lucide="hard-drive"></i>
+                                <div class="metric-info">
+                                    <div class="metric-name">Memory Usage</div>
+                                    <div class="metric-target">&lt; 80MB</div>
+                                    <div class="metric-technique">Efficient resource cleanup</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="metrics-category">
+                        <h3>TV-Specific Metrics</h3>
+                        <div class="tv-metrics">
+                            <div class="tv-metric">
+                                <div class="metric-badge performance">
+                                    <i data-lucide="mouse-pointer"></i>
+                                    <span>Input Response</span>
+                                </div>
+                                <div class="metric-value">&lt; 150ms</div>
+                            </div>
+                            <div class="tv-metric">
+                                <div class="metric-badge efficiency">
+                                    <i data-lucide="navigation"></i>
+                                    <span>Navigation Efficiency</span>
+                                </div>
+                                <div class="metric-value">100%</div>
+                            </div>
+                            <div class="tv-metric">
+                                <div class="metric-badge resource">
+                                    <i data-lucide="cpu"></i>
+                                    <span>CPU Utilization</span>
+                                </div>
+                                <div class="metric-value">&lt; 25%</div>
+                            </div>
+                            <div class="tv-metric">
+                                <div class="metric-badge memory">
+                                    <i data-lucide="hard-drive"></i>
+                                    <span>Memory Footprint</span>
+                                </div>
+                                <div class="metric-value">&lt; 100MB</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Implementation Strategy -->
+            <section class="section">
+                <h2 class="section-title">
+                    <i data-lucide="rocket"></i>
+                    Implementation Strategy
+                </h2>
+
+                <div class="implementation-timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-marker day2">2</div>
+                        <div class="timeline-content">
+                            <h3>Performance-First Implementation</h3>
+                            <p>Build with performance optimization from the start</p>
+                            <div class="timeline-techniques">
+                                <span class="technique-tag">Code splitting for video components</span>
+                                <span class="technique-tag">Lazy loading for non-critical features</span>
+                                <span class="technique-tag">Optimized HLS configuration</span>
+                                <span class="technique-tag">Memory-efficient React patterns</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-marker ongoing">∞</div>
+                        <div class="timeline-content">
+                            <h3>Real-time Performance Monitoring</h3>
+                            <p>Continuous performance tracking during development</p>
+                            <div class="timeline-techniques">
+                                <span class="technique-tag">Bundle analysis dashboard</span>
+                                <span class="technique-tag">Component render profiling</span>
+                                <span class="technique-tag">Video streaming metrics</span>
+                                <span class="technique-tag">Smart TV performance tracking</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="showcase-features">
+                    <h3>Performance Optimization Showcase Features</h3>
+                    <div class="features-grid">
+                        <div class="feature-card">
+                            <div class="feature-header">
+                                <i data-lucide="package"></i>
+                                <h4>Bundle Optimization</h4>
+                            </div>
+                            <div class="feature-content">
+                                <div class="feature-demo">Before/after bundle size comparison</div>
+                                <div class="feature-techniques">Code splitting, tree shaking, dynamic imports</div>
+                                <div class="feature-metrics">Bundle size reduction percentage</div>
+                            </div>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-header">
+                                <i data-lucide="cpu"></i>
+                                <h4>Runtime Optimization</h4>
+                            </div>
+                            <div class="feature-content">
+                                <div class="feature-demo">Component render profiling and optimization</div>
+                                <div class="feature-techniques">React.memo, useMemo, useCallback, virtualization</div>
+                                <div class="feature-metrics">Render time reduction, memory efficiency</div>
+                            </div>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-header">
+                                <i data-lucide="video"></i>
+                                <h4>Video Streaming Optimization</h4>
+                            </div>
+                            <div class="feature-content">
+                                <div class="feature-demo">Video streaming performance dashboard</div>
+                                <div class="feature-techniques">Buffer optimization, quality adaptation, network efficiency</div>
+                                <div class="feature-metrics">Time to first frame, rebuffering reduction</div>
+                            </div>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-header">
+                                <i data-lucide="tv"></i>
+                                <h4>Smart TV Optimization</h4>
+                            </div>
+                            <div class="feature-content">
+                                <div class="feature-demo">TV performance constraints and optimization</div>
+                                <div class="feature-techniques">Memory management, CPU optimization, input responsiveness</div>
+                                <div class="feature-metrics">Memory usage, CPU utilization, response time</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Success Criteria -->
+            <section class="section">
+                <h2 class="section-title">
+                    <i data-lucide="trophy"></i>
+                    Performance-Focused Success Criteria
+                </h2>
+
+                <div class="success-categories">
+                    <div class="success-category">
+                        <h3>Technical Metrics</h3>
+                        <div class="success-metrics">
+                            <div class="success-metric">
+                                <i data-lucide="gauge"></i>
+                                <div class="metric-details">
+                                    <div class="metric-name">Bundle Size</div>
+                                    <div class="metric-target">Initial load &lt; 150KB (aggressive target)</div>
+                                </div>
+                            </div>
+                            <div class="success-metric">
+                                <i data-lucide="timer"></i>
+                                <div class="metric-details">
+                                    <div class="metric-name">Load Time</div>
+                                    <div class="metric-target">Page interactive &lt; 2 seconds on 3G</div>
+                                </div>
+                            </div>
+                            <div class="success-metric">
+                                <i data-lucide="play"></i>
+                                <div class="metric-details">
+                                    <div class="metric-name">Video Start</div>
+                                    <div class="metric-target">Time to first frame &lt; 800ms</div>
+                                </div>
+                            </div>
+                            <div class="success-metric">
+                                <i data-lucide="hard-drive"></i>
+                                <div class="metric-details">
+                                    <div class="metric-name">Memory Usage</div>
+                                    <div class="metric-target">Total memory &lt; 80MB (TV constraint)</div>
+                                </div>
+                            </div>
+                            <div class="success-metric">
+                                <i data-lucide="gamepad-2"></i>
+                                <div class="metric-details">
+                                    <div class="metric-name">Input Response</div>
+                                    <div class="metric-target">D-pad response &lt; 150ms</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="success-category">
+                        <h3>FOX Alignment</h3>
+                        <div class="fox-alignment">
+                            <div class="alignment-item aligned">
+                                <i data-lucide="check-circle"></i>
+                                <div>
+                                    <strong>JS expert for performance improvement</strong>
+                                    <span>Primary recruiter requirement met</span>
+                                </div>
+                            </div>
+                            <div class="alignment-item aligned">
+                                <i data-lucide="check-circle"></i>
+                                <div>
+                                    <strong>Shared/Monolith Codebase</strong>
+                                    <span>Monorepo optimization patterns demonstrated</span>
+                                </div>
+                            </div>
+                            <div class="alignment-item aligned">
+                                <i data-lucide="check-circle"></i>
+                                <div>
+                                    <strong>TV App Performance</strong>
+                                    <span>Web-based TV app optimization expertise</span>
+                                </div>
+                            </div>
+                            <div class="alignment-item aligned">
+                                <i data-lucide="check-circle"></i>
+                                <div>
+                                    <strong>Measurable Results</strong>
+                                    <span>Quantified performance improvements</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Interview Preparation -->
+            <section class="section">
+                <h2 class="section-title">
+                    <i data-lucide="presentation"></i>
+                    FOX Interview Preparation
+                </h2>
+
+                <div class="interview-prep">
+                    <div class="prep-category">
+                        <h3>Performance Case Studies</h3>
+                        <div class="case-studies">
+                            <div class="case-study">
+                                <i data-lucide="trending-down"></i>
+                                <div>
+                                    <strong>Bundle Size Optimization</strong>
+                                    <p>Concrete examples showing X% reduction in initial load time through code splitting and tree shaking</p>
+                                </div>
+                            </div>
+                            <div class="case-study">
+                                <i data-lucide="zap"></i>
+                                <div>
+                                    <strong>Runtime Performance</strong>
+                                    <p>React optimization techniques yielding X% improvement in component render times</p>
+                                </div>
+                            </div>
+                            <div class="case-study">
+                                <i data-lucide="tv"></i>
+                                <div>
+                                    <strong>Smart TV Constraints</strong>
+                                    <p>Memory management and CPU optimization for low-power TV hardware</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="prep-category">
+                        <h3>Technical Deep Dive</h3>
+                        <div class="technical-topics">
+                            <div class="topic-item">
+                                <i data-lucide="code-2"></i>
+                                <span>Advanced JavaScript optimization patterns</span>
+                            </div>
+                            <div class="topic-item">
+                                <i data-lucide="video"></i>
+                                <span>HLS streaming performance optimization</span>
+                            </div>
+                            <div class="topic-item">
+                                <i data-lucide="layers"></i>
+                                <span>Monolith performance optimization strategies</span>
+                            </div>
+                            <div class="topic-item">
+                                <i data-lucide="bar-chart"></i>
+                                <span>Real-time performance monitoring and alerting</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="interview-talking-points">
+                    <h3>Key Talking Points</h3>
+                    <div class="talking-points">
+                        <div class="talking-point">
+                            <div class="point-marker">1</div>
+                            <div class="point-content">
+                                <strong>"I built a performance-optimized video player that demonstrates the exact JavaScript optimization expertise FOX needs"</strong>
+                                <p>Direct alignment with recruiter requirements</p>
+                            </div>
+                        </div>
+                        <div class="talking-point">
+                            <div class="point-marker">2</div>
+                            <div class="point-content">
+                                <strong>"Shared video player optimization benefits your entire codebase without touching individual applications"</strong>
+                                <p>Understanding of monolith architecture challenges</p>
+                            </div>
+                        </div>
+                        <div class="talking-point">
+                            <div class="point-marker">3</div>
+                            <div class="point-content">
+                                <strong>"Real-time performance monitoring shows quantified improvements across all applications"</strong>
+                                <p>Measurable results and professional monitoring</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Performance Optimization</h4>
+                    <p>JavaScript performance expertise for web-based TV/OTT video players, aligned with FOX Corporation requirements.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Key Focus Areas</h4>
+                    <ul>
+                        <li>Bundle optimization</li>
+                        <li>Runtime performance</li>
+                        <li>Video streaming efficiency</li>
+                        <li>Smart TV constraints</li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Success Metrics</h4>
+                    <ul>
+                        <li>&lt; 150KB initial bundle</li>
+                        <li>&lt; 800ms video start</li>
+                        <li>&lt; 100MB memory usage</li>
+                        <li>&lt; 150ms input response</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Video Player Demo - Performance Optimization Focus</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Add entrance animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.card, .section, .performance-area, .feature-card').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(el);
+        });
+
+        // Interactive metric cards
+        document.querySelectorAll('.vital-item, .video-metric, .tv-metric').forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px)';
+                this.style.boxShadow = '0 10px 25px rgba(0, 255, 157, 0.15)';
+            });
+
+            item.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = 'none';
+            });
+        });
+
+        // Smooth scrolling for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

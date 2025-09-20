@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shared HLS Video Player - Embed & Plugin Strategy</title>
+    <link rel="stylesheet" href="../shared-styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <nav class="breadcrumb">
+            <a href="../index.html" class="breadcrumb-link">
+                <i data-lucide="home"></i>
+                Documentation Home
+            </a>
+            <i data-lucide="chevron-right" class="breadcrumb-separator"></i>
+            <a href="#" class="breadcrumb-link">Specifications</a>
+            <i data-lucide="chevron-right" class="breadcrumb-separator"></i>
+            <span class="breadcrumb-current">Shared Player Embed</span>
+        </nav>
+
+        <header class="hero">
+            <div class="hero-content">
+                <div class="hero-badge embed">
+                    <i data-lucide="layers"></i>
+                    Embed & Plugin Strategy
+                </div>
+                <h1 class="hero-title">Shared HLS Video Player</h1>
+                <p class="hero-description">
+                    Embeddable video player architecture designed for FOX's shared/monolith codebase,
+                    featuring multiple integration approaches optimized for Smart TV and OTT platforms.
+                </p>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <div class="stat-value">4</div>
+                        <div class="stat-label">Integration Methods</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">All Platforms</div>
+                        <div class="stat-label">TV Support</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">Performance</div>
+                        <div class="stat-label">Optimized</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <!-- Strategic Alignment -->
+            <section class="section">
+                <h2 class="section-title">
+                    <i data-lucide="target"></i>
+                    Strategic Alignment with FOX Requirements
+                </h2>
+
+                <div class="alignment-comparison">
+                    <div class="alignment-side">
+                        <h3>FOX Challenge</h3>
+                        <div class="challenge-items">
+                            <div class="challenge-item">
+                                <i data-lucide="layers"></i>
+                                <div>
+                                    <strong>Codebase:</strong>
+                                    <span>Shared/monolith codebase for multiple TV/OTT apps</span>
+                                </div>
+                            </div>
+                            <div class="challenge-item">
+                                <i data-lucide="zap"></i>
+                                <div>
+                                    <strong>Performance:</strong>
+                                    <span>Performance optimization across all TV applications</span>
+                                </div>
+                            </div>
+                            <div class="challenge-item">
+                                <i data-lucide="monitor"></i>
+                                <div>
+                                    <strong>Integration:</strong>
+                                    <span>Video player embedded via webview in different apps</span>
+                                </div>
+                            </div>
+                            <div class="challenge-item">
+                                <i data-lucide="users"></i>
+                                <div>
+                                    <strong>Consistency:</strong>
+                                    <span>Same video experience across all FOX TV properties</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alignment-arrow">
+                        <i data-lucide="arrow-right"></i>
+                    </div>
+
+                    <div class="alignment-side">
+                        <h3>Our Solution</h3>
+                        <div class="solution-items">
+                            <div class="solution-item">
+                                <i data-lucide="cpu"></i>
+                                <div>
+                                    <strong>Shared Core:</strong>
+                                    <span>Single HLS video player optimized for performance</span>
+                                </div>
+                            </div>
+                            <div class="solution-item">
+                                <i data-lucide="plug"></i>
+                                <div>
+                                    <strong>Embeddable:</strong>
+                                    <span>Multiple integration methods (iframe, Web Component, SDK)</span>
+                                </div>
+                            </div>
+                            <div class="solution-item">
+                                <i data-lucide="gauge"></i>
+                                <div>
+                                    <strong>Performance First:</strong>
+                                    <span>Optimized for Smart TV memory and CPU constraints</span>
+                                </div>
+                            </div>
+                            <div class="solution-item">
+                                <i data-lucide="check-circle"></i>
+                                <div>
+                                    <strong>Consistency:</strong>
+                                    <span>Unified video experience across all embedding contexts</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="demonstration-value">
+                    <h3>Demonstration Value for FOX</h3>
+                    <div class="value-grid">
+                        <div class="value-item">
+                            <i data-lucide="bullseye"></i>
+                            <div>
+                                <strong>FOX Relevance</strong>
+                                <span>Exactly matches their technical architecture needs</span>
+                            </div>
+                        </div>
+                        <div class="value-item">
+                            <i data-lucide="trending-up"></i>
+                            <div>
+                                <strong>Performance</strong>
+                                <span>Shows JS optimization expertise for shared codebases</span>
+                            </div>
+                        </div>
+                        <div class="value-item">
+                            <i data-lucide="expand"></i>
+                            <div>
+                                <strong>Scalability</strong>
+                                <span>Demonstrates enterprise-level video player architecture</span>
+                            </div>
+                        </div>
+                        <div class="value-item">
+                            <i data-lucide="settings"></i>
+                            <div>
+                                <strong>Integration</strong>
+                                <span>Multiple embedding approaches for different use cases</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Integration Approaches -->
+            <section class="section">
+                <h2 class="section-title">
+                    <i data-lucide="plug"></i>
+                    Embed & Plugin Implementation Approaches
+                </h2>
+
+                <div class="integration-approaches">
+                    <!-- Iframe Embed -->
+                    <div class="card approach-card recommended">
+                        <div class="approach-header">
+                            <div class="approach-title">
+                                <i data-lucide="square"></i>
+                                <h3>Iframe Embed (Most Compatible)</h3>
+                            </div>
+                            <div class="approach-badge recommended">⭐ RECOMMENDED FOR FOX</div>
+                        </div>
+
+                        <div class="approach-content">
+                            <div class="expandable-section">
+                                <button class="expand-toggle" onclick="toggleExpand(this)">
+                                    <span>Show Implementation Details</span>
+                                    <i data-lucide="chevron-down"></i>
+                                </button>
+
+                                <div class="expanded-content">
+                                    <h4>Implementation Example</h4>
+                                    <div class="code-block">
+                                        <div class="code-header">
+                                            <span class="code-title">typescript</span>
+                                            <button class="copy-button" onclick="copyCode(this)">
+                                                <i data-lucide="copy"></i>
+                                            </button>
+                                        </div>
+                                        <pre><code>// Standalone video player page for iframe embedding
+// Route: /embed/player
+export default function EmbedPlayer() {
+  const searchParams = useSearchParams()
+  const src = searchParams.get('src')
+  const autoplay = searchParams.get('autoplay') === 'true'
+  const performance = searchParams.get('performance') || 'auto'
+
+  return (
+    &lt;div className="embed-video-player"&gt;
+      &lt;VideoPlayer
+        src={src}
+        autoplay={autoplay}
+        performanceMode={performance}
+        embedded={true}
+      /&gt;
+    &lt;/div&gt;
+  )
+}
+
+// Usage in FOX TV apps:
+&lt;iframe
+  src="https://video-demo.jdilig.me/embed/player?src=stream.m3u8&performance=smartTV"
+  width="100%"
+  height="100%"
+  frameborder="0"
+  allowfullscreen
+  allow="autoplay; fullscreen; picture-in-picture"&gt;
+&lt;/iframe&gt;</code></pre>
+                                    </div>
+
+                                    <div class="advantages-grid">
+                                        <div class="advantages-category">
+                                            <h5>Advantages</h5>
+                                            <ul>
+                                                <li>Complete isolation from host application</li>
+                                                <li>No CSS/JS conflicts with parent app</li>
+                                                <li>Independent performance optimization</li>
+                                                <li>Works in any webview or browser</li>
+                                                <li>Security sandboxing</li>
+                                                <li>Easy integration for FOX TV apps</li>
+                                            </ul>
+                                        </div>
+
+                                        <div class="advantages-category">
+                                            <h5>FOX Benefits</h5>
+                                            <ul>
+                                                <li>Drop-in replacement for existing video players</li>
+                                                <li>Performance optimized specifically for TV webviews</li>
+                                                <li>No modification needed to host TV applications</li>
+                                                <li>Centralized performance improvements benefit all apps</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Web Component -->
+                    <div class="card approach-card">
+                        <div class="approach-header">
+                            <div class="approach-title">
+                                <i data-lucide="component"></i>
+                                <h3>Web Component (Modern Standard)</h3>
+                            </div>
+                            <div class="approach-badge performance">⭐ PERFORMANCE OPTIMIZED</div>
+                        </div>
+
+                        <div class="approach-content">
+                            <div class="expandable-section">
+                                <button class="expand-toggle" onclick="toggleExpand(this)">
+                                    <span>Show Implementation Details</span>
+                                    <i data-lucide="chevron-down"></i>
+                                </button>
+
+                                <div class="expanded-content">
+                                    <h4>Custom Web Component Implementation</h4>
+                                    <div class="code-block">
+                                        <div class="code-header">
+                                            <span class="code-title">typescript</span>
+                                            <button class="copy-button" onclick="copyCode(this)">
+                                                <i data-lucide="copy"></i>
+                                            </button>
+                                        </div>
+                                        <pre><code>// Custom Web Component for maximum performance
+class HLSVideoPlayer extends HTMLElement {
+  static get observedAttributes() {
+    return ['src', 'autoplay', 'performance-mode', 'memory-limit']
+  }
+
+  connectedCallback() {
+    this.attachShadow({ mode: 'open' })
+    this.render()
+    this.initializePerformanceOptimization()
+    this.setupHLSStreaming()
+  }
+
+  initializePerformanceOptimization() {
+    const performanceMode = this.getAttribute('performance-mode')
+
+    if (performanceMode === 'smartTV') {
+      this.applySmartTVOptimizations()
+    } else if (performanceMode === 'mobile') {
+      this.applyMobileOptimizations()
+    }
+  }
+
+  applySmartTVOptimizations() {
+    // Memory limit enforcement
+    const memoryLimit = parseInt(this.getAttribute('memory-limit') || '100') // MB
+    this.setupMemoryMonitoring(memoryLimit)
+
+    // CPU optimization
+    this.setupCPUThrottling(30) // 30% max CPU
+
+    // Input response optimization
+    this.setupInputOptimization(150) // 150ms max response
+  }
+}
+
+// Register the custom element
+customElements.define('hls-video-player', HLSVideoPlayer)
+
+// Usage in FOX TV apps:
+&lt;hls-video-player
+  src="stream.m3u8"
+  performance-mode="smartTV"
+  memory-limit="100"
+  cpu-limit="30"&gt;
+&lt;/hls-video-player&gt;</code></pre>
+                                    </div>
+
+                                    <div class="performance-features">
+                                        <h5>Performance Features</h5>
+                                        <div class="feature-list">
+                                            <div class="feature-item">
+                                                <i data-lucide="settings"></i>
+                                                <span>Configurable performance modes (smartTV, mobile, desktop)</span>
+                                            </div>
+                                            <div class="feature-item">
+                                                <i data-lucide="hard-drive"></i>
+                                                <span>Memory limit enforcement with monitoring</span>
+                                            </div>
+                                            <div class="feature-item">
+                                                <i data-lucide="cpu"></i>
+                                                <span>CPU usage optimization and throttling</span>
+                                            </div>
+                                            <div class="feature-item">
+                                                <i data-lucide="mouse-pointer"></i>
+                                                <span>Input response time optimization</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- JavaScript SDK -->
+                    <div class="card approach-card">
+                        <div class="approach-header">
+                            <div class="approach-title">
+                                <i data-lucide="code-2"></i>
+                                <h3>JavaScript SDK (Developer Experience)</h3>
+                            </div>
+                            <div class="approach-badge enterprise">⭐ ENTERPRISE</div>
+                        </div>
+
+                        <div class="approach-content">
+                            <div class="expandable-section">
+                                <button class="expand-toggle" onclick="toggleExpand(this)">
+                                    <span>Show Implementation Details</span>
+                                    <i data-lucide="chevron-down"></i>
+                                </button>
+
+                                <div class="expanded-content">
+                                    <h4>Programmatic Control SDK</h4>
+                                    <div class="code-block">
+                                        <div class="code-header">
+                                            <span class="code-title">typescript</span>
+                                            <button class="copy-button" onclick="copyCode(this)">
+                                                <i data-lucide="copy"></i>
+                                            </button>
+                                        </div>
+                                        <pre><code>// NPM package for programmatic control
+import { HLSPlayer, PerformanceOptimizer } from '@video-player-demo/core'
+
+// Initialize with performance configuration
+const player = new HLSPlayer({
+  container: '#video-container',
+  src: 'stream.m3u8',
+
+  // Performance optimization for FOX TV apps
+  performance: {
+    platform: 'smartTV',
+    memoryLimit: 100, // MB
+    cpuTarget: 25,    // % max usage
+    inputResponseTarget: 150, // ms
+    bufferStrategy: 'conservative'
+  },
+
+  // Smart TV optimization
+  smartTV: {
+    dpadNavigation: true,
+    largeUI: true,
+    safeMarginsH: 48,
+    safeMarginsV: 27
+  },
+
+  // Monitoring and analytics
+  monitoring: {
+    coreWebVitals: true,
+    videoMetrics: true,
+    performanceAlerts: true,
+    memoryTracking: true
+  }
+})
+
+// Advanced performance control
+const optimizer = new PerformanceOptimizer(player)
+optimizer.optimizeForTVHardware()
+optimizer.enableMemoryManagement()
+optimizer.setupInputOptimization()</code></pre>
+                                    </div>
+
+                                    <div class="enterprise-features">
+                                        <h5>Enterprise Features</h5>
+                                        <div class="enterprise-grid">
+                                            <div class="enterprise-item">
+                                                <i data-lucide="bar-chart"></i>
+                                                <span>Performance budgets and monitoring</span>
+                                            </div>
+                                            <div class="enterprise-item">
+                                                <i data-lucide="git-branch"></i>
+                                                <span>A/B testing framework for optimization</span>
+                                            </div>
+                                            <div class="enterprise-item">
+                                                <i data-lucide="activity"></i>
+                                                <span>Cross-app analytics and performance tracking</span>
+                                            </div>
+                                            <div class="enterprise-item">
+                                                <i data-lucide="shield"></i>
+                                                <span>Advanced debugging and profiling tools</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Module Federation -->
+                    <div class="card approach-card">
+                        <div class="approach-header">
+                            <div class="approach-title">
+                                <i data-lucide="share-2"></i>
+                                <h3>Module Federation (Micro-Frontend)</h3>
+                            </div>
+                            <div class="approach-badge advanced">⭐ ADVANCED</div>
+                        </div>
+
+                        <div class="approach-content">
+                            <div class="expandable-section">
+                                <button class="expand-toggle" onclick="toggleExpand(this)">
+                                    <span>Show Implementation Details</span>
+                                    <i data-lucide="chevron-down"></i>
+                                </button>
+
+                                <div class="expanded-content">
+                                    <h4>Micro-Frontend Architecture</h4>
+                                    <div class="code-block">
+                                        <div class="code-header">
+                                            <span class="code-title">javascript</span>
+                                            <button class="copy-button" onclick="copyCode(this)">
+                                                <i data-lucide="copy"></i>
+                                            </button>
+                                        </div>
+                                        <pre><code>// webpack.config.js - Module Federation for shared player
+const ModuleFederationPlugin = require('@module-federation/webpack')
+
+module.exports = {
+  plugins: [
+    new ModuleFederationPlugin({
+      name: 'videoPlayerHost',
+      filename: 'remoteEntry.js',
+      exposes: {
+        './VideoPlayer': './src/components/VideoPlayer',
+        './PerformanceOptimizer': './src/lib/PerformanceOptimizer'
+      },
+      shared: {
+        react: { singleton: true },
+        'react-dom': { singleton: true }
+      }
+    })
+  ]
+}
+
+// Usage in FOX TV apps:
+const VideoPlayer = React.lazy(() => import('videoPlayerHost/VideoPlayer'))
+
+function FOXSportsApp() {
+  return (
+    &lt;Suspense fallback={&lt;VideoPlayerSkeleton /&gt;}&gt;
+      &lt;VideoPlayer
+        src="sports-stream.m3u8"
+        performanceMode="smartTV"
+        branding="fox-sports"
+      /&gt;
+    &lt;/Suspense&gt;
+  )
+}</code></pre>
+                                    </div>
+
+                                    <div class="fox-relevance">
+                                        <h5>FOX Relevance</h5>
+                                        <div class="relevance-list">
+                                            <div class="relevance-item">
+                                                <i data-lucide="layers"></i>
+                                                <span>Matches shared/monolith codebase architecture</span>
+                                            </div>
+                                            <div class="relevance-item">
+                                                <i data-lucide="trending-up"></i>
+                                                <span>Enables centralized performance improvements</span>
+                                            </div>
+                                            <div class="relevance-item">
+                                                <i data-lucide="refresh-cw"></i>
+                                                <span>Independent video player updates across all apps</span>
+                                            </div>
+                                            <div class="relevance-item">
+                                                <i data-lucide="tv"></i>
+                                                <span>Optimal for multiple TV application integration</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Smart TV Performance -->
+            <section class="section">
+                <h2 class="section-title">
+                    <i data-lucide="tv"></i>
+                    Smart TV Performance Optimization
+                </h2>
+
+                <div class="tv-optimization">
+                    <div class="constraint-categories">
+                        <div class="constraint-category">
+                            <h3>Memory Management</h3>
+                            <div class="constraint-details">
+                                <div class="constraint-target">
+                                    <i data-lucide="hard-drive"></i>
+                                    <span>&lt; 50MB for video player component</span>
+                                </div>
+                                <div class="constraint-note">Smart TV apps typically limited to 100-150MB total</div>
+                                <div class="techniques">
+                                    <div class="technique">
+                                        <i data-lucide="trash-2"></i>
+                                        <span>Aggressive cleanup of video segments</span>
+                                    </div>
+                                    <div class="technique">
+                                        <i data-lucide="code"></i>
+                                        <span>Efficient DOM manipulation patterns</span>
+                                    </div>
+                                    <div class="technique">
+                                        <i data-lucide="shield"></i>
+                                        <span>Memory leak prevention in React components</span>
+                                    </div>
+                                    <div class="technique">
+                                        <i data-lucide="buffer"></i>
+                                        <span>Buffer size optimization for TV hardware</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="constraint-category">
+                            <h3>CPU Optimization</h3>
+                            <div class="constraint-details">
+                                <div class="constraint-target">
+                                    <i data-lucide="cpu"></i>
+                                    <span>&lt; 25% CPU usage average</span>
+                                </div>
+                                <div class="constraint-note">Smart TV CPUs are low-power ARM processors</div>
+                                <div class="techniques">
+                                    <div class="technique">
+                                        <i data-lucide="timer"></i>
+                                        <span>RequestAnimationFrame throttling to 30fps for TV</span>
+                                    </div>
+                                    <div class="technique">
+                                        <i data-lucide="pause"></i>
+                                        <span>Efficient event handler debouncing</span>
+                                    </div>
+                                    <div class="technique">
+                                        <i data-lucide="refresh-cw"></i>
+                                        <span>Optimized React render cycles</span>
+                                    </div>
+                                    <div class="technique">
+                                        <i data-lucide="zap"></i>
+                                        <span>Hardware-accelerated CSS animations only</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="constraint-category">
+                            <h3>Network Optimization</h3>
+                            <div class="constraint-details">
+                                <div class="constraint-target">
+                                    <i data-lucide="wifi"></i>
+                                    <span>Adaptive streaming with aggressive buffering</span>
+                                </div>
+                                <div class="constraint-note">TV network connections often less stable</div>
+                                <div class="techniques">
+                                    <div class="technique">
+                                        <i data-lucide="shield-check"></i>
+                                        <span>Conservative buffer management</span>
+                                    </div>
+                                    <div class="technique">
+                                        <i data-lucide="trending-down"></i>
+                                        <span>Quality downgrade algorithms</span>
+                                    </div>
+                                    <div class="technique">
+                                        <i data-lucide="refresh-cw"></i>
+                                        <span>Network reconnection handling</span>
+                                    </div>
+                                    <div class="technique">
+                                        <i data-lucide="download-cloud"></i>
+                                        <span>Offline-capable progressive enhancement</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Webview Integration -->
+            <section class="section">
+                <h2 class="section-title">
+                    <i data-lucide="monitor"></i>
+                    TV App Webview Integration Patterns
+                </h2>
+
+                <div class="webview-platforms">
+                    <div class="platform-card">
+                        <div class="platform-header">
+                            <i data-lucide="smartphone"></i>
+                            <h3>Android TV WebView</h3>
+                        </div>
+                        <div class="platform-content">
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">java</span>
+                                    <button class="copy-button" onclick="copyCode(this)">
+                                        <i data-lucide="copy"></i>
+                                    </button>
+                                </div>
+                                <pre><code>// Android TV WebView setup
+WebView webView = findViewById(R.id.video_webview)
+webView.getSettings().setJavaScriptEnabled(true)
+webView.getSettings().setDomStorageEnabled(true)
+webView.getSettings().setMediaPlaybackRequiresUserGesture(false)
+
+// Performance optimization for TV
+webView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK)
+webView.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH)
+
+// Load optimized embed
+webView.loadUrl("https://video-demo.jdilig.me/embed/player?performance=androidTV")</code></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="platform-card">
+                        <div class="platform-header">
+                            <i data-lucide="tv"></i>
+                            <h3>Samsung Tizen WebView</h3>
+                        </div>
+                        <div class="platform-content">
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">javascript</span>
+                                    <button class="copy-button" onclick="copyCode(this)">
+                                        <i data-lucide="copy"></i>
+                                    </button>
+                                </div>
+                                <pre><code>// Samsung Tizen WebView
+var webview = document.createElement('webview')
+webview.src = 'https://video-demo.jdilig.me/embed/player?performance=tizen'
+webview.style.width = '100%'
+webview.style.height = '100%'
+
+// Tizen-specific optimizations
+webview.addEventListener('loadstart', function() {
+  // Configure for TV performance
+  webview.executeScript({
+    code: 'window.TVPerformanceMode = true; window.MemoryLimit = 100;'
+  })
+})</code></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="platform-card">
+                        <div class="platform-header">
+                            <i data-lucide="monitor"></i>
+                            <h3>LG webOS WebView</h3>
+                        </div>
+                        <div class="platform-content">
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">javascript</span>
+                                    <button class="copy-button" onclick="copyCode(this)">
+                                        <i data-lucide="copy"></i>
+                                    </button>
+                                </div>
+                                <pre><code>// LG webOS WebView
+var webview = new WebOSWebView()
+webview.src = 'https://video-demo.jdilig.me/embed/player?performance=webOS'
+
+// webOS performance optimization
+webview.setUserAgent('webOS TV optimized player')
+webview.enablePerformanceMode(true)</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="communication-api">
+                    <h3>Cross-Origin Communication</h3>
+                    <div class="communication-methods">
+                        <div class="communication-method">
+                            <h4>Player to Host Communication</h4>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">typescript</span>
+                                    <button class="copy-button" onclick="copyCode(this)">
+                                        <i data-lucide="copy"></i>
+                                    </button>
+                                </div>
+                                <pre><code>// Video player sends events to host application
+const sendToHost = (event, data) => {
+  if (window.parent !== window) {
+    window.parent.postMessage({
+      type: 'video-player-event',
+      event: event,
+      data: data,
+      timestamp: Date.now()
+    }, '*') // In production, specify origin
+  }
+}
+
+// Examples:
+sendToHost('video-started', { duration: player.duration })
+sendToHost('quality-changed', { quality: '1080p', reason: 'user-selection' })
+sendToHost('performance-metrics', {
+  memoryUsage: getMemoryUsage(),
+  cpuUsage: getCPUUsage(),
+  inputLatency: getInputLatency()
+})</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="communication-method">
+                            <h4>Host to Player Communication</h4>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">typescript</span>
+                                    <button class="copy-button" onclick="copyCode(this)">
+                                        <i data-lucide="copy"></i>
+                                    </button>
+                                </div>
+                                <pre><code>// Host application controls embedded player
+const controlEmbeddedPlayer = (action, params) => {
+  const iframe = document.getElementById('video-player-iframe')
+  iframe.contentWindow.postMessage({
+    type: 'video-player-control',
+    action: action,
+    params: params
+  }, 'https://video-demo.jdilig.me')
+}
+
+// Examples:
+controlEmbeddedPlayer('play', {})
+controlEmbeddedPlayer('seek', { time: 120 })
+controlEmbeddedPlayer('setPerformanceMode', { mode: 'smartTV' })</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Implementation Priority -->
+            <section class="section">
+                <h2 class="section-title">
+                    <i data-lucide="rocket"></i>
+                    Implementation Priority for FOX Demo
+                </h2>
+
+                <div class="implementation-phases">
+                    <div class="phase-card current">
+                        <div class="phase-header">
+                            <div class="phase-number">Day 2</div>
+                            <h3>Iframe Embed Implementation</h3>
+                            <div class="phase-status">Current Focus</div>
+                        </div>
+                        <div class="phase-content">
+                            <div class="phase-routes">
+                                <h4>Embed Routes</h4>
+                                <div class="route-list">
+                                    <div class="route-item">
+                                        <code>/embed/player</code>
+                                        <span>Full-featured embedded video player</span>
+                                    </div>
+                                    <div class="route-item">
+                                        <code>/embed/performance</code>
+                                        <span>Performance-optimized player with metrics dashboard</span>
+                                    </div>
+                                    <div class="route-item">
+                                        <code>/embed/simple</code>
+                                        <span>Minimal player for low-resource environments</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="phase-features">
+                                <h4>Key Features</h4>
+                                <div class="feature-tags">
+                                    <span class="feature-tag">URL parameter configuration</span>
+                                    <span class="feature-tag">Smart TV performance optimization</span>
+                                    <span class="feature-tag">Cross-origin event communication</span>
+                                    <span class="feature-tag">Responsive iframe behavior</span>
+                                    <span class="feature-tag">Performance metrics collection</span>
+                                </div>
+                            </div>
+
+                            <div class="demonstration-value">
+                                <h4>Demonstration Value</h4>
+                                <ul>
+                                    <li>Shows immediate integration capability for FOX TV apps</li>
+                                    <li>Performance optimization specifically for TV webviews</li>
+                                    <li>Professional embed architecture</li>
+                                    <li>Measurable performance improvements</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="phase-card future">
+                        <div class="phase-header">
+                            <div class="phase-number">Day 3-4</div>
+                            <h3>Web Component Enhancement</h3>
+                            <div class="phase-status">Future</div>
+                        </div>
+                        <div class="phase-content">
+                            <div class="phase-benefits">
+                                <ul>
+                                    <li>Framework-agnostic integration</li>
+                                    <li>Performance isolation and optimization</li>
+                                    <li>Custom attributes for configuration</li>
+                                    <li>Event-based communication</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="phase-card future">
+                        <div class="phase-header">
+                            <div class="phase-number">Post-Demo</div>
+                            <h3>Enterprise SDK</h3>
+                            <div class="phase-status">Future</div>
+                        </div>
+                        <div class="phase-content">
+                            <div class="phase-benefits">
+                                <ul>
+                                    <li>Programmatic performance control</li>
+                                    <li>Enterprise monitoring and analytics</li>
+                                    <li>A/B testing framework</li>
+                                    <li>Advanced debugging tools</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="configuration-api">
+                    <h3>Configuration API for FOX Integration</h3>
+                    <div class="api-parameters">
+                        <div class="parameter-group">
+                            <h4>URL Parameters</h4>
+                            <div class="parameter-list">
+                                <div class="parameter-item">
+                                    <code>src</code>
+                                    <span>HLS stream URL (required)</span>
+                                </div>
+                                <div class="parameter-item">
+                                    <code>autoplay</code>
+                                    <span>Boolean - auto-start playback</span>
+                                </div>
+                                <div class="parameter-item">
+                                    <code>performance</code>
+                                    <span>smartTV|mobile|desktop - optimization mode</span>
+                                </div>
+                                <div class="parameter-item">
+                                    <code>memoryLimit</code>
+                                    <span>Number - memory constraint in MB</span>
+                                </div>
+                                <div class="parameter-item">
+                                    <code>cpuLimit</code>
+                                    <span>Number - CPU usage limit percentage</span>
+                                </div>
+                                <div class="parameter-item">
+                                    <code>branding</code>
+                                    <span>fox-sports|fox-news|fox-entertainment - brand styling</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="parameter-group">
+                            <h4>Example URLs</h4>
+                            <div class="example-urls">
+                                <div class="example-url">
+                                    <code>https://video-demo.jdilig.me/embed/player?src=stream.m3u8&performance=smartTV&memoryLimit=100</code>
+                                </div>
+                                <div class="example-url">
+                                    <code>https://video-demo.jdilig.me/embed/performance?src=stream.m3u8&branding=fox-sports</code>
+                                </div>
+                                <div class="example-url">
+                                    <code>https://video-demo.jdilig.me/embed/simple?src=stream.m3u8&controls=false</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- FOX Interview Talking Points -->
+            <section class="section">
+                <h2 class="section-title">
+                    <i data-lucide="presentation"></i>
+                    FOX Interview Talking Points
+                </h2>
+
+                <div class="talking-points">
+                    <div class="talking-point-category">
+                        <h3>Shared Player Architecture Benefits</h3>
+                        <div class="talking-point-list">
+                            <div class="talking-point">
+                                <div class="point-icon">
+                                    <i data-lucide="zap"></i>
+                                </div>
+                                <div class="point-content">
+                                    <strong>Performance Optimization:</strong>
+                                    <p>"I built a shared HLS video player that can be optimized once and improve performance across all TV apps"</p>
+                                </div>
+                            </div>
+
+                            <div class="talking-point">
+                                <div class="point-icon">
+                                    <i data-lucide="layers"></i>
+                                </div>
+                                <div class="point-content">
+                                    <strong>Monolith Benefits:</strong>
+                                    <p>"Centralized video player optimization benefits your entire shared codebase without touching individual applications"</p>
+                                </div>
+                            </div>
+
+                            <div class="talking-point">
+                                <div class="point-icon">
+                                    <i data-lucide="plug"></i>
+                                </div>
+                                <div class="point-content">
+                                    <strong>Webview Integration:</strong>
+                                    <p>"Multiple embedding approaches provide flexibility for different integration needs"</p>
+                                </div>
+                            </div>
+
+                            <div class="talking-point">
+                                <div class="point-icon">
+                                    <i data-lucide="bar-chart"></i>
+                                </div>
+                                <div class="point-content">
+                                    <strong>Measurable Results:</strong>
+                                    <p>"Real-time performance monitoring shows quantified improvements across all applications"</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="talking-point-category">
+                        <h3>Technical Depth Demonstration</h3>
+                        <div class="technical-depth">
+                            <div class="depth-item">
+                                <i data-lucide="hard-drive"></i>
+                                <div>
+                                    <strong>Memory Management</strong>
+                                    <span>Advanced techniques for TV hardware constraints</span>
+                                </div>
+                            </div>
+                            <div class="depth-item">
+                                <i data-lucide="cpu"></i>
+                                <div>
+                                    <strong>CPU Optimization</strong>
+                                    <span>Efficient JavaScript execution for low-power devices</span>
+                                </div>
+                            </div>
+                            <div class="depth-item">
+                                <i data-lucide="wifi"></i>
+                                <div>
+                                    <strong>Network Adaptation</strong>
+                                    <span>Smart streaming optimization for TV network conditions</span>
+                                </div>
+                            </div>
+                            <div class="depth-item">
+                                <i data-lucide="monitor"></i>
+                                <div>
+                                    <strong>Cross-Platform Performance</strong>
+                                    <span>Consistent optimization across different TV platforms</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Shared Player Embed Strategy</h4>
+                    <p>Multiple integration approaches for embeddable video player optimized for FOX's shared codebase architecture.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Integration Methods</h4>
+                    <ul>
+                        <li>Iframe Embed (Recommended)</li>
+                        <li>Web Component (Performance)</li>
+                        <li>JavaScript SDK (Enterprise)</li>
+                        <li>Module Federation (Advanced)</li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Performance Focus</h4>
+                    <ul>
+                        <li>&lt; 50MB memory usage</li>
+                        <li>&lt; 25% CPU utilization</li>
+                        <li>&lt; 150ms input response</li>
+                        <li>Cross-platform optimization</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Video Player Demo - Shared Player Embed Strategy</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Expandable content functionality
+        function toggleExpand(button) {
+            const content = button.nextElementSibling;
+            const icon = button.querySelector('i[data-lucide]');
+            const span = button.querySelector('span');
+
+            if (content.style.display === 'block') {
+                content.style.display = 'none';
+                span.textContent = 'Show Implementation Details';
+                icon.setAttribute('data-lucide', 'chevron-down');
+            } else {
+                content.style.display = 'block';
+                span.textContent = 'Hide Implementation Details';
+                icon.setAttribute('data-lucide', 'chevron-up');
+            }
+
+            // Reinitialize icons for the changed icon
+            lucide.createIcons();
+        }
+
+        // Copy code functionality
+        function copyCode(button) {
+            const codeBlock = button.closest('.code-block').querySelector('code');
+            const text = codeBlock.textContent;
+
+            navigator.clipboard.writeText(text).then(() => {
+                const icon = button.querySelector('i');
+                icon.setAttribute('data-lucide', 'check');
+                lucide.createIcons();
+
+                setTimeout(() => {
+                    icon.setAttribute('data-lucide', 'copy');
+                    lucide.createIcons();
+                }, 2000);
+            });
+        }
+
+        // Add entrance animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.card, .section, .approach-card, .platform-card').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(el);
+        });
+
+        // Interactive hover effects
+        document.querySelectorAll('.approach-card, .platform-card, .phase-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px)';
+                this.style.boxShadow = '0 10px 25px rgba(0, 255, 157, 0.15)';
+            });
+
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = 'none';
+            });
+        });
+
+        // Smooth scrolling for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
