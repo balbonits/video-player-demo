@@ -131,7 +131,6 @@ export default defineConfig({
         ...devices['Desktop Chrome'],
         viewport: { width: 1440, height: 900 },
         // Simulate screen reader environment
-        reducedMotion: 'reduce',
         colorScheme: 'light',
         extraHTTPHeaders: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 JAWS/2023'
