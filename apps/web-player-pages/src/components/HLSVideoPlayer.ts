@@ -15,6 +15,11 @@
 // Import HLS.js for adaptive streaming
 import Hls from 'hls.js'
 
+// Import backend integration services
+import StreamingService from '../services/streaming-service'
+import { streamingAnalytics } from '../services/streaming-analytics'
+import AdaptiveQualityManager from '../services/adaptive-quality-manager'
+
 interface PerformanceMetrics {
   memoryUsage: number
   cpuUsage: number
@@ -56,6 +61,12 @@ class HLSVideoPlayer extends HTMLElement {
   private performanceMonitoringInterval: number | null = null
   private inputResponseStartTime: number = 0
 
+  // Backend integration services
+  private streamingService: StreamingService | null = null
+  private adaptiveQualityManager: AdaptiveQualityManager | null = null
+  private backendEnabled: boolean = true
+  private contentId: string = 'default-content'
+
   // Observed attributes for reactive updates
   static get observedAttributes() {
     return [
@@ -65,7 +76,11 @@ class HLSVideoPlayer extends HTMLElement {
       'memory-limit',
       'cpu-limit',
       'buffer-strategy',
-      'controls'
+      'controls',
+      'backend-url',
+      'content-id',
+      'enable-analytics',
+      'auth-token'
     ]
   }
 
@@ -112,6 +127,7 @@ class HLSVideoPlayer extends HTMLElement {
   connectedCallback() {
     this.parseAttributes()
     this.render()
+    this.initializeBackendServices()
     this.initializeVideoPlayer()
     this.setupPerformanceOptimization()
     this.startPerformanceMonitoring()
@@ -140,12 +156,81 @@ class HLSVideoPlayer extends HTMLElement {
     this.performanceConfig.cpuTarget = parseInt(this.getAttribute('cpu-limit') || '50')
     this.performanceConfig.bufferStrategy = (this.getAttribute('buffer-strategy') as any) || 'adaptive'
 
+    // Backend configuration
+    this.contentId = this.getAttribute('content-id') || 'default-content'
+    this.backendEnabled = this.getAttribute('enable-analytics') !== 'false'
+
     // Smart TV specific optimizations
     if (this.performanceConfig.mode === 'smartTV') {
       this.performanceConfig.memoryLimit = Math.min(this.performanceConfig.memoryLimit, 100)
       this.performanceConfig.cpuTarget = Math.min(this.performanceConfig.cpuTarget, 30)
       this.performanceConfig.inputResponseTarget = 150
     }
+  }
+
+  private async initializeBackendServices() {
+    if (!this.backendEnabled) {
+      console.log('[HLSVideoPlayer] Backend services disabled')
+      return
+    }
+
+    try {
+      // Initialize streaming service
+      const backendUrl = this.getAttribute('backend-url') || 'https://streaming-backend-gamma.vercel.app'
+      const authToken = this.getAttribute('auth-token')
+
+      this.streamingService = new StreamingService({
+        backendUrl,
+        contentId: this.contentId,
+        platform: this.performanceConfig.mode,
+        authToken: authToken || undefined,
+        enableAnalytics: true,
+        enableAdaptiveQuality: true,
+        enablePredictiveLoading: false,
+        memoryLimit: this.performanceConfig.memoryLimit,
+        cpuLimit: this.performanceConfig.cpuTarget
+      })
+
+      await this.streamingService.initialize()
+
+      // Initialize adaptive quality manager
+      this.adaptiveQualityManager = new AdaptiveQualityManager(this.performanceConfig.mode)
+
+      console.log('[HLSVideoPlayer] Backend services initialized successfully')
+
+      // Listen for QoE updates
+      window.addEventListener('streaming-qoe-update', this.handleQoEUpdate.bind(this) as EventListener)
+
+    } catch (error) {
+      console.warn('[HLSVideoPlayer] Backend initialization failed:', error)
+      this.backendEnabled = false
+    }
+  }
+
+  private handleQoEUpdate(event: Event) {
+    const customEvent = event as CustomEvent
+    const qoeData = customEvent.detail
+    console.log('[HLSVideoPlayer] QoE Update:', qoeData)
+
+    // Update performance indicator with QoE score
+    const indicator = this.shadow.getElementById('perf-indicator')
+    if (indicator && qoeData.qualityScore !== undefined) {
+      const scoreDisplay = `QoE: ${qoeData.qualityScore.toFixed(1)}/5.0`
+      const memoryMB = Math.round(this.performanceMetrics.memoryUsage / 1024 / 1024)
+      indicator.textContent = `${scoreDisplay} | Memory: ${memoryMB}MB | ${this.performanceConfig.mode}`
+
+      // Color coding based on QoE score
+      if (qoeData.qualityScore >= 4.0) {
+        indicator.style.background = 'rgba(34, 197, 94, 0.8)' // Green
+      } else if (qoeData.qualityScore >= 3.0) {
+        indicator.style.background = 'rgba(245, 158, 11, 0.8)' // Yellow
+      } else {
+        indicator.style.background = 'rgba(239, 68, 68, 0.8)' // Red
+      }
+    }
+
+    // Dispatch QoE event for external consumption
+    this.dispatchPerformanceEvent('qoe-update', qoeData)
   }
 
   private render() {
@@ -461,32 +546,84 @@ class HLSVideoPlayer extends HTMLElement {
     const startTime = performance.now()
 
     try {
+      let manifestUrl = src
+
+      // Use backend for manifest URL if streaming service is available
+      if (this.streamingService && this.backendEnabled) {
+        try {
+          manifestUrl = await this.streamingService.getHLSManifestUrl()
+          console.log('[HLSVideoPlayer] Using backend manifest URL:', manifestUrl)
+        } catch (error) {
+          console.warn('[HLSVideoPlayer] Backend manifest failed, using original URL:', error)
+          manifestUrl = src
+        }
+      }
+
       if (Hls.isSupported()) {
         // Initialize HLS with performance optimization
         this.hls = new Hls(this.getHLSConfig())
 
-        this.hls.loadSource(src)
+        // Configure HLS with backend integration
+        if (this.streamingService) {
+          this.streamingService.configureHLS(this.hls)
+        }
+
+        // Initialize adaptive quality manager
+        if (this.adaptiveQualityManager) {
+          this.adaptiveQualityManager.initialize(this.hls)
+        }
+
+        this.hls.loadSource(manifestUrl)
         this.hls.attachMedia(this.video)
 
         // Track video start performance
         this.hls.on(Hls.Events.MANIFEST_PARSED, () => {
           this.performanceMetrics.videoStartTime = performance.now() - startTime
           this.updateQualitySelector()
+
+          // Send analytics to backend
+          if (this.backendEnabled) {
+            streamingAnalytics.trackPerformance({
+              startupTime: this.performanceMetrics.videoStartTime,
+              manifestLoadTime: this.performanceMetrics.manifestLoadTime,
+              platformType: this.performanceConfig.mode
+            } as any)
+          }
+
           this.dispatchPerformanceEvent('video-ready', this.performanceMetrics)
         })
 
         // Advanced streaming performance monitoring
         this.setupAdvancedStreamingMetrics(this.hls, startTime)
 
+        // Backend error tracking
+        this.hls.on(Hls.Events.ERROR, (event: any, data: any) => {
+          if (this.backendEnabled) {
+            streamingAnalytics.trackError(`HLS Error: ${data.details}`, this.video?.currentTime)
+          }
+        })
+
       } else if (this.video.canPlayType('application/vnd.apple.mpegurl')) {
         // Safari native HLS support
-        this.video.src = src
+        this.video.src = manifestUrl
         this.performanceMetrics.videoStartTime = performance.now() - startTime
+
+        if (this.backendEnabled) {
+          streamingAnalytics.trackPerformance({
+            startupTime: this.performanceMetrics.videoStartTime,
+            platformType: this.performanceConfig.mode
+          } as any)
+        }
       } else {
         throw new Error('HLS not supported in this browser')
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error)
+
+      if (this.backendEnabled) {
+        streamingAnalytics.trackError(errorMessage, this.video?.currentTime)
+      }
+
       this.dispatchPerformanceEvent('error', { error: errorMessage })
     }
   }
@@ -1071,6 +1208,30 @@ class HLSVideoPlayer extends HTMLElement {
         this.performanceMetrics.bufferingRatio = (duration - totalBuffered) / duration
       }
     }
+
+    // Send performance metrics to backend analytics
+    if (this.backendEnabled) {
+      streamingAnalytics.trackPerformance({
+        memoryUsage: this.performanceMetrics.memoryUsage,
+        cpuUsage: this.performanceMetrics.cpuUsage,
+        rebufferRatio: this.performanceMetrics.bufferingRatio,
+        throughputMbps: this.performanceMetrics.throughputMbps,
+        qualityLevelChanges: this.performanceMetrics.qualityLevelChanges,
+        sessionDuration: Date.now() - (this.video?.currentTime || 0) * 1000,
+        platformType: this.performanceConfig.mode
+      } as any)
+    }
+
+    // Update adaptive quality decision if available
+    if (this.adaptiveQualityManager) {
+      this.adaptiveQualityManager.makeAdaptationDecision(this.performanceMetrics).then(decision => {
+        if (decision) {
+          this.adaptiveQualityManager?.applyAdaptationDecision(decision)
+        }
+      }).catch(error => {
+        console.warn('[HLSVideoPlayer] Adaptive quality decision failed:', error)
+      })
+    }
   }
 
   private updatePerformanceIndicator() {
@@ -1420,6 +1581,17 @@ class HLSVideoPlayer extends HTMLElement {
   }
 
   private cleanup() {
+    // Cleanup backend services
+    if (this.streamingService) {
+      this.streamingService.destroy()
+      this.streamingService = null
+    }
+
+    if (this.adaptiveQualityManager) {
+      this.adaptiveQualityManager.destroy()
+      this.adaptiveQualityManager = null
+    }
+
     // Cleanup for memory management
     if (this.hls) {
       this.hls.destroy()

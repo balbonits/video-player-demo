@@ -20,7 +20,7 @@ async function generateAllWireframes() {
 
   // Desktop Video Player
   const desktopWireframe = createWireframe({
-    title: 'Desktop Video Player - FOX Demo',
+    title: 'Desktop Video Player Demo',
     subtitle: 'Next.js Implementation with Redux & HLS',
     theme: 'fox'
   })

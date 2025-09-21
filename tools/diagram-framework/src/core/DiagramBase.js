@@ -272,7 +272,7 @@ export class DiagramBase {
         'text-secondary': '#666666',
         'element-bg': '#ffffff',
         'element-border': '#cccccc',
-        'accent': '#0066cc', // FOX-inspired blue
+        'accent': '#0066cc', // Professional blue accent
         'accent-shadow': 'rgba(0, 102, 204, 0.3)',
         'focus': '#0052a3',
         'connection': '#999999',

@@ -1,0 +1,5 @@
+{
+  "devDependencies": {
+    "lighthouse": "^12.8.2"
+  }
+}

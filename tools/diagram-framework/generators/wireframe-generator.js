@@ -20,7 +20,7 @@ export async function generateVideoPlayerWireframes() {
       creator: 'riley',
       generator: () => {
         const wireframe = createWireframe({
-          title: 'Desktop Video Player - FOX Demo',
+          title: 'Desktop Video Player Demo',
           subtitle: 'Next.js Pages Router Implementation',
           theme: 'fox',
           maxWidth: '1200px'

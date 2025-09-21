@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Video Player - Backend Integration UX Audit</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="theme_enhanced_video_player.css">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* Additional component-specific styles */
+        .video-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+        }
+
+        .control-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.6) 70%, transparent 100%);
+            padding: 2rem;
+            transition: opacity 0.3s ease;
+        }
+
+        .status-overlay {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            right: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            z-index: 10;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 1rem 0;
+            position: relative;
+        }
+
+        .progress-buffer {
+            position: absolute;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.4);
+            width: 65%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-played {
+            position: absolute;
+            height: 100%;
+            background: #ff6b35;
+            width: 45%;
+            transition: width 0.1s ease;
+            z-index: 2;
+        }
+
+        .control-button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid transparent;
+            border-radius: 8px;
+            padding: 0.75rem;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 56px;
+            min-height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+        }
+
+        .control-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: #ff6b35;
+        }
+
+        .control-button:focus {
+            outline: 4px solid #ff6b35;
+            outline-offset: 2px;
+        }
+
+        .metric-card {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 0.5rem 0;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+
+        .live-dot {
+            background: #ef4444;
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        .network-excellent { background: #10b981; }
+        .network-good { background: #f59e0b; }
+        .network-poor { background: #ef4444; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .accessibility-panel {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            color: #93c5fd;
+        }
+
+        .error-notification {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            color: #fca5a5;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .performance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .perf-metric {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .perf-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .perf-label {
+            font-size: 0.875rem;
+            opacity: 0.7;
+            margin-top: 0.5rem;
+        }
+
+        /* Smart TV Focus Simulation */
+        .tv-focused {
+            border: 4px solid #ff6b35 !important;
+            box-shadow: 0 0 0 2px rgba(255, 107, 53, 0.3) !important;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .control-overlay {
+                padding: 1rem;
+            }
+
+            .status-overlay {
+                top: 0.5rem;
+                left: 0.5rem;
+                right: 0.5rem;
+            }
+
+            .performance-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white font-sans">
+    <div class="max-w-7xl mx-auto p-6">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold mb-2">Enhanced Video Player - Backend Integration UX Audit</h1>
+            <p class="text-gray-400">
+                Optimized streaming interface with Smart TV accessibility and FOX Corporation performance requirements
+            </p>
+            <div class="mt-4 text-sm text-gray-500">
+                <strong>Design Focus:</strong> Enhanced streaming telemetry, Smart TV navigation, WCAG 2.1 AA compliance
+            </div>
+        </div>
+
+        <!-- Main Video Player Interface -->
+        <div class="video-container tv-safe">
+            <!-- Status Overlays -->
+            <div class="status-overlay">
+                <!-- Left Status Group -->
+                <div class="flex flex-col gap-2">
+                    <!-- Live Status -->
+                    <div class="status-indicator status-live">
+                        <span class="status-dot live-dot"></span>
+                        <span class="font-semibold">LIVE</span>
+                        <span class="text-sm opacity-75">12s</span>
+                    </div>
+
+                    <!-- Quality Indicator -->
+                    <div class="status-indicator status-playing">
+                        <i data-lucide="monitor" class="w-4 h-4"></i>
+                        <span>1080p AUTO</span>
+                    </div>
+                </div>
+
+                <!-- Right Status Group -->
+                <div class="flex flex-col gap-2 items-end">
+                    <!-- Network Status -->
+                    <div class="status-indicator">
+                        <span class="status-dot network-excellent"></span>
+                        <span>4G</span>
+                        <span class="text-sm opacity-75">5Mbps</span>
+                        <span class="text-sm opacity-75">45ms</span>
+                    </div>
+
+                    <!-- Battery Status (Mobile) -->
+                    <div class="status-indicator">
+                        <i data-lucide="battery" class="w-4 h-4"></i>
+                        <span class="text-sm">85%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Error Recovery Notification -->
+            <div class="absolute top-20 left-4 right-4 error-notification">
+                <div class="flex items-center">
+                    <i data-lucide="alert-triangle" class="w-5 h-5 mr-2"></i>
+                    <span>Network Error - Reconnecting (3/3)</span>
+                </div>
+                <div class="flex gap-2">
+                    <button class="px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-sm transition-colors">
+                        Switch to Lower Quality
+                    </button>
+                    <button class="px-3 py-1 border border-red-400 hover:bg-red-400 hover:text-black rounded text-sm transition-colors">
+                        Retry
+                    </button>
+                </div>
+            </div>
+
+            <!-- Buffer Health Indicator -->
+            <div class="absolute bottom-32 left-4 right-4">
+                <div class="metric-card">
+                    <div class="flex items-center justify-between text-sm mb-2">
+                        <span>Buffer Health</span>
+                        <span class="text-green-400">Excellent</span>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-buffer"></div>
+                        <div class="progress-played"></div>
+                    </div>
+                    <div class="flex justify-between text-xs text-gray-400 mt-1">
+                        <span>80% buffered</span>
+                        <span>Next: 720p in 2s</span>
+                        <span>Frames: 0 dropped</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Central Play Area -->
+            <div class="absolute inset-0 flex items-center justify-center">
+                <button class="control-button tv-focused text-4xl w-20 h-20">
+                    <i data-lucide="play" class="w-10 h-10"></i>
+                </button>
+            </div>
+
+            <!-- Enhanced Controls Panel -->
+            <div class="control-overlay">
+                <!-- Main Controls Row -->
+                <div class="flex items-center justify-between mb-4">
+                    <!-- Playback Controls -->
+                    <div class="flex items-center gap-2">
+                        <button class="control-button">
+                            <i data-lucide="skip-back" class="w-5 h-5"></i>
+                        </button>
+                        <button class="control-button tv-focused">
+                            <i data-lucide="pause" class="w-6 h-6"></i>
+                        </button>
+                        <button class="control-button">
+                            <i data-lucide="skip-forward" class="w-5 h-5"></i>
+                        </button>
+                        <span class="text-sm text-gray-400 ml-2">10s / 30s</span>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="flex-1 mx-8">
+                        <div class="progress-container">
+                            <div class="progress-buffer"></div>
+                            <div class="progress-played"></div>
+                        </div>
+                        <div class="flex justify-between text-xs text-gray-400 mt-1">
+                            <span>15:42</span>
+                            <span>24:30</span>
+                        </div>
+                    </div>
+
+                    <!-- Feature Controls -->
+                    <div class="flex items-center gap-2">
+                        <button class="control-button">
+                            <i data-lucide="volume-2" class="w-5 h-5"></i>
+                        </button>
+                        <button class="control-button">
+                            <i data-lucide="closed-captioning" class="w-5 h-5"></i>
+                        </button>
+                        <button class="control-button">
+                            <i data-lucide="settings" class="w-5 h-5"></i>
+                        </button>
+                        <button class="control-button">
+                            <i data-lucide="maximize" class="w-5 h-5"></i>
+                        </button>
+                        <button class="control-button">
+                            <i data-lucide="picture-in-picture-2" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Status Information Row -->
+                <div class="flex justify-between text-sm text-gray-400">
+                    <div class="flex items-center gap-4">
+                        <span>Time: 15:42 / 24:30</span>
+                        <span>Quality: AUTO(1080p)</span>
+                        <span>Buffer: 8.2s</span>
+                        <span>Network: 4G</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="status-dot network-excellent"></span>
+                        <span>Streaming Stable</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Accessibility Status Panel -->
+        <div class="accessibility-panel">
+            <h3 class="font-semibold mb-2 flex items-center">
+                <i data-lucide="accessibility" class="w-5 h-5 mr-2"></i>
+                Accessibility Status
+            </h3>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                <div>
+                    <span class="text-green-400">●</span> Screen Reader: ON
+                </div>
+                <div>
+                    <span class="text-green-400">●</span> Captions: EN
+                </div>
+                <div>
+                    <span class="text-gray-400">○</span> Audio Description: OFF
+                </div>
+                <div>
+                    <span class="text-green-400">●</span> High Contrast: ON
+                </div>
+                <div>
+                    <span class="text-green-400">●</span> Keyboard Nav: ACTIVE
+                </div>
+                <div>
+                    <span class="text-blue-400">●</span> Focus: Play Button
+                </div>
+            </div>
+            <div class="mt-2 text-xs opacity-75">
+                <strong>Screen Reader:</strong> "Play button selected. Press OK to play video. Current state: paused. Buffer health: excellent."
+            </div>
+        </div>
+
+        <!-- Performance Telemetry Panel -->
+        <div class="metric-card">
+            <h3 class="font-semibold mb-4 flex items-center">
+                <i data-lucide="activity" class="w-5 h-5 mr-2"></i>
+                Performance Telemetry
+            </h3>
+
+            <div class="performance-grid">
+                <div class="perf-metric">
+                    <div class="perf-value text-green-400">60</div>
+                    <div class="perf-label">FPS</div>
+                </div>
+                <div class="perf-metric">
+                    <div class="perf-value text-yellow-400">85MB</div>
+                    <div class="perf-label">Memory</div>
+                </div>
+                <div class="perf-metric">
+                    <div class="perf-value text-green-400">15%</div>
+                    <div class="perf-label">CPU</div>
+                </div>
+                <div class="perf-metric">
+                    <div class="perf-value text-green-400">2.1</div>
+                    <div class="perf-label">Mbps</div>
+                </div>
+                <div class="perf-metric">
+                    <div class="perf-value text-green-400">45ms</div>
+                    <div class="perf-label">Latency</div>
+                </div>
+                <div class="perf-metric">
+                    <div class="perf-value text-green-400">0</div>
+                    <div class="perf-label">Rebuffers</div>
+                </div>
+            </div>
+
+            <div class="mt-4 text-sm text-gray-400">
+                <div class="flex justify-between">
+                    <span>Segments: 156/156 loaded</span>
+                    <span>Quality Switches: 3</span>
+                    <span>Errors: 0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Smart TV Navigation Guide -->
+        <div class="metric-card">
+            <h3 class="font-semibold mb-4 flex items-center">
+                <i data-lucide="gamepad-2" class="w-5 h-5 mr-2"></i>
+                Smart TV D-Pad Navigation
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h4 class="font-medium mb-2 text-orange-400">Current Focus: Play Button</h4>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex items-center">
+                            <span class="w-8 text-center">←</span>
+                            <span>Previous Control</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="w-8 text-center">→</span>
+                            <span>Next Control</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="w-8 text-center">↑</span>
+                            <span>Quality Menu</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="w-8 text-center">↓</span>
+                            <span>Volume Menu</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="font-medium mb-2 text-blue-400">Remote Actions</h4>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex items-center">
+                            <span class="w-12 text-center bg-gray-800 rounded px-2 py-1 mr-2">OK</span>
+                            <span>Activate Control</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="w-12 text-center bg-gray-800 rounded px-2 py-1 mr-2">BACK</span>
+                            <span>Exit Controls</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="w-12 text-center bg-gray-800 rounded px-2 py-1 mr-2">MENU</span>
+                            <span>Settings</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="w-12 text-center bg-gray-800 rounded px-2 py-1 mr-2">HOME</span>
+                            <span>Exit Player</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- UX Improvement Summary -->
+        <div class="metric-card">
+            <h3 class="font-semibold mb-4 flex items-center">
+                <i data-lucide="lightbulb" class="w-5 h-5 mr-2"></i>
+                Backend Integration UX Improvements
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h4 class="font-medium mb-3 text-green-400">✓ Implemented Enhancements</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex items-start">
+                            <span class="text-green-500 mr-2">•</span>
+                            <span>Enhanced VideoStatusIndicator with TV-optimized display</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-green-500 mr-2">•</span>
+                            <span>Smart TV D-pad navigation with 4px focus indicators</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-green-500 mr-2">•</span>
+                            <span>Actionable error recovery with user choice options</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-green-500 mr-2">•</span>
+                            <span>Buffer health visualization with predictive quality info</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-green-500 mr-2">•</span>
+                            <span>Accessibility-first design with screen reader support</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-green-500 mr-2">•</span>
+                            <span>Performance-conscious animations and resource usage</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-medium mb-3 text-orange-400">→ Next Implementation Phase</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex items-start">
+                            <span class="text-orange-500 mr-2">•</span>
+                            <span>Real-time quality adjustment notifications</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-orange-500 mr-2">•</span>
+                            <span>Network change response automation</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-orange-500 mr-2">•</span>
+                            <span>Battery-aware streaming optimization UI</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-orange-500 mr-2">•</span>
+                            <span>Advanced CMCD (Common Media Client Data) integration</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-orange-500 mr-2">•</span>
+                            <span>P2P CDN status and bandwidth sharing UI</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-orange-500 mr-2">•</span>
+                            <span>Multi-audio track and subtitle management</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Technical Notes -->
+        <div class="metric-card">
+            <h3 class="font-semibold mb-4 flex items-center">
+                <i data-lucide="code" class="w-5 h-5 mr-2"></i>
+                Technical Implementation Notes
+            </h3>
+
+            <div class="space-y-4 text-sm">
+                <div>
+                    <h4 class="font-medium text-blue-400 mb-2">Performance Optimizations</h4>
+                    <ul class="list-disc list-inside space-y-1 text-gray-300">
+                        <li>CSS-only animations to minimize JavaScript execution</li>
+                        <li>Backdrop-filter blur effects for modern browser performance</li>
+                        <li>Efficient event delegation for control interactions</li>
+                        <li>Optimized buffer visualization with minimal reflows</li>
+                        <li>Smart TV memory constraints: &lt;100MB total usage</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-medium text-purple-400 mb-2">Accessibility Features</h4>
+                    <ul class="list-disc list-inside space-y-1 text-gray-300">
+                        <li>WCAG 2.1 AA compliant contrast ratios (4.5:1 minimum)</li>
+                        <li>Screen reader live regions for dynamic status updates</li>
+                        <li>Keyboard navigation with visible focus indicators</li>
+                        <li>Reduced motion support for vestibular disorders</li>
+                        <li>High contrast and forced colors mode compatibility</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-medium text-green-400 mb-2">Smart TV Considerations</h4>
+                    <ul class="list-disc list-inside space-y-1 text-gray-300">
+                        <li>48px minimum touch targets for remote control</li>
+                        <li>5% TV-safe area margin for overscan compensation</li>
+                        <li>18px minimum text size for 10-foot viewing distance</li>
+                        <li>Conservative bandwidth usage for Smart TV networks</li>
+                        <li>Spatial navigation patterns for D-pad control</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Screen Reader Live Region -->
+    <div aria-live="polite" aria-atomic="true" class="sr-only" id="live-region"></div>
+
+    <!-- Initialize Lucide Icons -->
+    <script>
+        lucide.createIcons();
+
+        // Simulate screen reader announcements
+        function announceToScreenReader(message) {
+            const liveRegion = document.getElementById('live-region');
+            liveRegion.textContent = message;
+        }
+
+        // Simulate dynamic updates
+        setTimeout(() => {
+            announceToScreenReader("Video quality automatically adjusted to 1080p. Buffer health excellent.");
+        }, 3000);
+
+        setTimeout(() => {
+            announceToScreenReader("Network connection improved. Switching to higher quality stream.");
+        }, 8000);
+    </script>
+</body>
+</html>

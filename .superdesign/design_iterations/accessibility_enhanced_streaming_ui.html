@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accessibility-Enhanced Streaming UI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="theme_enhanced_video_player.css">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* Enhanced Accessibility Styles */
+        .a11y-focus {
+            outline: 4px solid #3b82f6 !important;
+            outline-offset: 4px !important;
+            border-radius: 8px !important;
+        }
+
+        .high-contrast-mode {
+            filter: contrast(200%) saturate(150%);
+        }
+
+        .reduced-motion * {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+
+        .audio-description-indicator {
+            position: absolute;
+            top: 4rem;
+            right: 1rem;
+            background: rgba(59, 130, 246, 0.9);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            backdrop-filter: blur(8px);
+            border: 2px solid #3b82f6;
+        }
+
+        .caption-overlay {
+            position: absolute;
+            bottom: 6rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            text-align: center;
+            max-width: 80%;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .screen-reader-only {
+            position: absolute !important;
+            width: 1px !important;
+            height: 1px !important;
+            padding: 0 !important;
+            margin: -1px !important;
+            overflow: hidden !important;
+            clip: rect(0, 0, 0, 0) !important;
+            white-space: nowrap !important;
+            border: 0 !important;
+        }
+
+        .landmark-indicator {
+            position: absolute;
+            left: -2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #10b981;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .focus-trap-boundary {
+            border: 2px dashed rgba(59, 130, 246, 0.5);
+            border-radius: 12px;
+            position: relative;
+        }
+
+        .aria-live-region {
+            position: fixed;
+            top: -1000px;
+            left: -1000px;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+        }
+
+        .keyboard-hint {
+            position: absolute;
+            bottom: -2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(59, 130, 246, 0.9);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .control-button:focus + .keyboard-hint {
+            opacity: 1;
+        }
+
+        .audio-track-selector {
+            position: absolute;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            min-width: 300px;
+        }
+
+        .quality-announcement {
+            position: absolute;
+            top: 8rem;
+            left: 1rem;
+            background: rgba(16, 185, 129, 0.9);
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            border: 2px solid #10b981;
+            animation: slideInFade 0.5s ease-out;
+        }
+
+        @keyframes slideInFade {
+            from {
+                opacity: 0;
+                transform: translateX(-100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .motor-assist-controls {
+            position: absolute;
+            bottom: 8rem;
+            right: 1rem;
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid rgba(168, 85, 247, 0.5);
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .motor-assist-button {
+            min-width: 60px;
+            min-height: 60px;
+            margin: 0.25rem;
+            font-size: 1.5rem;
+            border: 3px solid rgba(168, 85, 247, 0.5);
+            border-radius: 12px;
+            background: rgba(168, 85, 247, 0.1);
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .motor-assist-button:hover,
+        .motor-assist-button:focus {
+            border-color: #a855f7;
+            background: rgba(168, 85, 247, 0.2);
+            transform: scale(1.1);
+        }
+
+        .cognitive-load-indicator {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background: rgba(245, 158, 11, 0.9);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            border: 2px solid #f59e0b;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white font-sans">
+    <div class="max-w-7xl mx-auto p-6">
+        <!-- Header with Accessibility Tools -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold mb-2">Accessibility-Enhanced Streaming Interface</h1>
+            <p class="text-gray-400 mb-4">
+                Advanced accessibility features for backend streaming integration - WCAG 2.1 AAA compliance
+            </p>
+
+            <!-- Accessibility Toolbar -->
+            <div class="flex flex-wrap gap-4 p-4 bg-gray-800 rounded-lg border border-gray-700">
+                <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium focus:a11y-focus">
+                    <i data-lucide="eye" class="w-4 h-4 inline mr-2"></i>
+                    High Contrast: ON
+                </button>
+                <button class="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-sm font-medium focus:a11y-focus">
+                    <i data-lucide="zap-off" class="w-4 h-4 inline mr-2"></i>
+                    Reduced Motion: ON
+                </button>
+                <button class="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-sm font-medium focus:a11y-focus">
+                    <i data-lucide="volume-2" class="w-4 h-4 inline mr-2"></i>
+                    Screen Reader: ON
+                </button>
+                <button class="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 rounded-lg text-sm font-medium focus:a11y-focus">
+                    <i data-lucide="type" class="w-4 h-4 inline mr-2"></i>
+                    Large Text: 120%
+                </button>
+                <button class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-sm font-medium focus:a11y-focus">
+                    <i data-lucide="hand" class="w-4 h-4 inline mr-2"></i>
+                    Motor Assist: ON
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Video Player with Enhanced Accessibility -->
+        <div class="focus-trap-boundary p-4" role="application" aria-label="Video Player Application">
+            <div class="landmark-indicator">MAIN</div>
+
+            <!-- Video Container -->
+            <div class="video-container relative" style="aspect-ratio: 16/9;">
+                <!-- Cognitive Load Indicator -->
+                <div class="cognitive-load-indicator">
+                    <i data-lucide="brain" class="w-4 h-4 inline mr-2"></i>
+                    Complexity: Low
+                </div>
+
+                <!-- Audio Description Indicator -->
+                <div class="audio-description-indicator">
+                    <i data-lucide="ear" class="w-4 h-4 inline mr-2"></i>
+                    Audio Description: Available
+                    <div class="text-xs mt-1">Press 'D' to toggle</div>
+                </div>
+
+                <!-- Quality Change Announcement -->
+                <div class="quality-announcement">
+                    <i data-lucide="monitor" class="w-4 h-4 inline mr-2"></i>
+                    Video quality changed to 1080p for better accessibility
+                </div>
+
+                <!-- Enhanced Caption Overlay -->
+                <div class="caption-overlay">
+                    <div class="text-lg font-medium mb-2">
+                        [Narrator speaking clearly in professional tone]
+                    </div>
+                    <div class="text-sm text-gray-300">
+                        "The streaming quality has been automatically optimized for your device capabilities."
+                    </div>
+                    <div class="mt-2 flex justify-center gap-4 text-xs">
+                        <span class="bg-blue-600 px-2 py-1 rounded">EN</span>
+                        <span class="bg-gray-600 px-2 py-1 rounded">ES available</span>
+                        <span class="bg-gray-600 px-2 py-1 rounded">Size: Large</span>
+                    </div>
+                </div>
+
+                <!-- Audio Track Selector -->
+                <div class="audio-track-selector">
+                    <h3 class="font-semibold mb-3 flex items-center">
+                        <i data-lucide="headphones" class="w-5 h-5 mr-2"></i>
+                        Audio Track Selection
+                    </h3>
+                    <div class="space-y-2">
+                        <label class="flex items-center">
+                            <input type="radio" name="audio-track" value="main" checked class="mr-3">
+                            <span>Main Audio (English)</span>
+                            <span class="ml-auto text-sm text-green-400">PLAYING</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="audio-track" value="described" class="mr-3">
+                            <span>Audio Description (English)</span>
+                            <span class="ml-auto text-sm text-gray-400">Available</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="audio-track" value="spanish" class="mr-3">
+                            <span>Spanish Audio</span>
+                            <span class="ml-auto text-sm text-gray-400">Available</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Central Play Area with Enhanced Focus -->
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <button
+                        class="control-button a11y-focus bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-full text-4xl transition-all duration-200 transform hover:scale-110"
+                        aria-label="Play video. Current state: paused. Duration: 24 minutes 30 seconds."
+                        aria-describedby="play-button-help"
+                    >
+                        <i data-lucide="play" class="w-12 h-12"></i>
+                    </button>
+                    <div class="keyboard-hint" id="play-button-help">
+                        Press Space or Enter to play
+                    </div>
+                </div>
+
+                <!-- Motor Assist Controls -->
+                <div class="motor-assist-controls">
+                    <div class="text-sm font-medium mb-3 text-purple-300">
+                        <i data-lucide="accessibility" class="w-4 h-4 inline mr-2"></i>
+                        Motor Assist Controls
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button class="motor-assist-button" aria-label="Play or pause video">
+                            <i data-lucide="play-pause" class="w-6 h-6"></i>
+                        </button>
+                        <button class="motor-assist-button" aria-label="Toggle fullscreen">
+                            <i data-lucide="maximize" class="w-6 h-6"></i>
+                        </button>
+                        <button class="motor-assist-button" aria-label="Volume control">
+                            <i data-lucide="volume-2" class="w-6 h-6"></i>
+                        </button>
+                        <button class="motor-assist-button" aria-label="Caption settings">
+                            <i data-lucide="closed-captioning" class="w-6 h-6"></i>
+                        </button>
+                    </div>
+                    <div class="text-xs text-purple-300 mt-2 text-center">
+                        Large targets • Dwell time: 2s
+                    </div>
+                </div>
+
+                <!-- Enhanced Controls Bar -->
+                <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <!-- Playback Controls with ARIA Labels -->
+                        <div class="flex items-center gap-3" role="group" aria-label="Playback controls">
+                            <button
+                                class="control-button bg-gray-700 hover:bg-gray-600 p-3 rounded-lg focus:a11y-focus"
+                                aria-label="Skip backward 10 seconds"
+                            >
+                                <i data-lucide="skip-back" class="w-5 h-5"></i>
+                                <div class="keyboard-hint">Left Arrow</div>
+                            </button>
+
+                            <button
+                                class="control-button bg-blue-600 hover:bg-blue-700 p-4 rounded-lg focus:a11y-focus"
+                                aria-label="Pause video"
+                                aria-pressed="false"
+                            >
+                                <i data-lucide="pause" class="w-6 h-6"></i>
+                                <div class="keyboard-hint">Spacebar</div>
+                            </button>
+
+                            <button
+                                class="control-button bg-gray-700 hover:bg-gray-600 p-3 rounded-lg focus:a11y-focus"
+                                aria-label="Skip forward 30 seconds"
+                            >
+                                <i data-lucide="skip-forward" class="w-5 h-5"></i>
+                                <div class="keyboard-hint">Right Arrow</div>
+                            </button>
+                        </div>
+
+                        <!-- Progress Bar with Enhanced Accessibility -->
+                        <div class="flex-1 mx-8" role="slider" aria-label="Video progress" aria-valuemin="0" aria-valuemax="1470" aria-valuenow="942" aria-valuetext="15 minutes 42 seconds of 24 minutes 30 seconds">
+                            <div class="progress-container bg-gray-600 rounded-full h-3 cursor-pointer focus:a11y-focus" tabindex="0">
+                                <div class="progress-buffer bg-gray-400 h-full rounded-full" style="width: 65%;"></div>
+                                <div class="progress-played bg-blue-500 h-full rounded-full" style="width: 45%;"></div>
+                                <div class="absolute -top-1 bg-white w-5 h-5 rounded-full border-2 border-blue-500" style="left: 45%; transform: translateX(-50%);"></div>
+                            </div>
+                            <div class="flex justify-between text-sm mt-2 text-gray-300">
+                                <span id="current-time">15:42</span>
+                                <span id="total-time">24:30</span>
+                            </div>
+                        </div>
+
+                        <!-- Feature Controls with Enhanced Labels -->
+                        <div class="flex items-center gap-3" role="group" aria-label="Video features">
+                            <button
+                                class="control-button bg-gray-700 hover:bg-gray-600 p-3 rounded-lg focus:a11y-focus"
+                                aria-label="Volume: 85%. Click to adjust"
+                                aria-expanded="false"
+                            >
+                                <i data-lucide="volume-2" class="w-5 h-5"></i>
+                                <div class="keyboard-hint">M for mute</div>
+                            </button>
+
+                            <button
+                                class="control-button bg-green-600 hover:bg-green-700 p-3 rounded-lg focus:a11y-focus"
+                                aria-label="Captions: On. English selected"
+                                aria-pressed="true"
+                            >
+                                <i data-lucide="closed-captioning" class="w-5 h-5"></i>
+                                <div class="keyboard-hint">C to toggle</div>
+                            </button>
+
+                            <button
+                                class="control-button bg-gray-700 hover:bg-gray-600 p-3 rounded-lg focus:a11y-focus"
+                                aria-label="Settings menu"
+                                aria-expanded="false"
+                            >
+                                <i data-lucide="settings" class="w-5 h-5"></i>
+                                <div class="keyboard-hint">S for settings</div>
+                            </button>
+
+                            <button
+                                class="control-button bg-gray-700 hover:bg-gray-600 p-3 rounded-lg focus:a11y-focus"
+                                aria-label="Enter fullscreen mode"
+                            >
+                                <i data-lucide="maximize" class="w-5 h-5"></i>
+                                <div class="keyboard-hint">F for fullscreen</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Status Information with ARIA Live Regions -->
+                    <div class="flex justify-between text-sm text-gray-400">
+                        <div aria-live="polite" aria-atomic="false">
+                            Quality: 1080p AUTO | Buffer: 8.2s excellent | Network: 4G stable
+                        </div>
+                        <div aria-live="polite" aria-atomic="false">
+                            Accessibility: Screen reader active | Captions on | Audio description available
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comprehensive Accessibility Status Panel -->
+        <div class="mt-8 bg-gray-800 rounded-lg p-6 border border-gray-700" role="region" aria-labelledby="a11y-status-heading">
+            <h2 id="a11y-status-heading" class="text-xl font-bold mb-4 flex items-center">
+                <i data-lucide="shield-check" class="w-6 h-6 mr-3"></i>
+                Accessibility Status Dashboard
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Visual Accessibility -->
+                <div class="bg-gray-900 p-4 rounded-lg">
+                    <h3 class="font-semibold text-blue-400 mb-3 flex items-center">
+                        <i data-lucide="eye" class="w-5 h-5 mr-2"></i>
+                        Visual Accessibility
+                    </h3>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span>High Contrast Mode</span>
+                            <span class="text-green-400">✓ Active</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Text Scaling</span>
+                            <span class="text-green-400">✓ 120%</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Color Contrast Ratio</span>
+                            <span class="text-green-400">✓ 7:1 (AAA)</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Focus Indicators</span>
+                            <span class="text-green-400">✓ 4px Blue</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Motor Accessibility -->
+                <div class="bg-gray-900 p-4 rounded-lg">
+                    <h3 class="font-semibold text-purple-400 mb-3 flex items-center">
+                        <i data-lucide="hand" class="w-5 h-5 mr-2"></i>
+                        Motor Accessibility
+                    </h3>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span>Large Touch Targets</span>
+                            <span class="text-green-400">✓ 60px min</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Dwell Time Controls</span>
+                            <span class="text-green-400">✓ 2s delay</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Keyboard Navigation</span>
+                            <span class="text-green-400">✓ Full support</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Alternative Input</span>
+                            <span class="text-green-400">✓ Voice/Switch</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cognitive Accessibility -->
+                <div class="bg-gray-900 p-4 rounded-lg">
+                    <h3 class="font-semibold text-yellow-400 mb-3 flex items-center">
+                        <i data-lucide="brain" class="w-5 h-5 mr-2"></i>
+                        Cognitive Accessibility
+                    </h3>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span>Reduced Motion</span>
+                            <span class="text-green-400">✓ Enabled</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Simple Language</span>
+                            <span class="text-green-400">✓ Grade 8</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Consistent Navigation</span>
+                            <span class="text-green-400">✓ Predictable</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Error Prevention</span>
+                            <span class="text-green-400">✓ Confirmations</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Auditory Accessibility -->
+                <div class="bg-gray-900 p-4 rounded-lg">
+                    <h3 class="font-semibold text-green-400 mb-3 flex items-center">
+                        <i data-lucide="volume-2" class="w-5 h-5 mr-2"></i>
+                        Auditory Accessibility
+                    </h3>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span>Closed Captions</span>
+                            <span class="text-green-400">✓ EN/ES</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Audio Description</span>
+                            <span class="text-green-400">✓ Available</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Sign Language</span>
+                            <span class="text-yellow-400">⚠ Optional</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Multiple Audio Tracks</span>
+                            <span class="text-green-400">✓ 3 tracks</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Screen Reader Support -->
+                <div class="bg-gray-900 p-4 rounded-lg">
+                    <h3 class="font-semibold text-indigo-400 mb-3 flex items-center">
+                        <i data-lucide="speaker" class="w-5 h-5 mr-2"></i>
+                        Screen Reader Support
+                    </h3>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span>ARIA Labels</span>
+                            <span class="text-green-400">✓ Complete</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Live Regions</span>
+                            <span class="text-green-400">✓ Dynamic updates</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Landmark Navigation</span>
+                            <span class="text-green-400">✓ MAIN/NAV</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Reading Order</span>
+                            <span class="text-green-400">✓ Logical</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Platform Compatibility -->
+                <div class="bg-gray-900 p-4 rounded-lg">
+                    <h3 class="font-semibold text-red-400 mb-3 flex items-center">
+                        <i data-lucide="smartphone" class="w-5 h-5 mr-2"></i>
+                        Platform Support
+                    </h3>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span>NVDA/JAWS</span>
+                            <span class="text-green-400">✓ Windows</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>VoiceOver</span>
+                            <span class="text-green-400">✓ macOS/iOS</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>TalkBack</span>
+                            <span class="text-green-400">✓ Android</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Smart TV Readers</span>
+                            <span class="text-yellow-400">⚠ Limited</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Keyboard Shortcuts Reference -->
+        <div class="mt-8 bg-gray-800 rounded-lg p-6 border border-gray-700" role="region" aria-labelledby="keyboard-shortcuts-heading">
+            <h2 id="keyboard-shortcuts-heading" class="text-xl font-bold mb-4 flex items-center">
+                <i data-lucide="keyboard" class="w-6 h-6 mr-3"></i>
+                Keyboard Shortcuts & Alternative Input
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="font-semibold text-blue-400 mb-3">Playback Controls</h3>
+                    <div class="space-y-2 text-sm font-mono">
+                        <div class="flex justify-between">
+                            <span class="bg-gray-900 px-2 py-1 rounded">Space</span>
+                            <span>Play/Pause</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="bg-gray-900 px-2 py-1 rounded">←</span>
+                            <span>Skip back 10s</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="bg-gray-900 px-2 py-1 rounded">→</span>
+                            <span>Skip forward 30s</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="bg-gray-900 px-2 py-1 rounded">↑/↓</span>
+                            <span>Volume control</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="font-semibold text-green-400 mb-3">Accessibility Features</h3>
+                    <div class="space-y-2 text-sm font-mono">
+                        <div class="flex justify-between">
+                            <span class="bg-gray-900 px-2 py-1 rounded">C</span>
+                            <span>Toggle captions</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="bg-gray-900 px-2 py-1 rounded">D</span>
+                            <span>Audio description</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="bg-gray-900 px-2 py-1 rounded">F</span>
+                            <span>Fullscreen</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="bg-gray-900 px-2 py-1 rounded">M</span>
+                            <span>Mute/unmute</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 p-4 bg-blue-900/20 border border-blue-800/50 rounded-lg">
+                <h4 class="font-semibold text-blue-400 mb-2">Voice Commands (if supported)</h4>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                    <div>"Play video" / "Pause video"</div>
+                    <div>"Turn on captions" / "Turn off captions"</div>
+                    <div>"Skip forward" / "Skip backward"</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ARIA Live Regions for Dynamic Announcements -->
+    <div aria-live="polite" aria-atomic="false" class="aria-live-region" id="polite-announcements"></div>
+    <div aria-live="assertive" aria-atomic="true" class="aria-live-region" id="urgent-announcements"></div>
+
+    <!-- Screen Reader Only Content -->
+    <div class="screen-reader-only">
+        <h2>Video Player Status Information</h2>
+        <p id="detailed-status">
+            Video is currently paused at 15 minutes 42 seconds of 24 minutes 30 seconds total.
+            Captions are enabled in English. Audio description is available but not currently active.
+            Video quality is set to 1080p automatic. Network connection is stable on 4G.
+            All accessibility features are properly enabled and functioning.
+        </p>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // Simulate accessibility announcements
+        function announceAccessibility(message, urgent = false) {
+            const region = document.getElementById(urgent ? 'urgent-announcements' : 'polite-announcements');
+            region.textContent = message;
+        }
+
+        // Simulate dynamic accessibility updates
+        setTimeout(() => {
+            announceAccessibility("Video quality automatically optimized for accessibility. High contrast mode active.");
+        }, 2000);
+
+        setTimeout(() => {
+            announceAccessibility("Audio description track is now available. Press D to enable.");
+        }, 5000);
+
+        setTimeout(() => {
+            announceAccessibility("Captions have been enlarged for better readability.", true);
+        }, 8000);
+
+        // Focus management demonstration
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Tab') {
+                console.log('Tab navigation - focus management active');
+            }
+        });
+
+        // Simulate Smart TV remote navigation
+        document.addEventListener('keydown', (e) => {
+            switch(e.key) {
+                case 'ArrowLeft':
+                    announceAccessibility("Navigated to previous control. Skip backward 10 seconds button selected.");
+                    break;
+                case 'ArrowRight':
+                    announceAccessibility("Navigated to next control. Skip forward 30 seconds button selected.");
+                    break;
+                case 'Enter':
+                    announceAccessibility("Control activated. Video will play in 1 second.");
+                    break;
+            }
+        });
+    </script>
+</body>
+</html>

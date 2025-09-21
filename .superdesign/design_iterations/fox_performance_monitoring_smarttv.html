@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FOX Corporation Smart TV Performance Monitor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="theme_enhanced_video_player.css">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* FOX Corporation Brand Integration */
+        :root {
+            --fox-orange: #ff6b35;
+            --fox-blue: #1e3a8a;
+            --fox-dark: #1a1a1a;
+            --fox-light: #f8fafc;
+        }
+
+        .fox-brand-header {
+            background: linear-gradient(135deg, var(--fox-orange) 0%, #e55a2b 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .performance-dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            height: 100vh;
+            padding: 2rem;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        }
+
+        .monitoring-panel {
+            background: rgba(15, 23, 42, 0.9);
+            border: 2px solid rgba(255, 107, 53, 0.3);
+            border-radius: 16px;
+            padding: 2rem;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .metric-card {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--fox-orange), var(--fox-blue));
+        }
+
+        .metric-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--fox-orange);
+            box-shadow: 0 10px 25px rgba(255, 107, 53, 0.2);
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-label {
+            font-size: 0.875rem;
+            opacity: 0.8;
+            font-weight: 500;
+        }
+
+        .metric-trend {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .trend-up {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+
+        .trend-down {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .trend-stable {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+        }
+
+        .realtime-chart {
+            height: 200px;
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 8px;
+            margin: 1rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-line {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to right,
+                transparent 0%,
+                rgba(255, 107, 53, 0.1) 20%,
+                rgba(255, 107, 53, 0.3) 50%,
+                rgba(255, 107, 53, 0.1) 80%,
+                transparent 100%
+            );
+        }
+
+        .alert-panel {
+            background: rgba(239, 68, 68, 0.1);
+            border: 2px solid rgba(239, 68, 68, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .optimization-suggestion {
+            background: rgba(34, 197, 94, 0.1);
+            border: 2px solid rgba(34, 197, 94, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .tv-safe-indicator {
+            position: fixed;
+            top: 5%;
+            left: 5%;
+            right: 5%;
+            bottom: 5%;
+            border: 2px dashed rgba(255, 107, 53, 0.3);
+            pointer-events: none;
+            border-radius: 20px;
+        }
+
+        .streaming-status {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .status-excellent { background: #22c55e; }
+        .status-good { background: #f59e0b; }
+        .status-warning { background: #ef4444; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
+        }
+
+        .qoe-score {
+            font-size: 3rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--fox-orange), var(--fox-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+            margin: 1rem 0;
+        }
+
+        .backend-integration-status {
+            background: rgba(59, 130, 246, 0.1);
+            border: 2px solid rgba(59, 130, 246, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        /* Smart TV Optimizations */
+        @media (min-width: 1920px) {
+            .metric-card {
+                padding: 2rem;
+            }
+
+            .metric-value {
+                font-size: 3rem;
+            }
+
+            .metric-label {
+                font-size: 1rem;
+            }
+        }
+
+        /* High DPI TV Support */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .monitoring-panel {
+                border-width: 3px;
+            }
+
+            .metric-card {
+                border-width: 2px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-white font-sans">
+    <!-- TV Safe Area Indicator -->
+    <div class="tv-safe-indicator"></div>
+
+    <!-- FOX Corporation Header -->
+    <div class="fox-brand-header tv-safe">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-4xl font-bold mb-2">FOX Performance Monitor</h1>
+                <p class="text-xl opacity-90">Smart TV Streaming Analytics & Optimization Dashboard</p>
+            </div>
+            <div class="text-right">
+                <div class="text-2xl font-bold">Real-Time QoE</div>
+                <div class="text-3xl font-black">94.8%</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Performance Dashboard -->
+    <div class="performance-dashboard tv-safe">
+        <!-- Left Panel: Real-Time Metrics -->
+        <div class="monitoring-panel">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold flex items-center">
+                    <i data-lucide="activity" class="w-8 h-8 mr-3 text-orange-400"></i>
+                    Real-Time Performance
+                </h2>
+                <div class="streaming-status">
+                    <div class="status-dot status-excellent"></div>
+                    <span class="text-lg font-semibold text-green-400">OPTIMAL</span>
+                </div>
+            </div>
+
+            <!-- Core Performance Metrics -->
+            <div class="metric-grid">
+                <div class="metric-card">
+                    <div class="metric-trend trend-stable">STABLE</div>
+                    <div class="metric-value text-green-400">60</div>
+                    <div class="metric-label">FPS</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-trend trend-up">↗ 5MB</div>
+                    <div class="metric-value text-yellow-400">78</div>
+                    <div class="metric-label">Memory (MB)</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-trend trend-down">↘ 3%</div>
+                    <div class="metric-value text-green-400">12</div>
+                    <div class="metric-label">CPU (%)</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-trend trend-stable">STABLE</div>
+                    <div class="metric-value text-blue-400">2.8</div>
+                    <div class="metric-label">Bitrate (Mbps)</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-trend trend-stable">GOOD</div>
+                    <div class="metric-value text-green-400">42</div>
+                    <div class="metric-label">Latency (ms)</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-trend trend-stable">PERFECT</div>
+                    <div class="metric-value text-green-400">0</div>
+                    <div class="metric-label">Dropped Frames</div>
+                </div>
+            </div>
+
+            <!-- Buffer Health Chart -->
+            <div class="mt-8">
+                <h3 class="text-xl font-semibold mb-4 flex items-center">
+                    <i data-lucide="bar-chart-3" class="w-6 h-6 mr-2"></i>
+                    Buffer Health Timeline
+                </h3>
+                <div class="realtime-chart">
+                    <div class="chart-line"></div>
+                    <div class="absolute inset-4 flex items-end justify-between text-xs opacity-60">
+                        <span>-60s</span>
+                        <span>-30s</span>
+                        <span>NOW</span>
+                    </div>
+                </div>
+                <div class="flex justify-between text-sm mt-2">
+                    <span class="text-green-400">Buffer: 8.5s (Excellent)</span>
+                    <span class="text-blue-400">Segments: 245/245</span>
+                    <span class="text-purple-400">Quality: 1080p AUTO</span>
+                </div>
+            </div>
+
+            <!-- Network Quality Analysis -->
+            <div class="mt-6">
+                <h3 class="text-xl font-semibold mb-4 flex items-center">
+                    <i data-lucide="wifi" class="w-6 h-6 mr-2"></i>
+                    Network Analysis
+                </h3>
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-green-400">4G+</div>
+                        <div class="text-sm opacity-75">Connection Type</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-green-400">8.2</div>
+                        <div class="text-sm opacity-75">Download (Mbps)</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-green-400">35</div>
+                        <div class="text-sm opacity-75">RTT (ms)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel: QoE & Optimization -->
+        <div class="monitoring-panel">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold flex items-center">
+                    <i data-lucide="trending-up" class="w-8 h-8 mr-3 text-blue-400"></i>
+                    Quality of Experience
+                </h2>
+                <div class="text-right">
+                    <div class="text-sm opacity-75">FOX Streaming Standard</div>
+                    <div class="text-lg font-semibold text-green-400">EXCEEDS TARGET</div>
+                </div>
+            </div>
+
+            <!-- QoE Score -->
+            <div class="text-center mb-8">
+                <div class="qoe-score">94.8</div>
+                <div class="text-lg opacity-75">Overall QoE Score</div>
+                <div class="text-sm text-green-400 mt-2">+2.3% vs. last hour</div>
+            </div>
+
+            <!-- Backend Integration Status -->
+            <div class="backend-integration-status">
+                <h3 class="text-lg font-semibold mb-3 flex items-center text-blue-400">
+                    <i data-lucide="server" class="w-5 h-5 mr-2"></i>
+                    Backend Integration Status
+                </h3>
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div class="flex justify-between">
+                        <span>Analytics API:</span>
+                        <span class="text-green-400">✓ CONNECTED</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Auth Service:</span>
+                        <span class="text-green-400">✓ ACTIVE</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Content ID:</span>
+                        <span class="text-blue-400">fox-content-2024</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Memory Limit:</span>
+                        <span class="text-yellow-400">100MB (78% used)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- QoE Breakdown -->
+            <div class="mt-6">
+                <h3 class="text-xl font-semibold mb-4">QoE Component Analysis</h3>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="flex items-center">
+                            <i data-lucide="zap" class="w-5 h-5 mr-2 text-green-400"></i>
+                            Startup Time
+                        </span>
+                        <div class="flex items-center gap-2">
+                            <div class="w-24 bg-gray-700 rounded-full h-2">
+                                <div class="bg-green-400 h-2 rounded-full" style="width: 95%"></div>
+                            </div>
+                            <span class="text-green-400 font-semibold">95%</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <span class="flex items-center">
+                            <i data-lucide="play" class="w-5 h-5 mr-2 text-green-400"></i>
+                            Playback Stability
+                        </span>
+                        <div class="flex items-center gap-2">
+                            <div class="w-24 bg-gray-700 rounded-full h-2">
+                                <div class="bg-green-400 h-2 rounded-full" style="width: 98%"></div>
+                            </div>
+                            <span class="text-green-400 font-semibold">98%</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <span class="flex items-center">
+                            <i data-lucide="monitor" class="w-5 h-5 mr-2 text-green-400"></i>
+                            Video Quality
+                        </span>
+                        <div class="flex items-center gap-2">
+                            <div class="w-24 bg-gray-700 rounded-full h-2">
+                                <div class="bg-green-400 h-2 rounded-full" style="width: 92%"></div>
+                            </div>
+                            <span class="text-green-400 font-semibold">92%</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <span class="flex items-center">
+                            <i data-lucide="wifi" class="w-5 h-5 mr-2 text-yellow-400"></i>
+                            Network Efficiency
+                        </span>
+                        <div class="flex items-center gap-2">
+                            <div class="w-24 bg-gray-700 rounded-full h-2">
+                                <div class="bg-yellow-400 h-2 rounded-full" style="width: 87%"></div>
+                            </div>
+                            <span class="text-yellow-400 font-semibold">87%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Smart TV Specific Metrics -->
+            <div class="mt-8">
+                <h3 class="text-xl font-semibold mb-4 flex items-center">
+                    <i data-lucide="tv" class="w-6 h-6 mr-2"></i>
+                    Smart TV Optimization
+                </h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-slate-800 p-4 rounded-lg">
+                        <div class="text-lg font-bold text-blue-400">85ms</div>
+                        <div class="text-sm opacity-75">Remote Response</div>
+                    </div>
+                    <div class="bg-slate-800 p-4 rounded-lg">
+                        <div class="text-lg font-bold text-green-400">9.2s</div>
+                        <div class="text-sm opacity-75">Channel Switch</div>
+                    </div>
+                    <div class="bg-slate-800 p-4 rounded-lg">
+                        <div class="text-lg font-bold text-purple-400">60Hz</div>
+                        <div class="text-sm opacity-75">Display Refresh</div>
+                    </div>
+                    <div class="bg-slate-800 p-4 rounded-lg">
+                        <div class="text-lg font-bold text-orange-400">HD+</div>
+                        <div class="text-sm opacity-75">TV Capability</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Optimization Recommendations -->
+            <div class="optimization-suggestion">
+                <h3 class="text-lg font-semibold mb-3 flex items-center text-green-400">
+                    <i data-lucide="lightbulb" class="w-5 h-5 mr-2"></i>
+                    Smart Optimizations Active
+                </h3>
+                <ul class="space-y-2 text-sm">
+                    <li class="flex items-start">
+                        <span class="text-green-500 mr-2">✓</span>
+                        <span>Buffer size auto-adjusted for Smart TV memory constraints</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-green-500 mr-2">✓</span>
+                        <span>Quality ladder optimized for 10-foot viewing distance</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-green-500 mr-2">✓</span>
+                        <span>Network prediction enabled for seamless streaming</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-blue-500 mr-2">→</span>
+                        <span>P2P CDN available - would reduce bandwidth by 25%</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Alert Panel -->
+            <div class="alert-panel" style="display: none;">
+                <h3 class="text-lg font-semibold mb-3 flex items-center text-red-400">
+                    <i data-lucide="alert-triangle" class="w-5 h-5 mr-2"></i>
+                    Performance Alert
+                </h3>
+                <p class="text-sm">Memory usage approaching limit. Consider reducing quality or clearing cache.</p>
+                <div class="mt-3 flex gap-2">
+                    <button class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded text-sm">
+                        Reduce Quality
+                    </button>
+                    <button class="px-4 py-2 border border-red-400 hover:bg-red-400 hover:text-black rounded text-sm">
+                        Clear Cache
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOX Corporation Footer -->
+    <div class="fox-brand-header tv-safe mt-8">
+        <div class="flex items-center justify-between text-lg">
+            <div>
+                <strong>FOX Streaming Technology</strong> • Performance monitoring optimized for Smart TV platforms
+            </div>
+            <div class="flex items-center gap-4">
+                <span class="flex items-center">
+                    <span class="status-dot status-excellent mr-2"></span>
+                    System Health: Excellent
+                </span>
+                <span>|</span>
+                <span>Last Updated: Real-time</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // Simulate real-time data updates
+        function updateMetrics() {
+            // Simulate performance variations
+            const metrics = [
+                { id: 'fps', value: 60, trend: 'stable' },
+                { id: 'memory', value: Math.floor(Math.random() * 10) + 75, trend: 'up' },
+                { id: 'cpu', value: Math.floor(Math.random() * 5) + 10, trend: 'down' },
+                { id: 'bitrate', value: (Math.random() * 0.5 + 2.5).toFixed(1), trend: 'stable' },
+                { id: 'latency', value: Math.floor(Math.random() * 10) + 35, trend: 'stable' },
+                { id: 'drops', value: 0, trend: 'stable' }
+            ];
+
+            // Update QoE score
+            const qoeScore = (94 + Math.random() * 4).toFixed(1);
+            document.querySelector('.qoe-score').textContent = qoeScore;
+
+            console.log('Performance metrics updated:', metrics);
+        }
+
+        // Update every 5 seconds
+        setInterval(updateMetrics, 5000);
+
+        // Simulate backend integration status
+        function checkBackendStatus() {
+            const backendUrl = 'https://streaming-backend-de3jgbd2a-john-diligs-projects.vercel.app';
+            console.log('Checking backend integration status:', backendUrl);
+
+            // Simulate QoE updates
+            const qoeEvent = new CustomEvent('qoe-update', {
+                detail: {
+                    score: 94.8,
+                    startup: 95,
+                    stability: 98,
+                    quality: 92,
+                    network: 87
+                }
+            });
+
+            window.dispatchEvent(qoeEvent);
+        }
+
+        // Check backend status every 30 seconds
+        setInterval(checkBackendStatus, 30000);
+
+        // Initial load
+        updateMetrics();
+        checkBackendStatus();
+
+        // Smart TV Remote simulation
+        document.addEventListener('keydown', (e) => {
+            switch(e.key) {
+                case 'ArrowUp':
+                case 'ArrowDown':
+                case 'ArrowLeft':
+                case 'ArrowRight':
+                    console.log('Smart TV remote navigation:', e.key);
+                    break;
+                case 'Enter':
+                    console.log('Smart TV remote select');
+                    break;
+            }
+        });
+    </script>
+</body>
+</html>

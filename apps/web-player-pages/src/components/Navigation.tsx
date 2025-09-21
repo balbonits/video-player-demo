@@ -47,18 +47,11 @@ const navItems: NavItem[] = [
     badgeColor: 'bg-purple-600'
   },
   {
-    href: '/chromecast',
-    label: 'Chromecast',
-    description: 'Cast receiver player',
-    badge: 'Cast',
-    badgeColor: 'bg-orange-600'
-  },
-  {
-    href: '/benchmark',
+    href: '/performance',
     label: 'Performance',
-    description: 'Performance testing tools',
-    badge: 'Test',
-    badgeColor: 'bg-red-600'
+    description: 'Lighthouse & performance monitoring',
+    badge: 'Analytics',
+    badgeColor: 'bg-purple-600'
   },
   {
     href: '/docs',

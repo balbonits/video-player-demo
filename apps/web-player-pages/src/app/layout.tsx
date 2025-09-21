@@ -9,8 +9,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "FOX Video Player Demo",
-  description: "Performance-optimized HLS video player for Smart TV/OTT platforms",
+  title: "Video Player Demo Suite",
+  description: "Performance-optimized video streaming players for Smart TV, OTT, and web platforms",
 };
 
 export default function RootLayout({

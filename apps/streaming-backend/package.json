@@ -1,11 +1,13 @@
 {
-  "name": "streaming-backend",
+  "name": "video-streaming-api",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
+    "build": "echo 'No build step required for serverless functions'",
+    "vercel-build": "echo 'Vercel build complete'",
     "test": "jest --coverage",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage --coverageReporters=text-lcov | coveralls"
@@ -24,6 +26,7 @@
   "devDependencies": {
     "@types/jest": "^30.0.0",
     "jest": "^30.1.3",
+    "jest-junit": "^16.0.0",
     "supertest": "^7.1.4"
   }
 }

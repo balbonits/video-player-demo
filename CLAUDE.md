@@ -794,3 +794,4 @@ When calling tools, you MUST use the actual tool call, do NOT just output text l
 - **Deployment**: Production deployments (Vercel push to main)
 
 **This autonomous permission structure enables continuous parallel work while maintaining oversight on critical operations.**
+- make sure to use subagents to run parallel tasks.

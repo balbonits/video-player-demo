@@ -1,0 +1,262 @@
+name: Docker CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'apps/streaming-backend/**'
+      - '.github/workflows/docker-ci.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/streaming-backend/**'
+      - '.github/workflows/docker-ci.yml'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}/streaming-backend
+
+jobs:
+  # Docker Build and Security Scan
+  docker-build:
+    name: Docker Build & Security Scan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      security-events: write
+
+    outputs:
+      image-digest: ${{ steps.build.outputs.digest }}
+      image-tag: ${{ steps.meta.outputs.tags }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,prefix=commit-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Docker image
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: apps/streaming-backend
+          target: production
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  # Docker Compose Testing
+  docker-compose-test:
+    name: Docker Compose Integration Test
+    runs-on: ubuntu-latest
+    needs: docker-build
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build test environment
+        working-directory: apps/streaming-backend
+        run: |
+          # Use locally built image for testing
+          docker build -t streaming-backend-test:latest .
+
+          # Update docker-compose to use local image
+          sed -i 's|build:|image: streaming-backend-test:latest #build:|g' docker-compose.yml
+
+      - name: Start services with Docker Compose
+        working-directory: apps/streaming-backend
+        run: |
+          docker-compose up -d streaming-backend redis
+
+          # Wait for services to be ready
+          timeout 60 bash -c 'until curl -f http://localhost:3001/health; do sleep 2; done'
+
+      - name: Run integration tests
+        working-directory: apps/streaming-backend
+        run: |
+          # Run the endpoint tests against Docker container
+          chmod +x test-endpoints.sh
+
+          # Modify script to test against running container
+          sed -i 's|npm start > /dev/null.*||g' test-endpoints.sh
+          sed -i 's|kill $SERVER_PID.*||g' test-endpoints.sh
+
+          ./test-endpoints.sh
+
+      - name: Check container health
+        working-directory: apps/streaming-backend
+        run: |
+          # Verify all containers are healthy
+          docker-compose ps
+
+          # Check logs for any errors
+          docker-compose logs streaming-backend | tail -20
+
+      - name: Performance test with Docker
+        working-directory: apps/streaming-backend
+        run: |
+          # Run load test against containerized service
+          echo "Running performance test..."
+          for i in {1..50}; do
+            curl -s http://localhost:3001/health > /dev/null &
+          done
+          wait
+          echo "Performance test completed"
+
+      - name: Cleanup
+        working-directory: apps/streaming-backend
+        if: always()
+        run: |
+          docker-compose down -v
+          docker rmi streaming-backend-test:latest || true
+
+  # Container Security Best Practices
+  container-security:
+    name: Container Security Validation
+    runs-on: ubuntu-latest
+    needs: docker-build
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Hadolint (Dockerfile linter)
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: apps/streaming-backend/Dockerfile
+          failure-threshold: warning
+
+      - name: Check for security best practices
+        working-directory: apps/streaming-backend
+        run: |
+          echo "🔒 Validating Docker security best practices..."
+
+          # Check for non-root user
+          if grep -q "USER.*[^0]" Dockerfile; then
+            echo "✅ Non-root user configured"
+          else
+            echo "❌ Container should run as non-root user"
+            exit 1
+          fi
+
+          # Check for health check
+          if grep -q "HEALTHCHECK" Dockerfile; then
+            echo "✅ Health check configured"
+          else
+            echo "⚠️  Consider adding health check"
+          fi
+
+          # Check for minimal base image
+          if grep -q "alpine" Dockerfile; then
+            echo "✅ Using minimal Alpine base image"
+          else
+            echo "⚠️  Consider using Alpine for smaller attack surface"
+          fi
+
+          # Check .dockerignore exists
+          if [[ -f .dockerignore ]]; then
+            echo "✅ .dockerignore file exists"
+          else
+            echo "❌ .dockerignore file missing"
+            exit 1
+          fi
+
+  # Production Deployment Validation
+  production-readiness:
+    name: Production Readiness Check
+    runs-on: ubuntu-latest
+    needs: [docker-build, docker-compose-test, container-security]
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate production configuration
+        working-directory: apps/streaming-backend
+        run: |
+          echo "🚀 Validating production readiness..."
+
+          # Check for production environment variables
+          if grep -q "NODE_ENV=production" Dockerfile; then
+            echo "✅ Production environment configured"
+          else
+            echo "⚠️  Production environment should be explicitly set"
+          fi
+
+          # Validate monitoring configuration
+          if [[ -f prometheus.yml ]]; then
+            echo "✅ Monitoring configuration present"
+          else
+            echo "❌ Monitoring configuration missing"
+            exit 1
+          fi
+
+          # Check for proper logging
+          if [[ -f nginx.conf ]]; then
+            echo "✅ Load balancer configuration present"
+          else
+            echo "⚠️  Load balancer configuration recommended"
+          fi
+
+      - name: Create deployment summary
+        run: |
+          echo "## 🐳 Docker Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Component | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Docker Build | ✅ Success |" >> $GITHUB_STEP_SUMMARY
+          echo "| Security Scan | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          echo "| Integration Tests | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          echo "| Container Security | ✅ Validated |" >> $GITHUB_STEP_SUMMARY
+          echo "| Production Ready | ✅ Validated |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Image:** \`${{ needs.docker-build.outputs.image-tag }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Digest:** \`${{ needs.docker-build.outputs.image-digest }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🚀 Ready for FOX Corporation Demo" >> $GITHUB_STEP_SUMMARY
+          echo "- Enterprise-grade containerization" >> $GITHUB_STEP_SUMMARY
+          echo "- Multi-platform support (AMD64/ARM64)" >> $GITHUB_STEP_SUMMARY
+          echo "- Security scanning integrated" >> $GITHUB_STEP_SUMMARY
+          echo "- Production monitoring configured" >> $GITHUB_STEP_SUMMARY
+          echo "- Load balancing and caching ready" >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,10 @@
+node_modules
+coverage
+*.test.js
+jest.config.js
+server.js
+.git
+.env.local
+.env.development
+.DS_Store
+*.md

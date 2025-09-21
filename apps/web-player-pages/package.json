@@ -13,10 +13,16 @@
     "test:performance": "jest --testPathPattern=performance",
     "test:accessibility": "jest --testPathPattern=accessibility",
     "test:integration": "jest --testPathPattern=integration",
-    "test:ci": "jest --coverage --watchAll=false --ci"
+    "test:ci": "jest --coverage --watchAll=false --ci",
+    "lighthouse": "lighthouse http://localhost:3000 --view",
+    "lighthouse:tv": "lighthouse http://localhost:3000 --preset=desktop --throttling.cpuSlowdownMultiplier=6 --view",
+    "lighthouse:mobile": "lighthouse http://localhost:3000 --preset=mobile --view",
+    "performance:analyze": "node scripts/lighthouse-report.js"
   },
   "dependencies": {
     "critters": "^0.0.23",
+    "gray-matter": "^4.0.3",
+    "markdown-to-jsx": "^7.7.13",
     "next": "^14.2.0",
     "react": "^18.3.0",
     "react-dom": "^18.3.0"

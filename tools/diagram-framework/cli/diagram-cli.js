@@ -32,7 +32,7 @@ program
 
     const wireframe = createWireframe({
       title: `${options.type} Wireframe - ${options.platform}`,
-      subtitle: `Interactive wireframe for FOX Corporation demo`,
+      subtitle: `Interactive wireframe for video player demo`,
       theme: 'fox'
     })
 

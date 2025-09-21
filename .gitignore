@@ -1,0 +1,102 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+package-lock.json
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Testing and Coverage
+coverage/
+test-results/
+.playwright/
+.nyc_output/
+*.lcov
+
+# Build outputs
+dist/
+build/
+out/
+.next/
+.nuxt/
+.vuepress/dist/
+
+# Logs
+logs/
+*.log
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Cache directories
+.npm/
+.yarn/cache/
+.cache/
+.parcel-cache/
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+tmp/
+temp/
+
+# Deployment
+.vercel/
+.netlify/
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Docker
+.docker/
+docker-compose.override.yml
+
+# Performance monitoring
+lighthouse-reports/
+performance-reports/
+
+# Security
+.secrets
+*.pem
+
+# Backup files
+*.backup
+*.bak
+*.orig

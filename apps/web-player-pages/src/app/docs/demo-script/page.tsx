@@ -15,7 +15,7 @@ export default function DemoScriptPage() {
 
         <h1 className="text-3xl font-bold mb-4">5-Minute Demo Script</h1>
         <p className="text-lg text-gray-400">
-          Perfect presentation script for FOX Corporation interviews and technical discussions
+          Professional presentation script for technical interviews and streaming platform discussions
         </p>
       </div>
 
@@ -25,12 +25,12 @@ export default function DemoScriptPage() {
           <h2 className="text-xl font-bold mb-4 text-blue-400">Opening (30 seconds)</h2>
           <div className="space-y-3 text-gray-300">
             <p className="italic">
-              "Since my time at FOX, I've been thinking about some of the accessibility and performance features
-              we always wanted to implement but never had bandwidth for. I built this video player demo to explore
-              how modern web APIs could make those features practical."
+              "Working in streaming video for major platforms, I've identified several accessibility and performance features
+              that users need but rarely get. I built this video player demo suite to showcase
+              how modern web APIs can make those features practical and performant."
             </p>
             <div className="bg-gray-900 p-3 rounded border-l-4 border-blue-500">
-              <strong>Key Message:</strong> Shows ongoing engagement with FOX technology challenges + innovation mindset
+              <strong>Key Message:</strong> Demonstrates deep streaming expertise + innovation mindset for modern platforms
             </div>
           </div>
         </div>
@@ -47,8 +47,8 @@ export default function DemoScriptPage() {
                 <strong>Show:</strong> Open HLS player, demonstrate adaptive quality switching
               </p>
               <div className="bg-gray-800 p-3 rounded text-sm">
-                <strong>Script:</strong> "This uses HLS.js - the same protocol foundation as FOX's current JW Player.
-                But I've optimized it for Smart TV constraints with 29% better performance and 21% less memory usage."
+                <strong>Script:</strong> "This uses HLS.js - the industry-standard protocol used by major streaming platforms.
+                I've optimized it for Smart TV constraints with 29% better performance and 21% less memory usage."
               </div>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>

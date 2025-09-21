@@ -93,8 +93,40 @@ const customJestConfig = {
 
   // Reporters for CI/CD integration
   reporters: [
-    'default'
+    'default',
+    ['jest-html-reporters', {
+      publicPath: './test-results/html',
+      filename: 'jest-report.html',
+      expand: true,
+      hideIcon: false,
+      pageTitle: 'Video Player Demo - Test Results',
+      logoImgPath: undefined,
+      darkTheme: false,
+    }],
+    ['jest-junit', {
+      outputDirectory: './test-results/junit',
+      outputName: 'junit.xml',
+      ancestorSeparator: ' › ',
+      uniqueOutputName: 'false',
+      suiteNameTemplate: '{filepath}',
+      classNameTemplate: '{classname}',
+      titleTemplate: '{title}',
+      includeConsoleOutput: true
+    }]
   ],
+
+  // Coverage reporters with multiple formats
+  coverageReporters: [
+    'text',
+    'text-summary',
+    'lcov',
+    'html',
+    'json',
+    'clover'
+  ],
+
+  // Coverage directory
+  coverageDirectory: './coverage',
 
 }
 

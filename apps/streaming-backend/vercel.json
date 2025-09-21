@@ -1,0 +1,80 @@
+{
+  "version": 2,
+  "rewrites": [
+    {
+      "source": "/manifest/(.*)/master.m3u8",
+      "destination": "/api/manifest/$1/master.m3u8"
+    },
+    {
+      "source": "/manifest/(.*)/video/(.*)/index.m3u8",
+      "destination": "/api/manifest/$1/video/$2/index.m3u8"
+    },
+    {
+      "source": "/segment/(.*)/(.*)/(.*).ts",
+      "destination": "/api/segment/$1/$2/$3.ts"
+    },
+    {
+      "source": "/analytics/events",
+      "destination": "/api/analytics/events"
+    },
+    {
+      "source": "/auth/validate",
+      "destination": "/api/auth/validate"
+    },
+    {
+      "source": "/bandwidth/estimate",
+      "destination": "/api/bandwidth/estimate"
+    },
+    {
+      "source": "/health",
+      "destination": "/api/health"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Content-Type, Range, X-Session-ID, X-Device-ID, Authorization"
+        },
+        {
+          "key": "Access-Control-Expose-Headers",
+          "value": "Content-Range, X-CDN-Cache, X-Edge-Location, X-Bandwidth-Estimate"
+        }
+      ]
+    },
+    {
+      "source": "/(.*)\\.m3u8",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/vnd.apple.mpegurl"
+        }
+      ]
+    },
+    {
+      "source": "/(.*)\\.ts",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "video/mp2t"
+        }
+      ]
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "github": {
+    "silent": true
+  }
+}

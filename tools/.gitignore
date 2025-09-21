@@ -1,0 +1,32 @@
+# Tools directory gitignore
+# Casey - Senior DevOps Engineer
+
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Generated files
+generated/
+output/
+build/
+dist/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Tool-specific output
+diagrams/output/
+*.svg.bak
+*.png.bak

@@ -10,6 +10,14 @@ interface ReactHLSPlayerProps {
   showPerformance?: boolean
   controls?: boolean
   className?: string
+
+  // Backend integration props
+  backendUrl?: string
+  contentId?: string
+  enableAnalytics?: boolean
+  authToken?: string
+  memoryLimit?: number
+  cpuLimit?: number
 }
 
 export default function ReactHLSPlayer({
@@ -18,7 +26,13 @@ export default function ReactHLSPlayer({
   autoplay = false,
   showPerformance = true,
   controls = true,
-  className = ''
+  className = '',
+  backendUrl = 'https://streaming-backend-gamma.vercel.app',
+  contentId = 'default-content',
+  enableAnalytics = true,
+  authToken,
+  memoryLimit,
+  cpuLimit
 }: ReactHLSPlayerProps) {
   const playerRef = useRef<HTMLElement>(null)
   const [isClient, setIsClient] = React.useState(false)
@@ -45,15 +59,21 @@ export default function ReactHLSPlayer({
       console.log('Performance metrics:', event.detail)
     }
 
+    const handleQoEUpdate = (event: CustomEvent) => {
+      console.log('QoE Update:', event.detail)
+    }
+
     const handleError = (event: CustomEvent) => {
       console.error('Player error:', event.detail)
     }
 
-    player.addEventListener('performance', handlePerformance as EventListener)
+    player.addEventListener('hls-performance', handlePerformance as EventListener)
+    player.addEventListener('qoe-update', handleQoEUpdate as EventListener)
     player.addEventListener('error', handleError as EventListener)
 
     return () => {
-      player.removeEventListener('performance', handlePerformance as EventListener)
+      player.removeEventListener('hls-performance', handlePerformance as EventListener)
+      player.removeEventListener('qoe-update', handleQoEUpdate as EventListener)
       player.removeEventListener('error', handleError as EventListener)
     }
   }, [isClient])
@@ -74,6 +94,12 @@ export default function ReactHLSPlayer({
       autoplay={autoplay}
       show-performance={showPerformance}
       controls={controls}
+      backend-url={backendUrl}
+      content-id={contentId}
+      enable-analytics={enableAnalytics}
+      auth-token={authToken}
+      memory-limit={memoryLimit}
+      cpu-limit={cpuLimit}
       className={className}
     />
   )

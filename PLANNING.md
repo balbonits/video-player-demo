@@ -12,7 +12,7 @@
 ### **Primary Goal: Working Video Player Demo**
 **Duration:** 2-4 hours (realistic estimate based on retrospective learnings)
 **Scope:** Web browser only, core features, professional quality
-**Success Criteria:** Functional HLS video player ready for FOX presentation
+**Success Criteria:** Functional HLS video player ready for professional demonstration
 
 ### **Learning Objectives for John:**
 - **Next.js Fundamentals:** Pages Router project structure and configuration
@@ -230,7 +230,7 @@
   - [ ] Demo functionality verified
   - [ ] Talking points prepared
   - [ ] Technical documentation ready
-  - [ ] FOX interview readiness confirmed
+  - [ ] Professional presentation readiness confirmed
 
 ---
 
@@ -275,7 +275,7 @@ Total: 160 minutes (2h 40m)
 ### **Demo Success:**
 - [ ] **Deployment:** Live demo at video-demo.jdilig.me
 - [ ] **Functionality:** All features work in production environment
-- [ ] **Presentation:** Ready for FOX Corporation demonstration
+- [ ] **Presentation:** Ready for professional technical demonstration
 - [ ] **Professional Quality:** Clean, polished, enterprise-level implementation
 
 ---
