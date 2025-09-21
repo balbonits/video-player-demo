@@ -115,7 +115,8 @@ class HLSVideoPlayer extends HTMLElement {
     this.initializeVideoPlayer()
     this.setupPerformanceOptimization()
     this.startPerformanceMonitoring()
-    this.setupEventListeners()
+    // Delay event listeners setup to ensure DOM is ready
+    setTimeout(() => this.setupEventListeners(), 0)
   }
 
   disconnectedCallback() {
@@ -226,6 +227,11 @@ class HLSVideoPlayer extends HTMLElement {
         .progress-container {
           flex: 1;
           margin: 0 12px;
+          padding: 10px 0; /* Increase click target area */
+          cursor: pointer;
+          position: relative;
+          display: flex;
+          align-items: center;
         }
 
         .progress-bar {
@@ -235,6 +241,13 @@ class HLSVideoPlayer extends HTMLElement {
           border-radius: 3px;
           position: relative;
           cursor: pointer;
+          touch-action: none; /* Prevent touch scrolling while seeking */
+          transition: height 0.2s ease;
+        }
+
+        .progress-bar:hover {
+          height: 10px;
+          margin: -2px 0;
         }
 
         .progress-fill {
@@ -242,6 +255,9 @@ class HLSVideoPlayer extends HTMLElement {
           background: #0066cc;
           border-radius: 3px;
           transition: width 0.1s ease;
+          pointer-events: none; /* Let clicks pass through to parent */
+          position: relative;
+          z-index: 2;
         }
 
         .progress-buffer {
@@ -251,6 +267,8 @@ class HLSVideoPlayer extends HTMLElement {
           border-radius: 3px;
           top: 0;
           left: 0;
+          pointer-events: none; /* Let clicks pass through to parent */
+          z-index: 1;
         }
 
         .time-display {
@@ -372,10 +390,69 @@ class HLSVideoPlayer extends HTMLElement {
 
     if (!this.video) return
 
+    // Set up video-specific event listeners now that video element exists
+    this.setupVideoEventListeners()
+
     const src = this.getAttribute('src')
     if (src) {
       this.loadVideo(src)
     }
+  }
+
+  private setupVideoEventListeners() {
+    if (!this.video) return
+
+    // Video play event
+    this.video.addEventListener('play', () => {
+      const playPauseBtn = this.shadow.getElementById('play-pause')
+      if (playPauseBtn) {
+        playPauseBtn.textContent = '⏸️'
+        playPauseBtn.setAttribute('aria-label', 'Pause video')
+      }
+    })
+
+    // Video pause event
+    this.video.addEventListener('pause', () => {
+      const playPauseBtn = this.shadow.getElementById('play-pause')
+      if (playPauseBtn) {
+        playPauseBtn.textContent = '▶️'
+        playPauseBtn.setAttribute('aria-label', 'Play video')
+      }
+    })
+
+    // Time updates
+    this.video.addEventListener('timeupdate', () => {
+      this.updateTimeDisplay()
+      this.updateProgressBar()
+    })
+
+    // Video metadata loaded - important for seeking functionality
+    this.video.addEventListener('loadedmetadata', () => {
+      this.updateTimeDisplay()
+      console.log('[HLSVideoPlayer] Video metadata loaded, duration:', this.video?.duration)
+      // Enable seeking now that metadata is available
+      this.dispatchPerformanceEvent('metadata-loaded', {
+        duration: this.video?.duration,
+        readyState: this.video?.readyState
+      })
+    })
+
+    // Additional event for data availability
+    this.video.addEventListener('loadeddata', () => {
+      console.log('[HLSVideoPlayer] Video data loaded, ready for playback')
+    })
+
+    // Monitor for duration changes (important for HLS streams)
+    this.video.addEventListener('durationchange', () => {
+      console.log('[HLSVideoPlayer] Duration changed to:', this.video?.duration)
+      this.updateTimeDisplay()
+    })
+
+    // Video error handling
+    this.video.addEventListener('error', (e) => {
+      console.error('Video error:', e)
+      this.performanceMetrics.errorCount++
+    })
   }
 
   private async loadVideo(src: string) {
@@ -1012,44 +1089,30 @@ class HLSVideoPlayer extends HTMLElement {
   }
 
   private setupEventListeners() {
-    if (!this.video) return
+    // Get video element reference - it might not be available yet
+    const getVideoElement = () => {
+      return this.video || (this.shadow.querySelector('.video-element') as HTMLVideoElement)
+    }
 
     // Play/Pause button
     const playPauseBtn = this.shadow.getElementById('play-pause')
     playPauseBtn?.addEventListener('click', async () => {
-      if (this.video?.paused) {
+      const video = getVideoElement()
+      if (!video) return
+
+      if (video.paused) {
         try {
-          await this.video.play()
+          await video.play()
         } catch (error) {
           console.log('Play was interrupted:', error)
         }
       } else {
-        this.video?.pause()
+        video.pause()
       }
     })
 
-    // Video events
-    this.video.addEventListener('play', () => {
-      const playPauseBtn = this.shadow.getElementById('play-pause')
-      if (playPauseBtn) {
-        playPauseBtn.textContent = '⏸️'
-        playPauseBtn.setAttribute('aria-label', 'Pause video')
-      }
-    })
-
-    this.video.addEventListener('pause', () => {
-      const playPauseBtn = this.shadow.getElementById('play-pause')
-      if (playPauseBtn) {
-        playPauseBtn.textContent = '▶️'
-        playPauseBtn.setAttribute('aria-label', 'Play video')
-      }
-    })
-
-    // Time updates
-    this.video.addEventListener('timeupdate', () => {
-      this.updateTimeDisplay()
-      this.updateProgressBar()
-    })
+    // Video events are now set up in setupVideoEventListeners()
+    // which is called after video element is properly initialized
 
     // Quality selector
     const qualitySelector = this.shadow.getElementById('quality')
@@ -1058,36 +1121,120 @@ class HLSVideoPlayer extends HTMLElement {
       this.changeQuality(target.value)
     })
 
-    // Volume/Mute button
+    // Volume/Mute button with lazy video reference
     const volumeBtn = this.shadow.getElementById('volume')
     volumeBtn?.addEventListener('click', () => {
-      if (!this.video) return
+      const video = getVideoElement()
+      if (!video) {
+        console.warn('Volume control: Video element not found')
+        return
+      }
 
-      if (this.video.muted || this.video.volume === 0) {
-        this.video.muted = false
-        this.video.volume = 1
+      if (video.muted || video.volume === 0) {
+        video.muted = false
+        video.volume = 1
         volumeBtn.textContent = '🔊'
         volumeBtn.setAttribute('aria-label', 'Mute volume')
       } else {
-        this.video.muted = true
+        video.muted = true
         volumeBtn.textContent = '🔇'
         volumeBtn.setAttribute('aria-label', 'Unmute volume')
       }
     })
 
-    // Progress bar seeking
+    // Progress bar seeking with improved handling and debugging
+    const progressContainer = this.shadow.querySelector('.progress-container') as HTMLElement
     const progressBar = this.shadow.querySelector('.progress-bar') as HTMLElement
-    progressBar?.addEventListener('click', (event) => {
-      if (!this.video || !isFinite(this.video.duration)) return
 
-      const rect = progressBar.getBoundingClientRect()
-      const clickX = event.clientX - rect.left
-      const percentage = clickX / rect.width
-      const newTime = percentage * this.video.duration
+    // Main seek handler function
+    const handleSeek = (event: MouseEvent) => {
+      event.preventDefault()
+      event.stopPropagation()
 
-      if (isFinite(newTime) && newTime >= 0 && newTime <= this.video.duration) {
-        this.video.currentTime = newTime
+      // Get the video element
+      const video = getVideoElement()
+      if (!video) {
+        console.warn('[HLSVideoPlayer] Video element not available for seeking')
+        return
       }
+
+      // Check if video metadata is loaded (readyState >= 1 means metadata is available)
+      if (video.readyState < HTMLMediaElement.HAVE_METADATA) {
+        console.warn('[HLSVideoPlayer] Video metadata not loaded yet, readyState:', video.readyState)
+        return
+      }
+
+      const duration = video.duration
+
+      // Check if duration is valid
+      if (!isFinite(duration) || duration <= 0) {
+        console.warn('[HLSVideoPlayer] Invalid video duration:', duration)
+        return
+      }
+
+      // Use progressBar for accurate position calculation
+      const targetElement = progressBar || progressContainer
+      if (!targetElement) {
+        console.warn('[HLSVideoPlayer] Progress bar element not found')
+        return
+      }
+
+      const rect = targetElement.getBoundingClientRect()
+      const clickX = Math.max(0, Math.min(event.clientX - rect.left, rect.width))
+      const percentage = clickX / rect.width
+      const newTime = percentage * duration
+
+      // Validate and apply the new time
+      if (isFinite(newTime) && newTime >= 0 && newTime <= duration) {
+        try {
+          video.currentTime = newTime
+          // Force update progress bar immediately for visual feedback
+          this.updateProgressBar()
+          console.log(`[HLSVideoPlayer] Seeking to ${newTime.toFixed(2)}s of ${duration.toFixed(2)}s (${(percentage * 100).toFixed(1)}%)`)
+        } catch (error) {
+          console.error('[HLSVideoPlayer] Error setting video time:', error)
+        }
+      } else {
+        console.warn('[HLSVideoPlayer] Invalid seek time:', newTime)
+      }
+    }
+
+    // Add click handler to both container and bar for better UX
+    progressContainer?.addEventListener('click', handleSeek)
+    progressBar?.addEventListener('click', handleSeek)
+
+    // Add drag-to-seek functionality for better UX
+    let isDragging = false
+    progressContainer?.addEventListener('mousedown', (event) => {
+      event.preventDefault()
+      isDragging = true
+      handleSeek(event) // Seek immediately on mousedown
+
+      const onMouseMove = (moveEvent: MouseEvent) => {
+        if (isDragging) {
+          handleSeek(moveEvent)
+        }
+      }
+
+      const onMouseUp = () => {
+        isDragging = false
+        document.removeEventListener('mousemove', onMouseMove)
+        document.removeEventListener('mouseup', onMouseUp)
+      }
+
+      document.addEventListener('mousemove', onMouseMove)
+      document.addEventListener('mouseup', onMouseUp)
+    })
+
+    // Touch support for mobile devices
+    progressContainer?.addEventListener('touchstart', (event) => {
+      event.preventDefault()
+      const touch = event.touches[0]
+      const mouseEvent = new MouseEvent('click', {
+        clientX: touch.clientX,
+        clientY: touch.clientY
+      })
+      handleSeek(mouseEvent)
     })
 
     // Fullscreen
@@ -1105,43 +1252,46 @@ class HLSVideoPlayer extends HTMLElement {
   }
 
   private async handleKeyboardInput(event: KeyboardEvent) {
+    // Get video element reference
+    const video = this.video || (this.shadow.querySelector('.video-element') as HTMLVideoElement)
+
     // Smart TV D-pad navigation
     switch (event.key) {
       case ' ':
       case 'Enter':
         event.preventDefault()
-        if (this.video) {
-          if (this.video.paused) {
+        if (video) {
+          if (video.paused) {
             try {
-              await this.video.play()
+              await video.play()
             } catch (error) {
               console.log('Play was interrupted:', error)
             }
           } else {
-            this.video.pause()
+            video.pause()
           }
         }
         break
 
       case 'ArrowLeft':
         event.preventDefault()
-        if (this.video && !isNaN(this.video.duration) && isFinite(this.video.currentTime)) {
-          const newTime = Math.max(0, this.video.currentTime - 10)
+        if (video && !isNaN(video.duration) && isFinite(video.currentTime)) {
+          const newTime = Math.max(0, video.currentTime - 10)
           if (isFinite(newTime)) {
-            this.video.currentTime = newTime
+            video.currentTime = newTime
           }
         }
         break
 
       case 'ArrowRight':
         event.preventDefault()
-        if (this.video && !isNaN(this.video.duration) && isFinite(this.video.currentTime)) {
+        if (video && !isNaN(video.duration) && isFinite(video.currentTime)) {
           const newTime = Math.min(
-            this.video.duration || 0,
-            this.video.currentTime + 10
+            video.duration || 0,
+            video.currentTime + 10
           )
           if (isFinite(newTime)) {
-            this.video.currentTime = newTime
+            video.currentTime = newTime
           }
         }
         break
@@ -1172,15 +1322,22 @@ class HLSVideoPlayer extends HTMLElement {
     const progressFill = this.shadow.querySelector('.progress-fill') as HTMLElement
     const progressBuffer = this.shadow.querySelector('.progress-buffer') as HTMLElement
 
-    if (progressFill && this.video.duration) {
+    // Check if duration is valid before updating progress
+    if (progressFill && isFinite(this.video.duration) && this.video.duration > 0) {
       const progress = (this.video.currentTime / this.video.duration) * 100
-      progressFill.style.width = `${progress}%`
+      progressFill.style.width = `${Math.min(100, Math.max(0, progress))}%`
     }
 
-    if (progressBuffer && this.video.buffered.length > 0 && this.video.duration) {
-      const buffered = this.video.buffered.end(this.video.buffered.length - 1)
-      const bufferProgress = (buffered / this.video.duration) * 100
-      progressBuffer.style.width = `${bufferProgress}%`
+    // Update buffer indicator
+    if (progressBuffer && this.video.buffered.length > 0 && isFinite(this.video.duration) && this.video.duration > 0) {
+      try {
+        const buffered = this.video.buffered.end(this.video.buffered.length - 1)
+        const bufferProgress = (buffered / this.video.duration) * 100
+        progressBuffer.style.width = `${Math.min(100, Math.max(0, bufferProgress))}%`
+      } catch (e) {
+        // Buffered range may not be available yet
+        progressBuffer.style.width = '0%'
+      }
     }
   }
 

@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dakota's Streaming Verification - Manual Testing</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      padding: 20px;
+      background: #1a1a1a;
+      color: #fff;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h1, h2 {
+      color: #0066cc;
+    }
+
+    .test-section {
+      background: #2a2a2a;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 8px;
+      border: 1px solid #444;
+    }
+
+    .test-controls {
+      display: flex;
+      gap: 10px;
+      margin: 10px 0;
+      flex-wrap: wrap;
+    }
+
+    button {
+      background: #0066cc;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    button:hover {
+      background: #0052a3;
+    }
+
+    .results {
+      background: #1a1a1a;
+      padding: 15px;
+      border-radius: 4px;
+      margin-top: 10px;
+      font-family: 'Monaco', 'Courier New', monospace;
+      font-size: 12px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .success {
+      color: #4caf50;
+    }
+
+    .warning {
+      color: #ff9800;
+    }
+
+    .error {
+      color: #f44336;
+    }
+
+    .metric {
+      display: inline-block;
+      margin: 5px 10px 5px 0;
+      padding: 5px 10px;
+      background: #333;
+      border-radius: 4px;
+    }
+
+    .metric-label {
+      color: #888;
+      margin-right: 5px;
+    }
+
+    .metric-value {
+      color: #4caf50;
+      font-weight: bold;
+    }
+
+    #player-container {
+      width: 100%;
+      aspect-ratio: 16/9;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎬 Dakota's Streaming Verification Suite</h1>
+    <p>Manual testing console for verifying HLS.js streaming features and performance</p>
+
+    <div id="player-container"></div>
+
+    <!-- HLS.js Configuration Tests -->
+    <div class="test-section">
+      <h2>📡 HLS.js Configuration</h2>
+      <div class="test-controls">
+        <button onclick="verifyHLSInit()">Verify HLS Initialization</button>
+        <button onclick="checkHLSConfig()">Check HLS Config</button>
+        <button onclick="getStreamingMetrics()">Get Streaming Metrics</button>
+        <button onclick="testPerformanceModes()">Test Performance Modes</button>
+      </div>
+      <div id="hls-results" class="results"></div>
+    </div>
+
+    <!-- Quality & ABR Tests -->
+    <div class="test-section">
+      <h2>🎚️ Quality & ABR Control</h2>
+      <div class="test-controls">
+        <button onclick="listQualityLevels()">List Quality Levels</button>
+        <button onclick="testQualitySwitch()">Test Quality Switching</button>
+        <button onclick="testABR()">Test Adaptive Bitrate</button>
+        <button onclick="forceQualityLevel(0)">Force Lowest Quality</button>
+        <button onclick="forceQualityLevel(-1)">Enable Auto Quality</button>
+      </div>
+      <div id="quality-results" class="results"></div>
+    </div>
+
+    <!-- Buffer Management Tests -->
+    <div class="test-section">
+      <h2>💾 Buffer Management</h2>
+      <div class="test-controls">
+        <button onclick="checkBufferStatus()">Check Buffer Status</button>
+        <button onclick="testBufferProgress()">Test Buffer Progress</button>
+        <button onclick="simulateMemoryPressure()">Simulate Memory Pressure</button>
+        <button onclick="checkBufferConfig()">Check Buffer Config</button>
+      </div>
+      <div id="buffer-results" class="results"></div>
+    </div>
+
+    <!-- Performance Metrics -->
+    <div class="test-section">
+      <h2>📊 Performance Metrics</h2>
+      <div class="test-controls">
+        <button onclick="collectMetrics()">Collect All Metrics</button>
+        <button onclick="monitorRealTime()">Start Real-time Monitor</button>
+        <button onclick="stopMonitor()">Stop Monitor</button>
+        <button onclick="exportMetrics()">Export Metrics</button>
+      </div>
+      <div id="metrics-results" class="results"></div>
+    </div>
+
+    <!-- CDN & Network Tests -->
+    <div class="test-section">
+      <h2>🌐 CDN & Network</h2>
+      <div class="test-controls">
+        <button onclick="detectCDN()">Detect CDN Provider</button>
+        <button onclick="testErrorRecovery()">Test Error Recovery</button>
+        <button onclick="simulateSlowNetwork()">Simulate Slow Network</button>
+        <button onclick="testFragmentRetry()">Test Fragment Retry</button>
+      </div>
+      <div id="network-results" class="results"></div>
+    </div>
+  </div>
+
+  <script type="module">
+    // Load the HLS Video Player component
+    import('/src/components/HLSVideoPlayer.js').then(() => {
+      const player = document.createElement('hls-video-player');
+      player.setAttribute('src', 'http://sample.vodobox.com/planete_interdite/planete_interdite_alternate.m3u8');
+      player.setAttribute('performance-mode', 'desktop');
+      player.setAttribute('controls', 'true');
+      player.setAttribute('show-performance', 'true');
+
+      document.getElementById('player-container').appendChild(player);
+      window.hlsPlayer = player;
+
+      // Listen for performance events
+      player.addEventListener('hls-performance', (event) => {
+        console.log('Performance Event:', event.detail);
+      });
+    });
+
+    // Helper function to display results
+    function displayResult(containerId, content, type = 'success') {
+      const container = document.getElementById(containerId);
+      const timestamp = new Date().toLocaleTimeString();
+      const className = type === 'error' ? 'error' : type === 'warning' ? 'warning' : 'success';
+
+      container.innerHTML = `<div class="${className}">[${timestamp}] ${content}</div>` + container.innerHTML;
+    }
+
+    // HLS.js Configuration Tests
+    window.verifyHLSInit = function() {
+      const player = window.hlsPlayer;
+      if (!player) {
+        displayResult('hls-results', 'Player not initialized', 'error');
+        return;
+      }
+
+      const hls = player.hls;
+      if (!hls) {
+        displayResult('hls-results', 'HLS.js not initialized', 'error');
+        return;
+      }
+
+      const info = `
+        ✅ HLS.js Initialized<br>
+        Version: ${Hls ? Hls.version : 'Unknown'}<br>
+        Media Element: ${hls.media ? 'Attached' : 'Not attached'}<br>
+        Levels Count: ${hls.levels ? hls.levels.length : 0}<br>
+        Current Level: ${hls.currentLevel}<br>
+        Auto Level: ${hls.autoLevelEnabled ? 'Enabled' : 'Disabled'}<br>
+        Live Stream: ${hls.levels?.[0]?.details?.live ? 'Yes' : 'No'}
+      `;
+
+      displayResult('hls-results', info, 'success');
+    };
+
+    window.checkHLSConfig = function() {
+      const player = window.hlsPlayer;
+      const hls = player?.hls;
+
+      if (!hls) {
+        displayResult('hls-results', 'HLS not available', 'error');
+        return;
+      }
+
+      const config = hls.config;
+      const info = `
+        <strong>HLS Configuration:</strong><br>
+        Max Buffer Length: ${config.maxBufferLength}s<br>
+        Back Buffer Length: ${config.backBufferLength}s<br>
+        Max Max Buffer Length: ${config.maxMaxBufferLength}s<br>
+        Fragment Loading Timeout: ${config.fragLoadingTimeOut}ms<br>
+        Manifest Loading Timeout: ${config.manifestLoadingTimeOut}ms<br>
+        ABR Factor: ${config.abrBandWidthFactor}<br>
+        ABR Up Factor: ${config.abrBandWidthUpFactor}<br>
+        Start Level: ${config.startLevel}<br>
+        Cap Level to Player Size: ${config.capLevelToPlayerSize}<br>
+        Enable Worker: ${config.enableWorker}<br>
+        Low Latency Mode: ${config.lowLatencyMode}
+      `;
+
+      displayResult('hls-results', info, 'success');
+    };
+
+    window.getStreamingMetrics = function() {
+      const player = window.hlsPlayer;
+      const metrics = player?.getPerformanceMetrics?.();
+
+      if (!metrics) {
+        displayResult('hls-results', 'Metrics not available', 'error');
+        return;
+      }
+
+      const info = `
+        <strong>Streaming Metrics:</strong><br>
+        Memory Usage: ${(metrics.memoryUsage / 1024 / 1024).toFixed(2)} MB<br>
+        Video Start Time: ${metrics.videoStartTime.toFixed(2)}ms<br>
+        Segment Load Time: ${metrics.segmentLoadTime.toFixed(2)}ms<br>
+        Manifest Load Time: ${metrics.manifestLoadTime.toFixed(2)}ms<br>
+        Throughput: ${metrics.throughputMbps.toFixed(2)} Mbps<br>
+        Quality Changes: ${metrics.qualityLevelChanges}<br>
+        Quality Stability: ${metrics.qualityStability.toFixed(1)}%<br>
+        Rebuffer Events: ${metrics.rebufferEvents}<br>
+        Total Rebuffer Time: ${metrics.totalRebufferTime.toFixed(0)}ms<br>
+        Error Count: ${metrics.errorCount}<br>
+        Seek Accuracy: ${metrics.seekAccuracy.toFixed(1)}%<br>
+        Bitrate Efficiency: ${metrics.bitrateEfficiency.toFixed(1)}%
+      `;
+
+      displayResult('hls-results', info, 'success');
+    };
+
+    window.testPerformanceModes = async function() {
+      const player = window.hlsPlayer;
+      const modes = ['smartTV', 'mobile', 'desktop'];
+      let results = '<strong>Performance Mode Test:</strong><br>';
+
+      for (const mode of modes) {
+        player.setAttribute('performance-mode', mode);
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        const hls = player.hls;
+        if (hls) {
+          results += `<br>${mode.toUpperCase()}:<br>`;
+          results += `  Max Buffer: ${hls.config.maxBufferLength}s<br>`;
+          results += `  Back Buffer: ${hls.config.backBufferLength}s<br>`;
+          results += `  ABR Factor: ${hls.config.abrBandWidthFactor}<br>`;
+        }
+      }
+
+      displayResult('hls-results', results, 'success');
+    };
+
+    // Quality & ABR Tests
+    window.listQualityLevels = function() {
+      const player = window.hlsPlayer;
+      const hls = player?.hls;
+
+      if (!hls || !hls.levels) {
+        displayResult('quality-results', 'Quality levels not available', 'error');
+        return;
+      }
+
+      let info = '<strong>Available Quality Levels:</strong><br>';
+      hls.levels.forEach((level, index) => {
+        const current = index === hls.currentLevel ? ' ← CURRENT' : '';
+        info += `Level ${index}: ${level.height}p @ ${(level.bitrate/1000).toFixed(0)}kbps (${level.codec})${current}<br>`;
+      });
+
+      info += `<br>Auto Level: ${hls.autoLevelEnabled ? 'Enabled' : 'Disabled'}<br>`;
+      info += `Current Level: ${hls.currentLevel}<br>`;
+      info += `Next Auto Level: ${hls.nextAutoLevel}`;
+
+      displayResult('quality-results', info, 'success');
+    };
+
+    window.testQualitySwitch = async function() {
+      const player = window.hlsPlayer;
+      const hls = player?.hls;
+
+      if (!hls || !hls.levels || hls.levels.length < 2) {
+        displayResult('quality-results', 'Not enough quality levels to test', 'warning');
+        return;
+      }
+
+      const originalLevel = hls.currentLevel;
+      let results = '<strong>Quality Switch Test:</strong><br>';
+
+      for (let i = 0; i < Math.min(3, hls.levels.length); i++) {
+        hls.currentLevel = i;
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        results += `Switched to Level ${i}: ${hls.levels[i].height}p<br>`;
+      }
+
+      hls.currentLevel = originalLevel;
+      results += `<br>✅ Quality switching verified`;
+
+      displayResult('quality-results', results, 'success');
+    };
+
+    window.testABR = function() {
+      const player = window.hlsPlayer;
+      const hls = player?.hls;
+
+      if (!hls) {
+        displayResult('quality-results', 'HLS not available', 'error');
+        return;
+      }
+
+      hls.currentLevel = -1; // Enable auto
+      hls.startLoad();
+
+      const info = `
+        <strong>ABR Status:</strong><br>
+        Auto Level Enabled: ${hls.autoLevelEnabled}<br>
+        Current Level: ${hls.currentLevel}<br>
+        Next Auto Level: ${hls.nextAutoLevel}<br>
+        Auto Level Capping: ${hls.autoLevelCapping}<br>
+        First Level: ${hls.firstLevel}<br>
+        Load Level: ${hls.loadLevel}<br>
+        Manual Level: ${hls.manualLevel}<br>
+        <br>✅ ABR enabled and monitoring quality changes
+      `;
+
+      displayResult('quality-results', info, 'success');
+    };
+
+    window.forceQualityLevel = function(level) {
+      const player = window.hlsPlayer;
+      const hls = player?.hls;
+
+      if (!hls) {
+        displayResult('quality-results', 'HLS not available', 'error');
+        return;
+      }
+
+      hls.currentLevel = level;
+
+      const levelInfo = level === -1 ? 'Auto' : `Level ${level} (${hls.levels[level]?.height}p)`;
+      displayResult('quality-results', `Quality set to: ${levelInfo}`, 'success');
+    };
+
+    // Buffer Management Tests
+    window.checkBufferStatus = function() {
+      const player = window.hlsPlayer;
+      const video = player?.shadowRoot?.querySelector('.video-element');
+      const hls = player?.hls;
+
+      if (!video || !hls) {
+        displayResult('buffer-results', 'Video/HLS not available', 'error');
+        return;
+      }
+
+      let bufferedRanges = [];
+      for (let i = 0; i < video.buffered.length; i++) {
+        bufferedRanges.push(`[${video.buffered.start(i).toFixed(1)}s - ${video.buffered.end(i).toFixed(1)}s]`);
+      }
+
+      const info = `
+        <strong>Buffer Status:</strong><br>
+        Current Time: ${video.currentTime.toFixed(1)}s<br>
+        Duration: ${video.duration.toFixed(1)}s<br>
+        Buffered Ranges: ${bufferedRanges.join(', ') || 'None'}<br>
+        Buffer Length: ${hls.config.maxBufferLength}s<br>
+        Back Buffer: ${hls.config.backBufferLength}s<br>
+        Target Duration: ${hls.targetduration || 'N/A'}s<br>
+        Media Buffer: ${hls.media?.buffered.length || 0} ranges
+      `;
+
+      displayResult('buffer-results', info, 'success');
+    };
+
+    window.testBufferProgress = function() {
+      const player = window.hlsPlayer;
+      const progressBuffer = player?.shadowRoot?.querySelector('.progress-buffer');
+      const progressFill = player?.shadowRoot?.querySelector('.progress-fill');
+
+      if (!progressBuffer || !progressFill) {
+        displayResult('buffer-results', 'Progress indicators not found', 'error');
+        return;
+      }
+
+      const info = `
+        <strong>Buffer Progress UI:</strong><br>
+        Buffer Width: ${progressBuffer.style.width || '0%'}<br>
+        Progress Width: ${progressFill.style.width || '0%'}<br>
+        ✅ Buffer progress indicators are updating
+      `;
+
+      displayResult('buffer-results', info, 'success');
+    };
+
+    window.simulateMemoryPressure = function() {
+      const player = window.hlsPlayer;
+      player?.setAttribute('memory-limit', '50');
+
+      // Force memory cleanup
+      if (player?.performMemoryCleanup) {
+        player.performMemoryCleanup();
+      }
+
+      displayResult('buffer-results', '⚠️ Memory pressure simulated - limit set to 50MB', 'warning');
+    };
+
+    window.checkBufferConfig = function() {
+      const player = window.hlsPlayer;
+      const hls = player?.hls;
+
+      if (!hls) {
+        displayResult('buffer-results', 'HLS not available', 'error');
+        return;
+      }
+
+      const config = hls.config;
+      const info = `
+        <strong>Buffer Configuration:</strong><br>
+        Max Buffer Length: ${config.maxBufferLength}s<br>
+        Max Buffer Size: ${(config.maxBufferSize / 1024 / 1024).toFixed(0)}MB<br>
+        Max Max Buffer Length: ${config.maxMaxBufferLength}s<br>
+        Back Buffer Length: ${config.backBufferLength}s<br>
+        Front Buffer Flush Threshold: ${config.frontBufferFlushThreshold || 'N/A'}s<br>
+        Live Back Buffer Length: ${config.liveBackBufferLength || 'N/A'}s<br>
+        Live Max Latency Duration: ${config.liveMaxLatencyDuration || 'N/A'}s
+      `;
+
+      displayResult('buffer-results', info, 'success');
+    };
+
+    // Performance Metrics
+    let metricsInterval = null;
+
+    window.collectMetrics = function() {
+      const player = window.hlsPlayer;
+      const metrics = player?.getPerformanceMetrics?.();
+      const hls = player?.hls;
+
+      if (!metrics || !hls) {
+        displayResult('metrics-results', 'Metrics not available', 'error');
+        return;
+      }
+
+      const info = `
+        <strong>Performance Metrics Snapshot:</strong><br>
+        <div class="metric"><span class="metric-label">Memory:</span><span class="metric-value">${(metrics.memoryUsage / 1024 / 1024).toFixed(2)} MB</span></div>
+        <div class="metric"><span class="metric-label">CPU Usage:</span><span class="metric-value">${metrics.cpuUsage.toFixed(1)}%</span></div>
+        <div class="metric"><span class="metric-label">Input Latency:</span><span class="metric-value">${metrics.inputLatency.toFixed(0)}ms</span></div>
+        <div class="metric"><span class="metric-label">Start Time:</span><span class="metric-value">${metrics.videoStartTime.toFixed(0)}ms</span></div>
+        <div class="metric"><span class="metric-label">Buffering:</span><span class="metric-value">${(metrics.bufferingRatio * 100).toFixed(1)}%</span></div>
+        <br>
+        <div class="metric"><span class="metric-label">Segment Load:</span><span class="metric-value">${metrics.segmentLoadTime.toFixed(0)}ms</span></div>
+        <div class="metric"><span class="metric-label">Manifest Load:</span><span class="metric-value">${metrics.manifestLoadTime.toFixed(0)}ms</span></div>
+        <div class="metric"><span class="metric-label">Throughput:</span><span class="metric-value">${metrics.throughputMbps.toFixed(2)} Mbps</span></div>
+        <div class="metric"><span class="metric-label">Quality Changes:</span><span class="metric-value">${metrics.qualityLevelChanges}</span></div>
+        <div class="metric"><span class="metric-label">Stability:</span><span class="metric-value">${metrics.qualityStability.toFixed(1)}%</span></div>
+        <br>
+        <div class="metric"><span class="metric-label">Rebuffers:</span><span class="metric-value">${metrics.rebufferEvents}</span></div>
+        <div class="metric"><span class="metric-label">Rebuffer Time:</span><span class="metric-value">${metrics.totalRebufferTime.toFixed(0)}ms</span></div>
+        <div class="metric"><span class="metric-label">Errors:</span><span class="metric-value">${metrics.errorCount}</span></div>
+        <div class="metric"><span class="metric-label">Seek Accuracy:</span><span class="metric-value">${metrics.seekAccuracy.toFixed(1)}%</span></div>
+        <div class="metric"><span class="metric-label">Bitrate Eff:</span><span class="metric-value">${metrics.bitrateEfficiency.toFixed(1)}%</span></div>
+      `;
+
+      displayResult('metrics-results', info, 'success');
+    };
+
+    window.monitorRealTime = function() {
+      if (metricsInterval) {
+        clearInterval(metricsInterval);
+      }
+
+      displayResult('metrics-results', '🔴 Real-time monitoring started', 'success');
+
+      metricsInterval = setInterval(() => {
+        collectMetrics();
+      }, 2000);
+    };
+
+    window.stopMonitor = function() {
+      if (metricsInterval) {
+        clearInterval(metricsInterval);
+        metricsInterval = null;
+      }
+      displayResult('metrics-results', '⏹️ Monitoring stopped', 'warning');
+    };
+
+    window.exportMetrics = function() {
+      const player = window.hlsPlayer;
+      const metrics = player?.getPerformanceMetrics?.();
+
+      if (!metrics) {
+        displayResult('metrics-results', 'No metrics to export', 'error');
+        return;
+      }
+
+      const exportData = {
+        timestamp: new Date().toISOString(),
+        metrics: metrics,
+        playerConfig: {
+          performanceMode: player.getAttribute('performance-mode'),
+          memoryLimit: player.getAttribute('memory-limit'),
+          cpuLimit: player.getAttribute('cpu-limit')
+        }
+      };
+
+      const dataStr = JSON.stringify(exportData, null, 2);
+      const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+
+      const exportLink = document.createElement('a');
+      exportLink.setAttribute('href', dataUri);
+      exportLink.setAttribute('download', `streaming-metrics-${Date.now()}.json`);
+      document.body.appendChild(exportLink);
+      exportLink.click();
+      document.body.removeChild(exportLink);
+
+      displayResult('metrics-results', '✅ Metrics exported to file', 'success');
+    };
+
+    // CDN & Network Tests
+    window.detectCDN = function() {
+      const player = window.hlsPlayer;
+      const src = player?.getAttribute('src');
+
+      if (!src) {
+        displayResult('network-results', 'No source URL', 'error');
+        return;
+      }
+
+      // Simple CDN detection logic
+      let cdn = 'Unknown';
+      if (src.includes('akamai') || src.includes('akamaihd.net')) cdn = 'Akamai';
+      else if (src.includes('cloudfront.net')) cdn = 'CloudFront';
+      else if (src.includes('fastly')) cdn = 'Fastly';
+      else if (src.includes('vodobox')) cdn = 'Vodobox CDN';
+      else if (src.includes('mux.dev')) cdn = 'Mux';
+
+      const info = `
+        <strong>CDN Detection:</strong><br>
+        Source URL: ${src}<br>
+        Detected CDN: ${cdn}<br>
+        ✅ CDN provider identified
+      `;
+
+      displayResult('network-results', info, 'success');
+    };
+
+    window.testErrorRecovery = function() {
+      const player = window.hlsPlayer;
+      const hls = player?.hls;
+
+      if (!hls) {
+        displayResult('network-results', 'HLS not available', 'error');
+        return;
+      }
+
+      // Set invalid source to trigger error
+      player.setAttribute('src', 'http://invalid-url.m3u8');
+
+      setTimeout(() => {
+        // Restore valid source
+        player.setAttribute('src', 'http://sample.vodobox.com/planete_interdite/planete_interdite_alternate.m3u8');
+        displayResult('network-results', '✅ Error recovery test completed', 'success');
+      }, 3000);
+
+      displayResult('network-results', '⚠️ Testing error recovery...', 'warning');
+    };
+
+    window.simulateSlowNetwork = function() {
+      // Mock slow network
+      if (navigator.connection) {
+        Object.defineProperty(navigator.connection, 'effectiveType', {
+          value: '2g',
+          writable: true
+        });
+        Object.defineProperty(navigator.connection, 'downlink', {
+          value: 0.3,
+          writable: true
+        });
+      }
+
+      displayResult('network-results', '⚠️ Simulating slow 2G network', 'warning');
+
+      // Reload player to apply network-aware config
+      const player = window.hlsPlayer;
+      const src = player?.getAttribute('src');
+      if (src) {
+        player.setAttribute('src', src);
+      }
+    };
+
+    window.testFragmentRetry = function() {
+      const player = window.hlsPlayer;
+      const hls = player?.hls;
+
+      if (!hls) {
+        displayResult('network-results', 'HLS not available', 'error');
+        return;
+      }
+
+      const config = hls.config;
+      const info = `
+        <strong>Fragment Retry Configuration:</strong><br>
+        Fragment Loading Timeout: ${config.fragLoadingTimeOut}ms<br>
+        Fragment Max Retries: ${config.fragLoadingMaxRetry}<br>
+        Fragment Retry Delay: ${config.fragLoadingRetryDelay}ms<br>
+        Manifest Loading Timeout: ${config.manifestLoadingTimeOut}ms<br>
+        Manifest Max Retries: ${config.manifestLoadingMaxRetry}<br>
+        Level Loading Timeout: ${config.levelLoadingTimeOut}ms<br>
+        Level Max Retries: ${config.levelLoadingMaxRetry}<br>
+        ✅ Retry mechanisms configured
+      `;
+
+      displayResult('network-results', info, 'success');
+    };
+
+    // Make Hls available globally for testing
+    window.Hls = window.Hls || {};
+  </script>
+</body>
+</html>

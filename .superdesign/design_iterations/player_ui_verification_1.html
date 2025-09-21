@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FOX Video Player UI Verification</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --background: oklch(0.1448 0 0);
+            --foreground: oklch(0.9851 0 0);
+            --card: oklch(0.2046 0 0);
+            --card-hover: oklch(0.2546 0 0);
+            --primary: oklch(0.6489 0.2370 200);
+            --accent: oklch(0.5635 0.2408 260.8178);
+            --success: oklch(0.7323 0.2492 142.4953);
+            --warning: oklch(0.8680 0.2110 85);
+            --error: oklch(0.5770 0.2450 27.3250);
+            --border: oklch(0.3046 0 0);
+            --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+            --radius: 0.5rem;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.3), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+        }
+
+        body {
+            background: var(--background);
+            color: var(--foreground);
+            font-family: var(--font-sans);
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            transition: all 0.2s ease;
+        }
+
+        .card:hover {
+            background: var(--card-hover);
+            box-shadow: var(--shadow);
+        }
+
+        .performance-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .badge-smarttv {
+            background: oklch(0.5555 0.2000 220);
+            color: white;
+        }
+
+        .badge-mobile {
+            background: oklch(0.5931 0.2726 280);
+            color: white;
+        }
+
+        .badge-desktop {
+            background: var(--success);
+            color: white;
+        }
+
+        .player-selector {
+            position: relative;
+            width: 100%;
+        }
+
+        .player-option {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.2s ease;
+            cursor: pointer;
+        }
+
+        .player-option:hover {
+            background: var(--card-hover);
+        }
+
+        .player-option.active {
+            background: oklch(0.2546 0.1 220);
+            border-left: 3px solid var(--primary);
+        }
+
+        .stream-button {
+            padding: 0.75rem;
+            border-radius: var(--radius);
+            background: var(--card);
+            border: 1px solid var(--border);
+            color: var(--foreground);
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+
+        .stream-button:hover {
+            background: var(--card-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .stream-button.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .video-container {
+            background: black;
+            border-radius: var(--radius);
+            overflow: hidden;
+            position: relative;
+            min-height: 400px;
+            height: 60vh;
+        }
+
+        .dropdown-expanded {
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .performance-metric {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            background: oklch(0.1948 0 0);
+            border-radius: 0.25rem;
+            border: 1px solid var(--border);
+        }
+
+        .metric-icon {
+            width: 1.5rem;
+            height: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @media (max-width: 768px) {
+            .video-container {
+                height: 40vh;
+                min-height: 250px;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8">
+    <!-- Header -->
+    <header class="text-center mb-8">
+        <h1 class="text-3xl md:text-4xl font-bold mb-2">FOX Video Player Demo</h1>
+        <p class="text-gray-400 text-base md:text-lg mb-4">
+            Performance-optimized HLS video player for Smart TV/OTT platforms
+        </p>
+        <div class="flex justify-center">
+            <div class="performance-badge badge-smarttv">
+                <span>📺</span>
+                <span>Smart TV Mode</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto">
+        <!-- Player Version Selector -->
+        <div class="mb-6">
+            <div class="player-selector card">
+                <div class="p-4 cursor-pointer" onclick="toggleDropdown()">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <span class="text-2xl">📺</span>
+                            <div>
+                                <h3 class="text-lg font-semibold">HLS.js Performance</h3>
+                                <p class="text-sm text-gray-400">HLS.js + Web Components</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="performance-badge badge-smarttv text-xs">smartTV</span>
+                            <svg id="dropdown-arrow" class="w-5 h-5 text-gray-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dropdown Options -->
+                <div id="dropdown-content" class="hidden">
+                    <div class="player-option active">
+                        <div class="flex items-start gap-3">
+                            <span class="text-2xl mt-1">📺</span>
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h4 class="font-semibold">HLS.js Performance</h4>
+                                    <span class="performance-badge badge-smarttv text-xs">smartTV</span>
+                                </div>
+                                <p class="text-sm text-gray-400 mb-2">Optimized HLS.js implementation with Smart TV constraints</p>
+                                <div class="text-xs text-green-400">✓ Memory pool management</div>
+                                <div class="text-xs text-green-400">✓ Smart TV buffering strategy</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="player-option">
+                        <div class="flex items-start gap-3">
+                            <span class="text-2xl mt-1">🌐</span>
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h4 class="font-semibold">Native HTML5 Video</h4>
+                                    <span class="performance-badge badge-desktop text-xs">desktop</span>
+                                </div>
+                                <p class="text-sm text-gray-400 mb-2">Browser-native HLS support for maximum compatibility</p>
+                                <div class="text-xs text-green-400">✓ Native HLS on Safari/iOS</div>
+                                <div class="text-xs text-green-400">✓ Minimal JavaScript overhead</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="player-option">
+                        <div class="flex items-start gap-3">
+                            <span class="text-2xl mt-1">📱</span>
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h4 class="font-semibold">Mobile Optimized</h4>
+                                    <span class="performance-badge badge-mobile text-xs">mobile</span>
+                                </div>
+                                <p class="text-sm text-gray-400 mb-2">Battery and bandwidth optimized for mobile devices</p>
+                                <div class="text-xs text-green-400">✓ Battery usage optimization</div>
+                                <div class="text-xs text-green-400">✓ Touch gesture controls</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="player-option">
+                        <div class="flex items-start gap-3">
+                            <span class="text-2xl mt-1">🟣</span>
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h4 class="font-semibold">Roku TV Simulation</h4>
+                                    <span class="performance-badge badge-smarttv text-xs">smartTV</span>
+                                </div>
+                                <p class="text-sm text-gray-400 mb-2">Simulates Roku Smart TV hardware constraints</p>
+                                <div class="text-xs text-green-400">✓ Limited to 256MB memory simulation</div>
+                                <div class="text-xs text-green-400">✓ BrightScript-style navigation</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="player-option">
+                        <div class="flex items-start gap-3">
+                            <span class="text-2xl mt-1">📱➡️📺</span>
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h4 class="font-semibold">Chromecast Receiver</h4>
+                                    <span class="performance-badge badge-smarttv text-xs">smartTV</span>
+                                </div>
+                                <p class="text-sm text-gray-400 mb-2">Chromecast Cast Application Framework optimization</p>
+                                <div class="text-xs text-green-400">✓ Cast Application Framework integration</div>
+                                <div class="text-xs text-green-400">✓ Remote control via mobile</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="player-option">
+                        <div class="flex items-start gap-3">
+                            <span class="text-2xl mt-1">⚡</span>
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h4 class="font-semibold">Performance Benchmark</h4>
+                                    <span class="performance-badge badge-desktop text-xs">desktop</span>
+                                </div>
+                                <p class="text-sm text-gray-400 mb-2">Real-time performance monitoring and optimization showcase</p>
+                                <div class="text-xs text-green-400">✓ Real-time performance metrics</div>
+                                <div class="text-xs text-green-400">✓ Memory usage monitoring</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Video Player Container -->
+        <div class="video-container mb-6 flex items-center justify-center">
+            <div class="text-white text-center">
+                <div class="mb-4">
+                    <svg class="w-16 h-16 mx-auto animate-pulse" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <p class="text-lg">Video Player Active</p>
+                <p class="text-sm text-gray-400 mt-2">HLS.js Performance Mode</p>
+            </div>
+        </div>
+
+        <!-- Stream Source Selector -->
+        <div class="card p-4 mb-6">
+            <h3 class="text-lg font-semibold mb-3" style="color: oklch(0.6489 0.2370 180)">Stream Source</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <button class="stream-button active">
+                    <div class="font-semibold text-sm">Mux Test Stream</div>
+                    <div class="text-xs mt-1 opacity-80">High quality adaptive streaming</div>
+                </button>
+                <button class="stream-button">
+                    <div class="font-semibold text-sm">Apple Test Stream</div>
+                    <div class="text-xs mt-1 opacity-80">Apple HLS reference</div>
+                </button>
+                <button class="stream-button">
+                    <div class="font-semibold text-sm">Tears of Steel (4K)</div>
+                    <div class="text-xs mt-1 opacity-80">4K video content</div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Performance Metrics -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="card p-4">
+                <h4 class="text-lg font-semibold mb-3 flex items-center gap-2">
+                    <span>⚡</span>
+                    Performance Optimizations
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    <div class="text-sm text-green-400">✓ Memory pool management</div>
+                    <div class="text-sm text-green-400">✓ Smart TV buffering</div>
+                    <div class="text-sm text-green-400">✓ Hardware acceleration</div>
+                    <div class="text-sm text-green-400">✓ D-pad navigation</div>
+                </div>
+            </div>
+
+            <div class="card p-4">
+                <h3 class="text-lg font-semibold mb-3" style="color: oklch(0.8680 0.2110 85)">Player Information</h3>
+                <div class="space-y-3">
+                    <div>
+                        <h4 class="font-semibold mb-1">Technology Stack</h4>
+                        <p class="text-sm text-gray-400">HLS.js + Web Components</p>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold mb-1">Performance Mode</h4>
+                        <div class="performance-badge badge-smarttv">
+                            <span>📺</span>
+                            <span>Smart TV</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Targets -->
+        <div class="mt-6 card p-6">
+            <h3 class="text-xl font-semibold mb-4" style="color: oklch(0.5770 0.2450 27)">FOX Performance Targets</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="performance-metric">
+                    <div class="metric-icon">💾</div>
+                    <div>
+                        <div class="text-sm font-semibold">Memory</div>
+                        <div class="text-xs text-gray-400">&lt; 100MB</div>
+                    </div>
+                </div>
+                <div class="performance-metric">
+                    <div class="metric-icon">⚡</div>
+                    <div>
+                        <div class="text-sm font-semibold">CPU</div>
+                        <div class="text-xs text-gray-400">&lt; 30%</div>
+                    </div>
+                </div>
+                <div class="performance-metric">
+                    <div class="metric-icon">⏱️</div>
+                    <div>
+                        <div class="text-sm font-semibold">Response</div>
+                        <div class="text-xs text-gray-400">&lt; 150ms</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function toggleDropdown() {
+            const dropdown = document.getElementById('dropdown-content');
+            const arrow = document.getElementById('dropdown-arrow');
+
+            if (dropdown.classList.contains('hidden')) {
+                dropdown.classList.remove('hidden');
+                dropdown.classList.add('dropdown-expanded');
+                arrow.style.transform = 'rotate(180deg)';
+            } else {
+                dropdown.classList.add('hidden');
+                dropdown.classList.remove('dropdown-expanded');
+                arrow.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        // Simulate player switching
+        document.querySelectorAll('.player-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.player-option').forEach(o => o.classList.remove('active'));
+                this.classList.add('active');
+                console.log('Player switched');
+            });
+        });
+
+        // Simulate stream source switching
+        document.querySelectorAll('.stream-button').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('.stream-button').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                console.log('Stream source changed');
+            });
+        });
+    </script>
+</body>
+</html>

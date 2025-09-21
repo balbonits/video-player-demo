@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Volume Controls - HLS Video Player</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #FF4500;
+        }
+
+        .player-wrapper {
+            width: 100%;
+            max-width: 800px;
+            aspect-ratio: 16/9;
+            margin: 0 auto;
+            border: 2px solid #FF4500;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .test-info {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .test-info h2 {
+            color: #FF4500;
+            margin-bottom: 10px;
+        }
+
+        .test-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .test-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .test-list li:last-child {
+            border-bottom: none;
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 4px;
+        }
+
+        #console-log {
+            margin-top: 20px;
+            padding: 10px;
+            background: #000;
+            border: 1px solid #333;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            margin: 2px 0;
+            color: #0f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>HLS Video Player - Volume Controls Test</h1>
+
+        <div class="player-wrapper">
+            <hls-video-player
+                id="test-player"
+                src="http://sample.vodobox.com/planete_interdite/planete_interdite_alternate.m3u8"
+                controls="true"
+                autoplay="false"
+                performance-mode="desktop">
+            </hls-video-player>
+        </div>
+
+        <div class="test-info">
+            <h2>Volume Control Tests</h2>
+            <ul class="test-list">
+                <li>✅ Click the volume button (🔊/🔇) to toggle mute</li>
+                <li>✅ Volume should toggle between muted and unmuted states</li>
+                <li>✅ Button icon should change when toggling</li>
+                <li>✅ Aria-label should update for accessibility</li>
+                <li>✅ Check browser console for any errors</li>
+            </ul>
+
+            <div class="status">
+                <strong>Status:</strong> <span id="player-status">Loading player...</span>
+            </div>
+
+            <div id="console-log">
+                <div class="log-entry">Console output:</div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Load the HLS Video Player component
+        import('/src/components/HLSVideoPlayer.js').then(module => {
+            console.log('HLS Video Player component loaded');
+
+            const player = document.getElementById('test-player');
+            const status = document.getElementById('player-status');
+            const consoleLog = document.getElementById('console-log');
+
+            // Helper to log messages
+            function log(message) {
+                const entry = document.createElement('div');
+                entry.className = 'log-entry';
+                entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+                consoleLog.appendChild(entry);
+                consoleLog.scrollTop = consoleLog.scrollHeight;
+                console.log(message);
+            }
+
+            // Wait for player to be ready
+            setTimeout(() => {
+                status.textContent = 'Player ready - Testing volume controls';
+                status.style.color = '#0f0';
+
+                // Access shadow DOM to test volume button
+                const shadowRoot = player.shadowRoot;
+                if (shadowRoot) {
+                    const volumeBtn = shadowRoot.getElementById('volume');
+                    const video = shadowRoot.querySelector('.video-element');
+
+                    if (volumeBtn) {
+                        log('Volume button found ✓');
+
+                        // Add listener to track volume changes
+                        if (video) {
+                            video.addEventListener('volumechange', () => {
+                                log(`Volume changed: muted=${video.muted}, volume=${video.volume}`);
+                            });
+
+                            // Test clicking the volume button
+                            setTimeout(() => {
+                                log('Testing volume button click...');
+                                volumeBtn.click();
+
+                                setTimeout(() => {
+                                    log(`After click: muted=${video.muted}, icon="${volumeBtn.textContent}"`);
+                                }, 100);
+                            }, 2000);
+                        } else {
+                            log('Warning: Video element not found');
+                        }
+                    } else {
+                        log('ERROR: Volume button not found in shadow DOM');
+                        status.textContent = 'Error: Volume button not found';
+                        status.style.color = '#f00';
+                    }
+                } else {
+                    log('ERROR: Shadow DOM not accessible');
+                    status.textContent = 'Error: Shadow DOM not accessible';
+                    status.style.color = '#f00';
+                }
+            }, 1000);
+
+            // Listen for player events
+            player.addEventListener('performance-metric', (e) => {
+                if (e.detail.type === 'video-ready') {
+                    log('Video ready event received');
+                }
+            });
+
+        }).catch(error => {
+            console.error('Failed to load HLS Video Player:', error);
+            document.getElementById('player-status').textContent = 'Error loading player: ' + error.message;
+        });
+
+        // Override console methods to capture all logs
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.textContent = `[LOG] ${args.join(' ')}`;
+            document.getElementById('console-log').appendChild(entry);
+        };
+
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.style.color = '#f00';
+            entry.textContent = `[ERROR] ${args.join(' ')}`;
+            document.getElementById('console-log').appendChild(entry);
+        };
+
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.style.color = '#ff0';
+            entry.textContent = `[WARN] ${args.join(' ')}`;
+            document.getElementById('console-log').appendChild(entry);
+        };
+    </script>
+</body>
+</html>

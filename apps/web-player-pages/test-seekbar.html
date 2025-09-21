@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Player Seekbar Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a1a;
+            color: white;
+        }
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .status {
+            background: #2a2a2a;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .status h2 {
+            margin: 0 0 10px 0;
+            color: #0066cc;
+        }
+        .test-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .info-item {
+            background: #3a3a3a;
+            padding: 8px 12px;
+            border-radius: 4px;
+        }
+        .info-label {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 4px;
+        }
+        .info-value {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .test-controls {
+            background: #2a2a2a;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .test-button {
+            background: #0066cc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            margin: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .test-button:hover {
+            background: #0052a3;
+        }
+        .console-log {
+            background: #1a1a1a;
+            border: 1px solid #444;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .log-entry {
+            margin: 2px 0;
+        }
+        .log-entry.info { color: #66d9ef; }
+        .log-entry.warn { color: #f4bf75; }
+        .log-entry.error { color: #f92672; }
+        .log-entry.success { color: #a6e22e; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="status">
+            <h2>🎬 Video Player Seekbar Test</h2>
+            <p>This test page verifies that the seekbar/progress bar is working correctly.</p>
+            <div class="test-info">
+                <div class="info-item">
+                    <div class="info-label">Video State</div>
+                    <div class="info-value" id="videoState">Not Loaded</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Ready State</div>
+                    <div class="info-value" id="readyState">0</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Duration</div>
+                    <div class="info-value" id="duration">0:00</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Current Time</div>
+                    <div class="info-value" id="currentTime">0:00</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Progress</div>
+                    <div class="info-value" id="progress">0%</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Seekbar Clicks</div>
+                    <div class="info-value" id="seekCount">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Import the HLS Video Player Web Component -->
+        <script type="module" src="/src/components/HLSVideoPlayer.js"></script>
+
+        <!-- Video Player Component -->
+        <hls-video-player
+            src="http://sample.vodobox.com/planete_interdite/planete_interdite_alternate.m3u8"
+            performance-mode="desktop">
+        </hls-video-player>
+
+        <div class="test-controls">
+            <h3>Test Controls</h3>
+            <button class="test-button" onclick="testSeek(0)">Seek to Start</button>
+            <button class="test-button" onclick="testSeek(0.25)">Seek to 25%</button>
+            <button class="test-button" onclick="testSeek(0.5)">Seek to 50%</button>
+            <button class="test-button" onclick="testSeek(0.75)">Seek to 75%</button>
+            <button class="test-button" onclick="testSeek(0.95)">Seek to 95%</button>
+            <button class="test-button" onclick="clearConsole()">Clear Log</button>
+
+            <div class="console-log" id="consoleLog"></div>
+        </div>
+    </div>
+
+    <script>
+        let seekCount = 0;
+        const player = document.querySelector('hls-video-player');
+        const consoleLog = document.getElementById('consoleLog');
+
+        // Override console methods to capture logs
+        const originalLog = console.log;
+        const originalWarn = console.warn;
+        const originalError = console.error;
+
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addLogEntry('info', args.join(' '));
+        };
+
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            addLogEntry('warn', args.join(' '));
+        };
+
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addLogEntry('error', args.join(' '));
+        };
+
+        function addLogEntry(type, message) {
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            consoleLog.insertBefore(entry, consoleLog.firstChild);
+
+            // Keep only last 50 entries
+            while (consoleLog.children.length > 50) {
+                consoleLog.removeChild(consoleLog.lastChild);
+            }
+        }
+
+        function clearConsole() {
+            consoleLog.innerHTML = '';
+            addLogEntry('info', 'Console cleared');
+        }
+
+        // Monitor video state
+        function updateStatus() {
+            const shadow = player.shadowRoot;
+            const video = shadow?.querySelector('.video-element');
+
+            if (video) {
+                const readyStateText = ['HAVE_NOTHING', 'HAVE_METADATA', 'HAVE_CURRENT_DATA', 'HAVE_FUTURE_DATA', 'HAVE_ENOUGH_DATA'];
+
+                document.getElementById('videoState').textContent = video.paused ? 'Paused' : 'Playing';
+                document.getElementById('readyState').textContent = `${video.readyState} (${readyStateText[video.readyState] || 'Unknown'})`;
+                document.getElementById('duration').textContent = formatTime(video.duration);
+                document.getElementById('currentTime').textContent = formatTime(video.currentTime);
+
+                if (isFinite(video.duration) && video.duration > 0) {
+                    const progress = (video.currentTime / video.duration) * 100;
+                    document.getElementById('progress').textContent = `${progress.toFixed(1)}%`;
+                } else {
+                    document.getElementById('progress').textContent = '0%';
+                }
+            }
+        }
+
+        function formatTime(seconds) {
+            if (!isFinite(seconds)) return '0:00';
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function testSeek(percentage) {
+            const shadow = player.shadowRoot;
+            const video = shadow?.querySelector('.video-element');
+            const progressBar = shadow?.querySelector('.progress-bar');
+
+            if (!video || !progressBar) {
+                addLogEntry('error', 'Video or progress bar not found');
+                return;
+            }
+
+            if (!isFinite(video.duration) || video.duration <= 0) {
+                addLogEntry('warn', `Cannot seek - invalid duration: ${video.duration}`);
+                return;
+            }
+
+            const seekTime = video.duration * percentage;
+
+            // Simulate a click on the progress bar
+            const rect = progressBar.getBoundingClientRect();
+            const clickX = rect.left + (rect.width * percentage);
+            const clickY = rect.top + (rect.height / 2);
+
+            const clickEvent = new MouseEvent('click', {
+                view: window,
+                bubbles: true,
+                cancelable: true,
+                clientX: clickX,
+                clientY: clickY
+            });
+
+            progressBar.dispatchEvent(clickEvent);
+
+            seekCount++;
+            document.getElementById('seekCount').textContent = seekCount;
+
+            addLogEntry('success', `Simulated click at ${(percentage * 100).toFixed(0)}% - seeking to ${seekTime.toFixed(2)}s`);
+        }
+
+        // Listen for performance events from the player
+        player.addEventListener('hls-performance', (event) => {
+            if (event.detail.type === 'metadata-loaded') {
+                addLogEntry('success', `Metadata loaded - Duration: ${event.detail.data.duration}s, Ready State: ${event.detail.data.readyState}`);
+            }
+        });
+
+        // Update status every 100ms
+        setInterval(updateStatus, 100);
+
+        // Initial log
+        addLogEntry('info', 'Test page loaded - waiting for video to load...');
+    </script>
+</body>
+</html>

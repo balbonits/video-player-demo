@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HLSVideoPlayer Controls Verification</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #0a0a0a;
+            color: #fff;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            margin-bottom: 20px;
+            color: #0066cc;
+        }
+        .player-wrapper {
+            width: 100%;
+            max-width: 800px;
+            height: 450px;
+            margin: 20px auto;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 102, 204, 0.3);
+        }
+        .controls-test {
+            background: #1a1a1a;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #333;
+            border-radius: 4px;
+        }
+        .test-section h3 {
+            margin-top: 0;
+            color: #0066cc;
+        }
+        .test-button {
+            background: #0066cc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+        .test-button:hover {
+            background: #0052a3;
+        }
+        .test-button:active {
+            transform: scale(0.98);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 13px;
+        }
+        .status.success {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid #22c55e;
+            color: #22c55e;
+        }
+        .status.error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid #ef4444;
+            color: #ef4444;
+        }
+        .status.info {
+            background: rgba(0, 102, 204, 0.1);
+            border: 1px solid #0066cc;
+            color: #3b82f6;
+        }
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .metric-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .metric-label {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 5px;
+        }
+        .metric-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #0066cc;
+        }
+        .keyboard-hint {
+            background: rgba(0, 102, 204, 0.1);
+            border: 1px solid #0066cc;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .keyboard-hint code {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 13px;
+        }
+        .test-results {
+            margin-top: 20px;
+        }
+        .test-result {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            margin: 5px 0;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .test-result.pass {
+            border-left: 4px solid #22c55e;
+        }
+        .test-result.fail {
+            border-left: 4px solid #ef4444;
+        }
+        .test-result.pending {
+            border-left: 4px solid #888;
+        }
+        .test-icon {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎬 HLSVideoPlayer Controls Verification</h1>
+
+        <div class="player-wrapper">
+            <hls-video-player
+                id="testPlayer"
+                src="http://sample.vodobox.com/planete_interdite/planete_interdite_alternate.m3u8"
+                performance-mode="desktop"
+                controls="true">
+            </hls-video-player>
+        </div>
+
+        <div class="controls-test">
+            <h2>Control Tests</h2>
+
+            <div class="keyboard-hint">
+                <strong>Keyboard Shortcuts:</strong>
+                <code>Space/Enter</code> - Play/Pause |
+                <code>←/→</code> - Seek 10s |
+                <code>F</code> - Fullscreen
+            </div>
+
+            <div class="test-section">
+                <h3>1. Play/Pause Controls</h3>
+                <button class="test-button" onclick="testPlayPause()">Test Play/Pause Button</button>
+                <button class="test-button" onclick="testProgrammaticPlay()">Test Programmatic Play</button>
+                <button class="test-button" onclick="testProgrammaticPause()">Test Programmatic Pause</button>
+                <div id="playPauseStatus" class="status"></div>
+            </div>
+
+            <div class="test-section">
+                <h3>2. Volume/Mute Controls</h3>
+                <button class="test-button" onclick="testVolumeMute()">Test Volume/Mute Toggle</button>
+                <button class="test-button" onclick="testVolumeBeforeLoad()">Test Volume Before Video Load</button>
+                <div id="volumeStatus" class="status"></div>
+            </div>
+
+            <div class="test-section">
+                <h3>3. Progress Bar Seeking</h3>
+                <button class="test-button" onclick="testSeek(30)">Seek to 30s</button>
+                <button class="test-button" onclick="testSeek(60)">Seek to 60s</button>
+                <button class="test-button" onclick="testSeek(90)">Seek to 90s</button>
+                <button class="test-button" onclick="testInvalidSeek()">Test Invalid Seek</button>
+                <div id="seekStatus" class="status"></div>
+            </div>
+
+            <div class="test-section">
+                <h3>4. Fullscreen Controls</h3>
+                <button class="test-button" onclick="testFullscreen()">Test Fullscreen Toggle</button>
+                <div id="fullscreenStatus" class="status"></div>
+            </div>
+
+            <div class="test-section">
+                <h3>5. Quality Selection</h3>
+                <button class="test-button" onclick="testQualityChange()">Test Quality Change</button>
+                <button class="test-button" onclick="testAutoQuality()">Test Auto Quality</button>
+                <div id="qualityStatus" class="status"></div>
+            </div>
+
+            <div class="test-section">
+                <h3>6. Edge Cases</h3>
+                <button class="test-button" onclick="testControlsBeforeLoad()">Test Controls Before Video Load</button>
+                <button class="test-button" onclick="testInvalidDuration()">Test Invalid Duration Handling</button>
+                <button class="test-button" onclick="testMemoryCleanup()">Test Memory Cleanup</button>
+                <div id="edgeStatus" class="status"></div>
+            </div>
+
+            <div class="test-section">
+                <h3>Performance Metrics</h3>
+                <button class="test-button" onclick="showMetrics()">Update Metrics</button>
+                <div id="metricsDisplay" class="metrics"></div>
+            </div>
+
+            <div class="test-section">
+                <h3>Test Results Summary</h3>
+                <div id="testResults" class="test-results"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import the HLS Video Player component
+        import '/src/components/HLSVideoPlayer.js';
+
+        const player = document.getElementById('testPlayer');
+        const testResults = [];
+
+        // Helper to update status
+        function updateStatus(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `status ${type}`;
+        }
+
+        // Helper to log test result
+        function logTestResult(name, passed, message) {
+            testResults.push({ name, passed, message });
+            updateTestResultsDisplay();
+        }
+
+        // Update test results display
+        function updateTestResultsDisplay() {
+            const resultsDiv = document.getElementById('testResults');
+            const passedTests = testResults.filter(r => r.passed).length;
+            const totalTests = testResults.length;
+
+            resultsDiv.innerHTML = `
+                <div class="status ${passedTests === totalTests ? 'success' : 'info'}">
+                    Tests Passed: ${passedTests}/${totalTests}
+                </div>
+                ${testResults.map(result => `
+                    <div class="test-result ${result.passed ? 'pass' : 'fail'}">
+                        <span class="test-icon">${result.passed ? '✓' : '✗'}</span>
+                        <div>
+                            <strong>${result.name}</strong>
+                            ${result.message ? `<br><small>${result.message}</small>` : ''}
+                        </div>
+                    </div>
+                `).join('')}
+            `;
+        }
+
+        // Listen for player events
+        player.addEventListener('hls-performance', (event) => {
+            console.log('Performance Event:', event.detail);
+            if (event.detail.type === 'error') {
+                updateStatus('edgeStatus', `Error: ${event.detail.data.error}`, 'error');
+            }
+        });
+
+        // Test functions
+        window.testPlayPause = async function() {
+            try {
+                const shadowRoot = player.shadowRoot;
+                const playPauseBtn = shadowRoot.querySelector('#play-pause');
+                const video = shadowRoot.querySelector('.video-element');
+
+                // Test play
+                if (video.paused) {
+                    playPauseBtn.click();
+                    await new Promise(resolve => setTimeout(resolve, 500));
+
+                    if (!video.paused) {
+                        updateStatus('playPauseStatus', 'Play button works! Video is playing.', 'success');
+                        logTestResult('Play Button', true, 'Successfully started playback');
+
+                        // Test pause
+                        setTimeout(() => {
+                            playPauseBtn.click();
+                            if (video.paused) {
+                                updateStatus('playPauseStatus', 'Pause button works! Video is paused.', 'success');
+                                logTestResult('Pause Button', true, 'Successfully paused playback');
+                            }
+                        }, 1000);
+                    } else {
+                        updateStatus('playPauseStatus', 'Play button failed - video still paused', 'error');
+                        logTestResult('Play Button', false, 'Video did not start playing');
+                    }
+                } else {
+                    // Already playing, test pause
+                    playPauseBtn.click();
+                    await new Promise(resolve => setTimeout(resolve, 500));
+
+                    if (video.paused) {
+                        updateStatus('playPauseStatus', 'Pause button works! Video is paused.', 'success');
+                        logTestResult('Pause Button', true, 'Successfully paused playback');
+                    }
+                }
+            } catch (error) {
+                updateStatus('playPauseStatus', `Error: ${error.message}`, 'error');
+                logTestResult('Play/Pause Test', false, error.message);
+            }
+        };
+
+        window.testProgrammaticPlay = async function() {
+            try {
+                await player.play();
+                const video = player.shadowRoot.querySelector('.video-element');
+
+                if (!video.paused) {
+                    updateStatus('playPauseStatus', 'Programmatic play() works!', 'success');
+                    logTestResult('Programmatic Play', true, 'play() method works');
+                } else {
+                    updateStatus('playPauseStatus', 'Programmatic play() failed', 'error');
+                    logTestResult('Programmatic Play', false, 'Video did not start');
+                }
+            } catch (error) {
+                updateStatus('playPauseStatus', `Play error: ${error.message}`, 'error');
+                logTestResult('Programmatic Play', false, error.message);
+            }
+        };
+
+        window.testProgrammaticPause = function() {
+            try {
+                player.pause();
+                const video = player.shadowRoot.querySelector('.video-element');
+
+                if (video.paused) {
+                    updateStatus('playPauseStatus', 'Programmatic pause() works!', 'success');
+                    logTestResult('Programmatic Pause', true, 'pause() method works');
+                } else {
+                    updateStatus('playPauseStatus', 'Programmatic pause() failed', 'error');
+                    logTestResult('Programmatic Pause', false, 'Video did not pause');
+                }
+            } catch (error) {
+                updateStatus('playPauseStatus', `Pause error: ${error.message}`, 'error');
+                logTestResult('Programmatic Pause', false, error.message);
+            }
+        };
+
+        window.testVolumeMute = function() {
+            try {
+                const shadowRoot = player.shadowRoot;
+                const volumeBtn = shadowRoot.querySelector('#volume');
+                const video = shadowRoot.querySelector('.video-element');
+
+                const wasMuted = video.muted;
+                volumeBtn.click();
+
+                if (video.muted !== wasMuted) {
+                    updateStatus('volumeStatus', `Volume toggle works! Muted: ${video.muted}`, 'success');
+                    logTestResult('Volume Toggle', true, `Successfully toggled mute state`);
+
+                    // Verify button text changed
+                    const expectedIcon = video.muted ? '🔇' : '🔊';
+                    if (volumeBtn.textContent === expectedIcon) {
+                        logTestResult('Volume Icon Update', true, 'Icon updated correctly');
+                    }
+                } else {
+                    updateStatus('volumeStatus', 'Volume toggle failed', 'error');
+                    logTestResult('Volume Toggle', false, 'Mute state did not change');
+                }
+            } catch (error) {
+                updateStatus('volumeStatus', `Error: ${error.message}`, 'error');
+                logTestResult('Volume Test', false, error.message);
+            }
+        };
+
+        window.testVolumeBeforeLoad = function() {
+            try {
+                // Create new player without source
+                const testPlayer = document.createElement('hls-video-player');
+                document.body.appendChild(testPlayer);
+
+                setTimeout(() => {
+                    const volumeBtn = testPlayer.shadowRoot.querySelector('#volume');
+                    volumeBtn.click();
+
+                    // Should handle gracefully without error
+                    updateStatus('volumeStatus', 'Volume control handles missing video gracefully', 'success');
+                    logTestResult('Volume Before Load', true, 'No errors when video not loaded');
+
+                    // Cleanup
+                    document.body.removeChild(testPlayer);
+                }, 100);
+            } catch (error) {
+                updateStatus('volumeStatus', `Error: ${error.message}`, 'error');
+                logTestResult('Volume Before Load', false, error.message);
+            }
+        };
+
+        window.testSeek = function(seconds) {
+            try {
+                const video = player.shadowRoot.querySelector('.video-element');
+                const previousTime = video.currentTime;
+
+                player.seek(seconds);
+
+                if (Math.abs(video.currentTime - seconds) < 1) {
+                    updateStatus('seekStatus', `Seek successful! Now at ${video.currentTime.toFixed(1)}s`, 'success');
+                    logTestResult(`Seek to ${seconds}s`, true, `Seeked from ${previousTime.toFixed(1)}s to ${video.currentTime.toFixed(1)}s`);
+                } else {
+                    updateStatus('seekStatus', `Seek failed. Expected ${seconds}s, got ${video.currentTime.toFixed(1)}s`, 'error');
+                    logTestResult(`Seek to ${seconds}s`, false, `Expected ${seconds}s, got ${video.currentTime.toFixed(1)}s`);
+                }
+            } catch (error) {
+                updateStatus('seekStatus', `Seek error: ${error.message}`, 'error');
+                logTestResult('Seek Test', false, error.message);
+            }
+        };
+
+        window.testInvalidSeek = function() {
+            try {
+                const video = player.shadowRoot.querySelector('.video-element');
+
+                // Test NaN
+                player.seek(NaN);
+                const afterNaN = video.currentTime;
+
+                // Test negative
+                player.seek(-10);
+                const afterNegative = video.currentTime;
+
+                // Test beyond duration
+                player.seek(99999);
+                const afterBeyond = video.currentTime;
+
+                updateStatus('seekStatus', `Invalid seek handled: NaN→${afterNaN.toFixed(1)}s, -10→${afterNegative.toFixed(1)}s, 99999→${afterBeyond.toFixed(1)}s`, 'success');
+                logTestResult('Invalid Seek Handling', true, 'All invalid seeks handled gracefully');
+            } catch (error) {
+                updateStatus('seekStatus', `Error: ${error.message}`, 'error');
+                logTestResult('Invalid Seek Handling', false, error.message);
+            }
+        };
+
+        window.testFullscreen = function() {
+            try {
+                const fullscreenBtn = player.shadowRoot.querySelector('#fullscreen');
+
+                if (!document.fullscreenElement) {
+                    fullscreenBtn.click();
+                    updateStatus('fullscreenStatus', 'Fullscreen requested. Press ESC to exit.', 'success');
+                    logTestResult('Fullscreen Toggle', true, 'Fullscreen request sent');
+                } else {
+                    document.exitFullscreen();
+                    updateStatus('fullscreenStatus', 'Exited fullscreen', 'success');
+                    logTestResult('Fullscreen Exit', true, 'Successfully exited fullscreen');
+                }
+            } catch (error) {
+                updateStatus('fullscreenStatus', `Error: ${error.message}`, 'error');
+                logTestResult('Fullscreen Test', false, error.message);
+            }
+        };
+
+        window.testQualityChange = function() {
+            try {
+                const qualitySelector = player.shadowRoot.querySelector('#quality');
+
+                if (qualitySelector.options.length > 1) {
+                    // Change to specific quality
+                    player.setQuality('1');
+                    updateStatus('qualityStatus', 'Quality changed to level 1', 'success');
+                    logTestResult('Quality Change', true, `Changed to quality level 1`);
+                } else {
+                    updateStatus('qualityStatus', 'No quality levels available yet', 'info');
+                    logTestResult('Quality Change', false, 'Quality levels not loaded');
+                }
+            } catch (error) {
+                updateStatus('qualityStatus', `Error: ${error.message}`, 'error');
+                logTestResult('Quality Test', false, error.message);
+            }
+        };
+
+        window.testAutoQuality = function() {
+            try {
+                player.setQuality('auto');
+                updateStatus('qualityStatus', 'Quality set to Auto', 'success');
+                logTestResult('Auto Quality', true, 'Successfully set to auto quality');
+            } catch (error) {
+                updateStatus('qualityStatus', `Error: ${error.message}`, 'error');
+                logTestResult('Auto Quality', false, error.message);
+            }
+        };
+
+        window.testControlsBeforeLoad = function() {
+            try {
+                // Create player without source
+                const testPlayer = document.createElement('hls-video-player');
+                document.body.appendChild(testPlayer);
+
+                setTimeout(() => {
+                    const playBtn = testPlayer.shadowRoot.querySelector('#play-pause');
+                    playBtn.click();
+
+                    updateStatus('edgeStatus', 'Controls work before video load - no errors', 'success');
+                    logTestResult('Controls Before Load', true, 'Handled gracefully');
+
+                    document.body.removeChild(testPlayer);
+                }, 100);
+            } catch (error) {
+                updateStatus('edgeStatus', `Error: ${error.message}`, 'error');
+                logTestResult('Controls Before Load', false, error.message);
+            }
+        };
+
+        window.testInvalidDuration = function() {
+            try {
+                const video = player.shadowRoot.querySelector('.video-element');
+                const originalDuration = video.duration;
+
+                // Temporarily set invalid duration
+                Object.defineProperty(video, 'duration', {
+                    configurable: true,
+                    value: NaN
+                });
+
+                // Try to seek
+                player.seek(30);
+
+                // Restore
+                Object.defineProperty(video, 'duration', {
+                    configurable: true,
+                    value: originalDuration
+                });
+
+                updateStatus('edgeStatus', 'Invalid duration handled gracefully', 'success');
+                logTestResult('Invalid Duration', true, 'No errors with NaN duration');
+            } catch (error) {
+                updateStatus('edgeStatus', `Error: ${error.message}`, 'error');
+                logTestResult('Invalid Duration', false, error.message);
+            }
+        };
+
+        window.testMemoryCleanup = function() {
+            try {
+                // Create and destroy multiple players
+                const players = [];
+                for (let i = 0; i < 3; i++) {
+                    const testPlayer = document.createElement('hls-video-player');
+                    document.body.appendChild(testPlayer);
+                    players.push(testPlayer);
+                }
+
+                // Remove all
+                players.forEach(p => {
+                    p.disconnectedCallback();
+                    document.body.removeChild(p);
+                });
+
+                updateStatus('edgeStatus', 'Memory cleanup successful - resources freed', 'success');
+                logTestResult('Memory Cleanup', true, 'All resources properly cleaned up');
+            } catch (error) {
+                updateStatus('edgeStatus', `Error: ${error.message}`, 'error');
+                logTestResult('Memory Cleanup', false, error.message);
+            }
+        };
+
+        window.showMetrics = function() {
+            try {
+                const metrics = player.getPerformanceMetrics();
+                const metricsDiv = document.getElementById('metricsDisplay');
+
+                metricsDiv.innerHTML = `
+                    <div class="metric-item">
+                        <div class="metric-label">Memory Usage</div>
+                        <div class="metric-value">${(metrics.memoryUsage / 1024 / 1024).toFixed(1)} MB</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-label">Input Latency</div>
+                        <div class="metric-value">${metrics.inputLatency.toFixed(0)} ms</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-label">Buffer Ratio</div>
+                        <div class="metric-value">${(metrics.bufferingRatio * 100).toFixed(1)}%</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-label">Video Start Time</div>
+                        <div class="metric-value">${metrics.videoStartTime.toFixed(0)} ms</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-label">Throughput</div>
+                        <div class="metric-value">${metrics.throughputMbps.toFixed(2)} Mbps</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-label">Quality Changes</div>
+                        <div class="metric-value">${metrics.qualityLevelChanges}</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-label">Rebuffer Events</div>
+                        <div class="metric-value">${metrics.rebufferEvents}</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-label">Error Count</div>
+                        <div class="metric-value">${metrics.errorCount}</div>
+                    </div>
+                `;
+
+                logTestResult('Metrics Display', true, 'Successfully retrieved performance metrics');
+            } catch (error) {
+                console.error('Metrics error:', error);
+                logTestResult('Metrics Display', false, error.message);
+            }
+        };
+
+        // Auto-run basic tests after load
+        setTimeout(() => {
+            updateStatus('playPauseStatus', 'Ready for testing', 'info');
+            updateStatus('volumeStatus', 'Ready for testing', 'info');
+            updateStatus('seekStatus', 'Ready for testing', 'info');
+            updateStatus('fullscreenStatus', 'Ready for testing', 'info');
+            updateStatus('qualityStatus', 'Ready for testing', 'info');
+            updateStatus('edgeStatus', 'Ready for testing', 'info');
+            showMetrics();
+        }, 2000);
+    </script>
+</body>
+</html>

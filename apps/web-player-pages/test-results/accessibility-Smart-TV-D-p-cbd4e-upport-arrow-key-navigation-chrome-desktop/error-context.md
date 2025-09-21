@@ -1,0 +1,146 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - heading "FOX Video Player Demo" [level=1] [ref=e4]
+      - paragraph [ref=e5]: Performance-optimized HLS video player for Smart TV/OTT platforms
+      - generic [ref=e7]:
+        - generic [ref=e8]: 📺
+        - generic [ref=e9]: Smart TV
+    - main [ref=e10]:
+      - button "📺 HLS.js Performance HLS.js + Web Components smartTV" [ref=e13]:
+        - generic [ref=e14]:
+          - generic [ref=e15]:
+            - generic [ref=e16]: 📺
+            - generic [ref=e17]:
+              - heading "HLS.js Performance" [level=3] [ref=e18]
+              - paragraph [ref=e19]: HLS.js + Web Components
+          - generic [ref=e20]:
+            - generic [ref=e21]: smartTV
+            - img [ref=e22]
+      - generic [ref=e26]:
+        - generic [ref=e29]:
+          - button "Play video" [ref=e30] [cursor=pointer]: ▶️
+          - button "Volume control" [ref=e31] [cursor=pointer]: 🔊
+          - slider "Video progress" [ref=e33] [cursor=pointer]
+          - generic [ref=e34]:
+            - generic [ref=e35]: 0:00
+            - text: /
+            - generic [ref=e36]: 0:00
+          - combobox "Video quality" [ref=e37]:
+            - option "Auto" [selected]
+          - button "Fullscreen" [ref=e38] [cursor=pointer]: ⛶
+        - generic [ref=e39]: "Memory: 98MB | Input: 0ms | Mode: smartTV"
+      - generic [ref=e40]:
+        - heading "Stream Source" [level=3] [ref=e41]
+        - generic [ref=e42]:
+          - button "Mux Test Stream (Big Buck Bunny) High quality adaptive streaming with multiple bitrates" [ref=e43]:
+            - generic [ref=e44]: Mux Test Stream (Big Buck Bunny)
+            - generic [ref=e45]: High quality adaptive streaming with multiple bitrates
+          - button "Apple Test Stream Apple HLS reference implementation" [ref=e46]:
+            - generic [ref=e47]: Apple Test Stream
+            - generic [ref=e48]: Apple HLS reference implementation
+          - button "Tears of Steel (4K) 4K video content for high-end testing" [ref=e49]:
+            - generic [ref=e50]: Tears of Steel (4K)
+            - generic [ref=e51]: 4K video content for high-end testing
+      - generic [ref=e52]:
+        - generic [ref=e53]:
+          - heading "⚡ Performance Optimizations" [level=4] [ref=e54]:
+            - generic [ref=e55]: ⚡
+            - text: Performance Optimizations
+          - generic [ref=e56]:
+            - generic [ref=e57]:
+              - generic [ref=e58]: ✓
+              - text: Memory pool management
+            - generic [ref=e59]:
+              - generic [ref=e60]: ✓
+              - text: Smart TV buffering strategy
+            - generic [ref=e61]:
+              - generic [ref=e62]: ✓
+              - text: Hardware acceleration detection
+            - generic [ref=e63]:
+              - generic [ref=e64]: ✓
+              - text: D-pad navigation optimized
+        - generic [ref=e65]:
+          - heading "Player Information" [level=3] [ref=e66]
+          - generic [ref=e67]:
+            - generic [ref=e68]:
+              - heading "Technology Stack" [level=4] [ref=e69]
+              - paragraph [ref=e70]: HLS.js + Web Components
+            - generic [ref=e71]:
+              - heading "Description" [level=4] [ref=e72]
+              - paragraph [ref=e73]: Optimized HLS.js implementation with Smart TV constraints
+            - generic [ref=e74]:
+              - heading "Performance Mode" [level=4] [ref=e75]
+              - generic [ref=e77]:
+                - generic [ref=e78]: 📺
+                - generic [ref=e79]: Smart TV
+      - generic [ref=e80]:
+        - heading "Platform Support Matrix" [level=3] [ref=e81]
+        - table [ref=e83]:
+          - rowgroup [ref=e84]:
+            - row "Platform Native HLS HLS.js Performance Mode Status" [ref=e85]:
+              - cell "Platform" [ref=e86]
+              - cell "Native HLS" [ref=e87]
+              - cell "HLS.js" [ref=e88]
+              - cell "Performance Mode" [ref=e89]
+              - cell "Status" [ref=e90]
+          - rowgroup [ref=e91]:
+            - row "🌐 Desktop Browsers Safari Only ✓ Desktop Full Support" [ref=e92]:
+              - cell "🌐 Desktop Browsers" [ref=e93]
+              - cell "Safari Only" [ref=e94]
+              - cell "✓" [ref=e95]
+              - cell "Desktop" [ref=e96]
+              - cell "Full Support" [ref=e97]
+            - row "📱 Mobile Browsers iOS ✓ ✓ Mobile Optimized" [ref=e98]:
+              - cell "📱 Mobile Browsers" [ref=e99]
+              - cell "iOS ✓" [ref=e100]
+              - cell "✓" [ref=e101]
+              - cell "Mobile" [ref=e102]
+              - cell "Optimized" [ref=e103]
+            - row "📺 Smart TVs Limited ✓ Smart TV Constrained" [ref=e104]:
+              - cell "📺 Smart TVs" [ref=e105]
+              - cell "Limited" [ref=e106]
+              - cell "✓" [ref=e107]
+              - cell "Smart TV" [ref=e108]
+              - cell "Constrained" [ref=e109]
+            - row "🟣 Roku Devices ✗ Limited Smart TV Simulated" [ref=e110]:
+              - cell "🟣 Roku Devices" [ref=e111]
+              - cell "✗" [ref=e112]
+              - cell "Limited" [ref=e113]
+              - cell "Smart TV" [ref=e114]
+              - cell "Simulated" [ref=e115]
+            - row "📱➡️📺 Chromecast ✓ ✓ Smart TV Cast Ready" [ref=e116]:
+              - cell "📱➡️📺 Chromecast" [ref=e117]
+              - cell "✓" [ref=e118]
+              - cell "✓" [ref=e119]
+              - cell "Smart TV" [ref=e120]
+              - cell "Cast Ready" [ref=e121]
+      - generic [ref=e122]:
+        - heading "FOX Corporation Performance Targets" [level=3] [ref=e123]
+        - generic [ref=e124]:
+          - generic [ref=e125]:
+            - heading "Smart TV Constraints" [level=4] [ref=e126]
+            - list [ref=e127]:
+              - listitem [ref=e128]: • Memory usage < 100MB
+              - listitem [ref=e129]: • CPU usage < 30%
+              - listitem [ref=e130]: • Input response < 150ms
+              - listitem [ref=e131]: • Conservative buffering
+          - generic [ref=e132]:
+            - heading "Web Performance" [level=4] [ref=e133]
+            - list [ref=e134]:
+              - listitem [ref=e135]: • Initial load < 200KB
+              - listitem [ref=e136]: • Time to first frame < 1s
+              - listitem [ref=e137]: • Rebuffering rate < 1%
+              - listitem [ref=e138]: • 60fps UI animations
+          - generic [ref=e139]:
+            - heading "Shared Codebase" [level=4] [ref=e140]
+            - list [ref=e141]:
+              - listitem [ref=e142]: • Cross-platform compatibility
+              - listitem [ref=e143]: • Performance isolation
+              - listitem [ref=e144]: • Unified monitoring
+              - listitem [ref=e145]: • Module federation ready
+  - alert [ref=e146]
+```
