@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Mobile Video Player - FOX Demo</title>
+    <link rel="stylesheet" href="theme_v1_performance.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <style>
+        body {
+            background-color: var(--background) !important;
+            color: var(--foreground) !important;
+            font-family: var(--font-sans) !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            font-size: 16px !important;
+            -webkit-text-size-adjust: 100%;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        /* Mobile container */
+        .mobile-container {
+            position: relative;
+            min-height: 100vh;
+            background-color: var(--background);
+            overflow-x: hidden;
+        }
+
+        /* Mobile video player */
+        .mobile-player-wrapper {
+            position: relative;
+            width: 100%;
+            background-color: var(--card);
+        }
+
+        .mobile-player-wrapper.portrait {
+            aspect-ratio: 16/9;
+        }
+
+        .mobile-player-wrapper.landscape {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1000;
+        }
+
+        .mobile-video-element {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--muted-foreground);
+            font-size: 18px;
+        }
+
+        /* Mobile controls overlay */
+        .mobile-controls-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(
+                to top,
+                rgba(0, 0, 0, 0.9) 0%,
+                rgba(0, 0, 0, 0.6) 50%,
+                transparent 100%
+            );
+            padding: 16px;
+            transform: translateY(100%);
+            transition: transform 300ms ease-out;
+            z-index: 20;
+        }
+
+        .mobile-controls-overlay.visible {
+            transform: translateY(0);
+        }
+
+        /* Mobile progress bar */
+        .mobile-progress-container {
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .mobile-progress-bar {
+            height: 4px;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            overflow: hidden;
+            cursor: pointer;
+            touch-action: none;
+            position: relative;
+        }
+
+        .mobile-progress-bar.dragging {
+            height: 8px;
+        }
+
+        .mobile-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+            width: 35%;
+            border-radius: inherit;
+            transition: width 0.1s ease-out;
+        }
+
+        .mobile-progress-thumb {
+            position: absolute;
+            top: 50%;
+            left: 35%;
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 200ms ease-out;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .mobile-progress-bar:active .mobile-progress-thumb,
+        .mobile-progress-bar.dragging .mobile-progress-thumb {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        /* Mobile control layout */
+        .mobile-controls-grid {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .mobile-controls-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .mobile-controls-center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+        }
+
+        .mobile-controls-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Mobile buttons - Touch optimized */
+        .mobile-button {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            color: white;
+            cursor: pointer;
+            transition: all 200ms ease-out;
+            min-width: 44px;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .mobile-button:active {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(0.95);
+        }
+
+        .mobile-button.primary {
+            background: var(--primary);
+            border-radius: 50%;
+            min-width: 56px;
+            min-height: 56px;
+        }
+
+        .mobile-button.primary:active {
+            background: var(--primary-hover);
+        }
+
+        /* Mobile time display */
+        .mobile-time-display {
+            color: white;
+            font-family: var(--font-mono);
+            font-size: 14px;
+            text-align: center;
+            min-width: 90px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        /* Mobile captions */
+        .mobile-captions {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+            max-width: 90%;
+            text-align: center;
+            z-index: 15;
+            line-height: 1.4;
+        }
+
+        /* Mobile content area */
+        .mobile-content {
+            padding: 16px;
+        }
+
+        .mobile-video-info {
+            background-color: var(--card);
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-bottom: 16px;
+        }
+
+        .mobile-video-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--foreground);
+        }
+
+        .mobile-video-description {
+            color: var(--muted-foreground);
+            line-height: 1.5;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+
+        /* Mobile accessibility controls */
+        .mobile-accessibility-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .mobile-accessibility-button {
+            background: var(--secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            color: var(--foreground);
+            cursor: pointer;
+            transition: all 200ms ease-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 14px;
+            touch-action: manipulation;
+        }
+
+        .mobile-accessibility-button:active {
+            background: var(--primary);
+            color: var(--primary-foreground);
+            transform: scale(0.98);
+        }
+
+        .mobile-accessibility-button.active {
+            background: var(--accent);
+            color: var(--accent-foreground);
+            border-color: var(--accent);
+        }
+
+        /* Mobile transcript */
+        .mobile-transcript {
+            background-color: var(--card);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .mobile-transcript-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .mobile-transcript-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--foreground);
+        }
+
+        .mobile-transcript-toggle {
+            background: var(--primary);
+            border: none;
+            border-radius: 6px;
+            padding: 8px 12px;
+            color: var(--primary-foreground);
+            font-size: 12px;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+
+        .mobile-transcript-content {
+            max-height: 300px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .mobile-transcript-content.collapsed {
+            max-height: 100px;
+            overflow: hidden;
+        }
+
+        .mobile-transcript-line {
+            padding: 8px 0;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 200ms ease-out;
+            font-size: 14px;
+            line-height: 1.6;
+            touch-action: manipulation;
+        }
+
+        .mobile-transcript-line:active {
+            background-color: var(--transcript-highlight);
+        }
+
+        .mobile-transcript-line.active {
+            background-color: var(--transcript-active);
+            font-weight: 500;
+            padding-left: 12px;
+            border-left: 3px solid var(--primary);
+        }
+
+        .mobile-timestamp {
+            color: var(--primary);
+            font-family: var(--font-mono);
+            font-size: 12px;
+            margin-right: 8px;
+        }
+
+        /* Mobile settings panel */
+        .mobile-settings-panel {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--card);
+            border-top: 1px solid var(--border);
+            border-radius: 16px 16px 0 0;
+            padding: 24px 16px;
+            transform: translateY(100%);
+            transition: transform 300ms ease-out;
+            z-index: 1000;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .mobile-settings-panel.open {
+            transform: translateY(0);
+        }
+
+        .mobile-settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .mobile-settings-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--foreground);
+        }
+
+        .mobile-settings-close {
+            background: var(--muted);
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--foreground);
+            cursor: pointer;
+        }
+
+        .mobile-settings-group {
+            margin-bottom: 24px;
+        }
+
+        .mobile-settings-group-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--foreground);
+            margin-bottom: 12px;
+        }
+
+        .mobile-quality-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .mobile-quality-option {
+            background: var(--secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            color: var(--foreground);
+            cursor: pointer;
+            transition: all 200ms ease-out;
+            text-align: center;
+            font-size: 14px;
+            touch-action: manipulation;
+        }
+
+        .mobile-quality-option:active {
+            transform: scale(0.98);
+        }
+
+        .mobile-quality-option.active {
+            background: var(--primary);
+            color: var(--primary-foreground);
+            border-color: var(--primary);
+        }
+
+        /* Mobile gestures overlay */
+        .mobile-gesture-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 10;
+            touch-action: none;
+        }
+
+        /* Orientation specific styles */
+        @media (orientation: landscape) and (max-height: 500px) {
+            .mobile-content {
+                display: none;
+            }
+
+            .mobile-controls-overlay {
+                padding: 12px 24px;
+            }
+
+            .mobile-captions {
+                bottom: 60px;
+            }
+        }
+
+        /* Dark status bar for video */
+        @media (prefers-color-scheme: dark) {
+            meta[name="theme-color"] {
+                content: "#000000";
+            }
+        }
+
+        /* PWA viewport adjustments */
+        @media (display-mode: standalone) {
+            .mobile-container {
+                padding-top: env(safe-area-inset-top);
+                padding-bottom: env(safe-area-inset-bottom);
+            }
+        }
+
+        /* Touch feedback animations */
+        @keyframes ripple {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+
+        .ripple-effect {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ripple-effect::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            width: 20px;
+            height: 20px;
+            animation: ripple 0.6s ease-out;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-container">
+        <!-- Mobile Video Player -->
+        <div class="mobile-player-wrapper portrait" id="mobile-player">
+            <!-- Video Element -->
+            <div class="mobile-video-element">
+                <div style="text-align: center;">
+                    <i data-lucide="smartphone" style="width: 60px; height: 60px; margin-bottom: 16px; opacity: 0.6;"></i>
+                    <div style="font-size: 18px;">Mobile Video Player</div>
+                    <div style="font-size: 14px; margin-top: 8px; opacity: 0.8;">HLS Streaming Demo</div>
+                    <div style="font-size: 12px; margin-top: 4px; opacity: 0.6;">Tap to play</div>
+                </div>
+            </div>
+
+            <!-- Mobile Captions -->
+            <div class="mobile-captions">
+                Mobile-optimized captions with touch controls
+            </div>
+
+            <!-- Gesture Overlay for Touch Controls -->
+            <div class="mobile-gesture-overlay" id="gesture-overlay"></div>
+
+            <!-- Mobile Controls -->
+            <div class="mobile-controls-overlay visible" id="mobile-controls">
+                <!-- Progress Bar -->
+                <div class="mobile-progress-container">
+                    <div class="mobile-progress-bar" id="progress-bar">
+                        <div class="mobile-progress-fill" id="progress-fill"></div>
+                        <div class="mobile-progress-thumb" id="progress-thumb"></div>
+                    </div>
+                </div>
+
+                <!-- Control Grid -->
+                <div class="mobile-controls-grid">
+                    <!-- Left Controls -->
+                    <div class="mobile-controls-left">
+                        <button class="mobile-button" aria-label="Previous" id="prev-btn">
+                            <i data-lucide="skip-back"></i>
+                        </button>
+                    </div>
+
+                    <!-- Center Controls -->
+                    <div class="mobile-controls-center">
+                        <button class="mobile-button" aria-label="Rewind 10s" id="rewind-btn">
+                            <i data-lucide="rotate-ccw"></i>
+                        </button>
+                        <button class="mobile-button primary" aria-label="Play video" id="play-btn">
+                            <i data-lucide="play" style="width: 24px; height: 24px;"></i>
+                        </button>
+                        <button class="mobile-button" aria-label="Forward 30s" id="forward-btn">
+                            <i data-lucide="rotate-cw"></i>
+                        </button>
+                    </div>
+
+                    <!-- Right Controls -->
+                    <div class="mobile-controls-right">
+                        <div class="mobile-time-display" id="time-display">
+                            12:34 / 45:67
+                        </div>
+                        <button class="mobile-button" aria-label="Settings" id="settings-btn">
+                            <i data-lucide="more-vertical"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Content -->
+        <div class="mobile-content">
+            <!-- Video Information -->
+            <div class="mobile-video-info">
+                <h1 class="mobile-video-title">Planete Interdite - Mobile Demo</h1>
+                <p class="mobile-video-description">
+                    Touch-optimized video player with gesture controls, live transcription, and mobile-first accessibility features.
+                </p>
+
+                <!-- Accessibility Controls -->
+                <div class="mobile-accessibility-grid">
+                    <button class="mobile-accessibility-button active" id="transcript-toggle">
+                        <i data-lucide="file-text"></i>
+                        <span>Transcript</span>
+                    </button>
+                    <button class="mobile-accessibility-button" id="captions-toggle">
+                        <i data-lucide="closed-captioning"></i>
+                        <span>Captions</span>
+                    </button>
+                    <button class="mobile-accessibility-button" id="audio-desc-toggle">
+                        <i data-lucide="volume-2"></i>
+                        <span>Audio Desc</span>
+                    </button>
+                    <button class="mobile-accessibility-button" id="high-contrast-toggle">
+                        <i data-lucide="contrast"></i>
+                        <span>Contrast</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Transcript -->
+            <div class="mobile-transcript">
+                <div class="mobile-transcript-header">
+                    <h2 class="mobile-transcript-title">Live Transcript</h2>
+                    <button class="mobile-transcript-toggle" id="transcript-expand">
+                        Expand
+                    </button>
+                </div>
+
+                <div class="mobile-transcript-content" id="transcript-content">
+                    <div class="mobile-transcript-line">
+                        <span class="mobile-timestamp">00:12</span>
+                        Welcome to this mobile demonstration of touch-optimized video streaming.
+                    </div>
+                    <div class="mobile-transcript-line active">
+                        <span class="mobile-timestamp">00:18</span>
+                        This player features gesture controls and mobile-first accessibility.
+                    </div>
+                    <div class="mobile-transcript-line">
+                        <span class="mobile-timestamp">00:25</span>
+                        Swipe gestures provide intuitive navigation and playback control.
+                    </div>
+                    <div class="mobile-transcript-line">
+                        <span class="mobile-timestamp">00:32</span>
+                        Touch targets are optimized for thumb navigation on mobile devices.
+                    </div>
+                    <div class="mobile-transcript-line">
+                        <span class="mobile-timestamp">00:38</span>
+                        Responsive design adapts to both portrait and landscape orientations.
+                    </div>
+                    <div class="mobile-transcript-line">
+                        <span class="mobile-timestamp">00:45</span>
+                        Performance optimizations ensure smooth playback on mobile networks.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Settings Panel -->
+        <div class="mobile-settings-panel" id="settings-panel">
+            <div class="mobile-settings-header">
+                <h2 class="mobile-settings-title">Video Settings</h2>
+                <button class="mobile-settings-close" id="settings-close">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+
+            <div class="mobile-settings-group">
+                <div class="mobile-settings-group-title">Video Quality</div>
+                <div class="mobile-quality-grid">
+                    <div class="mobile-quality-option active">Auto</div>
+                    <div class="mobile-quality-option">720p HD</div>
+                    <div class="mobile-quality-option">480p</div>
+                    <div class="mobile-quality-option">360p</div>
+                </div>
+            </div>
+
+            <div class="mobile-settings-group">
+                <div class="mobile-settings-group-title">Captions</div>
+                <div class="mobile-quality-grid">
+                    <div class="mobile-quality-option active">English</div>
+                    <div class="mobile-quality-option">French</div>
+                    <div class="mobile-quality-option">Spanish</div>
+                    <div class="mobile-quality-option">Off</div>
+                </div>
+            </div>
+
+            <div class="mobile-settings-group">
+                <div class="mobile-settings-group-title">Accessibility</div>
+                <div class="mobile-quality-grid">
+                    <div class="mobile-quality-option">Large Text</div>
+                    <div class="mobile-quality-option">High Contrast</div>
+                    <div class="mobile-quality-option">Audio Description</div>
+                    <div class="mobile-quality-option">Reduced Motion</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile player elements
+            const mobilePlayer = document.getElementById('mobile-player');
+            const mobileControls = document.getElementById('mobile-controls');
+            const gestureOverlay = document.getElementById('gesture-overlay');
+            const settingsBtn = document.getElementById('settings-btn');
+            const settingsPanel = document.getElementById('settings-panel');
+            const settingsClose = document.getElementById('settings-close');
+            const playBtn = document.getElementById('play-btn');
+            const progressBar = document.getElementById('progress-bar');
+            const progressFill = document.getElementById('progress-fill');
+            const transcriptToggle = document.getElementById('transcript-toggle');
+            const transcriptExpand = document.getElementById('transcript-expand');
+            const transcriptContent = document.getElementById('transcript-content');
+
+            let controlsTimeout;
+            let isPlaying = false;
+            let isDragging = false;
+
+            // Show/hide controls
+            function showControls() {
+                mobileControls.classList.add('visible');
+                clearTimeout(controlsTimeout);
+                controlsTimeout = setTimeout(() => {
+                    if (!isDragging) {
+                        mobileControls.classList.remove('visible');
+                    }
+                }, 3000);
+            }
+
+            // Touch gesture handling
+            let touchStartX = 0;
+            let touchStartY = 0;
+            let touchStartTime = 0;
+
+            gestureOverlay.addEventListener('touchstart', function(e) {
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+                touchStartTime = Date.now();
+                showControls();
+            });
+
+            gestureOverlay.addEventListener('touchend', function(e) {
+                const touchEndX = e.changedTouches[0].clientX;
+                const touchEndY = e.changedTouches[0].clientY;
+                const touchEndTime = Date.now();
+
+                const deltaX = touchEndX - touchStartX;
+                const deltaY = touchEndY - touchStartY;
+                const deltaTime = touchEndTime - touchStartTime;
+
+                // Tap to toggle play/pause
+                if (Math.abs(deltaX) < 10 && Math.abs(deltaY) < 10 && deltaTime < 300) {
+                    togglePlayPause();
+                }
+
+                // Horizontal swipe for seek
+                else if (Math.abs(deltaX) > 50 && Math.abs(deltaY) < 50 && deltaTime < 500) {
+                    const seekDirection = deltaX > 0 ? 'forward' : 'backward';
+                    handleSeek(seekDirection);
+                }
+
+                // Vertical swipe for volume/brightness
+                else if (Math.abs(deltaY) > 50 && Math.abs(deltaX) < 50 && deltaTime < 500) {
+                    const side = touchStartX < window.innerWidth / 2 ? 'left' : 'right';
+                    const direction = deltaY < 0 ? 'up' : 'down';
+                    handleVerticalSwipe(side, direction);
+                }
+            });
+
+            // Play/pause toggle
+            function togglePlayPause() {
+                isPlaying = !isPlaying;
+                const icon = playBtn.querySelector('i');
+                if (isPlaying) {
+                    icon.setAttribute('data-lucide', 'pause');
+                } else {
+                    icon.setAttribute('data-lucide', 'play');
+                }
+                lucide.createIcons();
+                showControls();
+            }
+
+            playBtn.addEventListener('click', togglePlayPause);
+
+            // Seek handling
+            function handleSeek(direction) {
+                console.log(`Seeking ${direction}`);
+                // Visual feedback could be added here
+                showControls();
+            }
+
+            // Vertical swipe handling
+            function handleVerticalSwipe(side, direction) {
+                if (side === 'left') {
+                    // Brightness control
+                    console.log(`Brightness ${direction}`);
+                } else {
+                    // Volume control
+                    console.log(`Volume ${direction}`);
+                }
+                showControls();
+            }
+
+            // Progress bar interaction
+            progressBar.addEventListener('touchstart', function(e) {
+                isDragging = true;
+                progressBar.classList.add('dragging');
+                showControls();
+                updateProgress(e);
+            });
+
+            progressBar.addEventListener('touchmove', function(e) {
+                if (isDragging) {
+                    e.preventDefault();
+                    updateProgress(e);
+                }
+            });
+
+            progressBar.addEventListener('touchend', function(e) {
+                isDragging = false;
+                progressBar.classList.remove('dragging');
+            });
+
+            function updateProgress(e) {
+                const rect = progressBar.getBoundingClientRect();
+                const touch = e.touches ? e.touches[0] : e.changedTouches[0];
+                const percent = Math.max(0, Math.min(100, ((touch.clientX - rect.left) / rect.width) * 100));
+                progressFill.style.width = percent + '%';
+                document.getElementById('progress-thumb').style.left = percent + '%';
+            }
+
+            // Settings panel
+            settingsBtn.addEventListener('click', function() {
+                settingsPanel.classList.add('open');
+            });
+
+            settingsClose.addEventListener('click', function() {
+                settingsPanel.classList.remove('open');
+            });
+
+            // Quality option selection
+            document.querySelectorAll('.mobile-quality-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remove active from siblings
+                    const siblings = this.parentElement.querySelectorAll('.mobile-quality-option');
+                    siblings.forEach(sibling => sibling.classList.remove('active'));
+                    this.classList.add('active');
+
+                    // Add ripple effect
+                    this.classList.add('ripple-effect');
+                    setTimeout(() => {
+                        this.classList.remove('ripple-effect');
+                    }, 600);
+                });
+            });
+
+            // Accessibility controls
+            document.querySelectorAll('.mobile-accessibility-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    this.classList.toggle('active');
+                });
+            });
+
+            // Transcript expansion
+            transcriptExpand.addEventListener('click', function() {
+                const isCollapsed = transcriptContent.classList.contains('collapsed');
+                if (isCollapsed) {
+                    transcriptContent.classList.remove('collapsed');
+                    this.textContent = 'Collapse';
+                } else {
+                    transcriptContent.classList.add('collapsed');
+                    this.textContent = 'Expand';
+                }
+            });
+
+            // Transcript line interaction
+            document.querySelectorAll('.mobile-transcript-line').forEach(line => {
+                line.addEventListener('click', function() {
+                    document.querySelectorAll('.mobile-transcript-line').forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            // Orientation change handling
+            window.addEventListener('orientationchange', function() {
+                setTimeout(() => {
+                    if (window.orientation === 90 || window.orientation === -90) {
+                        mobilePlayer.classList.add('landscape');
+                        mobilePlayer.classList.remove('portrait');
+                    } else {
+                        mobilePlayer.classList.add('portrait');
+                        mobilePlayer.classList.remove('landscape');
+                    }
+                }, 100);
+            });
+
+            // Simulate active transcript line updating
+            const transcriptLines = document.querySelectorAll('.mobile-transcript-line');
+            let currentIndex = 1;
+
+            setInterval(() => {
+                transcriptLines.forEach(line => line.classList.remove('active'));
+                transcriptLines[currentIndex].classList.add('active');
+                currentIndex = (currentIndex + 1) % transcriptLines.length;
+            }, 3500);
+
+            // Initial controls display
+            showControls();
+
+            // Set initial collapsed state
+            transcriptContent.classList.add('collapsed');
+        });
+    </script>
+</body>
+</html>

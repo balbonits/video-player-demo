@@ -491,7 +491,7 @@ class HLSVideoPlayer extends HTMLElement {
     }
   }
 
-  private getHLSConfig(): Partial<Hls['config']> {
+  public getHLSConfig(): Partial<Hls['config']> {
     // Enterprise-grade HLS configuration optimized for FOX-level streaming
     const baseConfig = {
       enableWorker: true,
@@ -545,33 +545,55 @@ class HLSVideoPlayer extends HTMLElement {
     const configByMode = {
       smartTV: {
         ...baseConfig,
-        // Smart TV memory constraints (critical for FOX TV apps)
-        maxBufferLength: 120,         // Conservative for TV memory
-        backBufferLength: 30,         // Minimal back buffer for memory
-        maxMaxBufferLength: 180,      // Hard limit to prevent OOM
+        // CRITICAL: Smart TV memory constraints (FOX TV apps requirement)
+        maxBufferLength: 90,          // Reduced from 120 to stay under 50MB
+        backBufferLength: 15,         // Aggressive cleanup for memory
+        maxMaxBufferLength: 120,      // Hard limit prevents OOM crashes
+        maxBufferSize: 50 * 1000 * 1000, // 50MB hard limit
+        maxBufferHole: 0.5,           // Tolerate small gaps to save memory
+
+        // Smart TV CPU optimization (target < 30% usage)
+        enableWorker: false,          // Disable workers on weak CPUs
+        startLevel: 0,                // Start with lowest quality
+        autoStartLoad: true,          // Preload to reduce startup CPU spike
+        testBandwidth: false,         // Skip bandwidth test to reduce CPU
 
         // Smart TV network optimizations
-        abrEwmaFastLive: 5.0,         // Slower adaptation for TV networks
-        abrEwmaSlowLive: 15.0,        // Prioritize stability over quality
-        abrBandWidthFactor: 0.8,      // More conservative bandwidth usage
-        abrBandWidthUpFactor: 0.5,    // Very conservative quality increases
+        abrEwmaFastLive: 8.0,         // Much slower adaptation for stability
+        abrEwmaSlowLive: 20.0,        // Heavy stability bias
+        abrBandWidthFactor: 0.7,      // Very conservative bandwidth
+        abrBandWidthUpFactor: 0.3,    // Extremely conservative upgrades
+        abrMaxWithRealBitrate: true,  // Use real bitrate for accuracy
 
-        // Smart TV specific timeouts (account for slower processors)
-        fragLoadingTimeOut: 30000,    // Longer timeout for slow TV networks
-        manifestLoadingTimeOut: 15000, // Extra time for manifest parsing
-        levelLoadingTimeOut: 15000,   // Level loading patience
+        // Smart TV specific timeouts (weak processors)
+        fragLoadingTimeOut: 40000,    // 40s for slow TV networks
+        manifestLoadingTimeOut: 20000, // 20s for manifest parsing
+        levelLoadingTimeOut: 20000,   // 20s for level loading
+
+        // Fragment loading optimization
+        initialLiveManifestSize: 1,   // Minimize initial load
+        maxLoadingDelay: 4,           // Faster segment selection
 
         // Live streaming for sports (FOX Sports optimization)
-        liveSyncDurationCount: 4,     // Slightly behind live edge for stability
-        lowLatencyMode: false,        // Compatibility over latency for TVs
+        liveSyncDurationCount: 5,     // Further behind for stability
+        liveBackBufferLength: 15,     // Minimal live back buffer
+        lowLatencyMode: false,        // Stability over latency
 
         // Error handling for unreliable TV networks
-        fragLoadingMaxRetry: 6,       // More retries for TV reliability
-        levelLoadingMaxRetry: 5,      // Robust level retry
+        fragLoadingMaxRetry: 8,       // More retries for TV reliability
+        fragLoadingRetryDelay: 2000,  // 2s between retries
+        levelLoadingMaxRetry: 6,      // Robust level retry
+        manifestLoadingMaxRetry: 4,   // Manifest retry strategy
 
         // Memory management
-        maxFragLookUpTolerance: 0.2,  // Reduce fragment lookup tolerance
-        appendErrorMaxRetry: 3        // Conservative append retries
+        maxFragLookUpTolerance: 0.1,  // Strict fragment tolerance
+        appendErrorMaxRetry: 2,       // Conservative append retries
+        nudgeMaxRetry: 5,             // Handle playback stalls
+        nudgeOffset: 0.2,             // Jump ahead when stalled
+
+        // Progressive enhancement
+        progressive: false,           // Disable for TV compatibility
+        renderTextTracksNatively: true, // Use native caption rendering
       },
 
       mobile: {
@@ -1089,119 +1111,138 @@ class HLSVideoPlayer extends HTMLElement {
   }
 
   private setupEventListeners() {
-    // Get video element reference - it might not be available yet
+    // Ensure video element is always accessible
     const getVideoElement = () => {
-      return this.video || (this.shadow.querySelector('.video-element') as HTMLVideoElement)
+      if (!this.video) {
+        this.video = this.shadow.querySelector('.video-element') as HTMLVideoElement
+      }
+      return this.video
     }
 
-    // Play/Pause button
+    // Play/Pause button with better event delegation
     const playPauseBtn = this.shadow.getElementById('play-pause')
-    playPauseBtn?.addEventListener('click', async () => {
-      const video = getVideoElement()
-      if (!video) return
-
-      if (video.paused) {
-        try {
-          await video.play()
-        } catch (error) {
-          console.log('Play was interrupted:', error)
+    if (playPauseBtn) {
+      playPauseBtn.addEventListener('click', async () => {
+        const video = getVideoElement()
+        if (!video) {
+          console.warn('[HLSVideoPlayer] Video element not found for play/pause')
+          return
         }
-      } else {
-        video.pause()
-      }
-    })
 
-    // Video events are now set up in setupVideoEventListeners()
-    // which is called after video element is properly initialized
+        try {
+          if (video.paused) {
+            await video.play()
+            playPauseBtn.textContent = '⏸️'
+            playPauseBtn.setAttribute('aria-label', 'Pause video')
+          } else {
+            video.pause()
+            playPauseBtn.textContent = '▶️'
+            playPauseBtn.setAttribute('aria-label', 'Play video')
+          }
+        } catch (error) {
+          console.error('[HLSVideoPlayer] Play/pause error:', error)
+        }
+      })
+    }
 
     // Quality selector
-    const qualitySelector = this.shadow.getElementById('quality')
-    qualitySelector?.addEventListener('change', (event) => {
-      const target = event.target as HTMLSelectElement
-      this.changeQuality(target.value)
-    })
+    const qualitySelector = this.shadow.getElementById('quality') as HTMLSelectElement
+    if (qualitySelector) {
+      qualitySelector.addEventListener('change', (event) => {
+        const target = event.target as HTMLSelectElement
+        this.changeQuality(target.value)
+      })
+    }
 
-    // Volume/Mute button with lazy video reference
+    // Volume/Mute button with state tracking
     const volumeBtn = this.shadow.getElementById('volume')
-    volumeBtn?.addEventListener('click', () => {
-      const video = getVideoElement()
-      if (!video) {
-        console.warn('Volume control: Video element not found')
-        return
-      }
+    if (volumeBtn) {
+      // Track previous volume for unmuting
+      let previousVolume = 1.0
 
-      if (video.muted || video.volume === 0) {
-        video.muted = false
-        video.volume = 1
-        volumeBtn.textContent = '🔊'
-        volumeBtn.setAttribute('aria-label', 'Mute volume')
-      } else {
-        video.muted = true
-        volumeBtn.textContent = '🔇'
-        volumeBtn.setAttribute('aria-label', 'Unmute volume')
-      }
-    })
+      volumeBtn.addEventListener('click', () => {
+        const video = getVideoElement()
+        if (!video) {
+          console.warn('[HLSVideoPlayer] Video element not found for volume control')
+          return
+        }
 
-    // Progress bar seeking with improved handling and debugging
+        if (video.muted || video.volume === 0) {
+          // Unmute and restore volume
+          video.muted = false
+          video.volume = previousVolume > 0 ? previousVolume : 1.0
+          volumeBtn.textContent = '🔊'
+          volumeBtn.setAttribute('aria-label', 'Mute volume')
+          console.log('[HLSVideoPlayer] Volume unmuted:', video.volume)
+        } else {
+          // Save current volume and mute
+          previousVolume = video.volume
+          video.muted = true
+          volumeBtn.textContent = '🔇'
+          volumeBtn.setAttribute('aria-label', 'Unmute volume')
+          console.log('[HLSVideoPlayer] Volume muted')
+        }
+      })
+    }
+
+    // Progress bar seeking with enhanced Shadow DOM support
     const progressContainer = this.shadow.querySelector('.progress-container') as HTMLElement
     const progressBar = this.shadow.querySelector('.progress-bar') as HTMLElement
 
-    // Main seek handler function
-    const handleSeek = (event: MouseEvent) => {
+    // Enhanced seek handler with better coordinate calculation
+    const handleSeek = (event: MouseEvent | TouchEvent) => {
       event.preventDefault()
       event.stopPropagation()
 
-      // Get the video element
       const video = getVideoElement()
       if (!video) {
-        console.warn('[HLSVideoPlayer] Video element not available for seeking')
+        console.warn('[HLSVideoPlayer] Video not available for seeking')
         return
       }
 
-      // Check if video metadata is loaded (readyState >= 1 means metadata is available)
+      // Wait for metadata if not loaded
       if (video.readyState < HTMLMediaElement.HAVE_METADATA) {
-        console.warn('[HLSVideoPlayer] Video metadata not loaded yet, readyState:', video.readyState)
+        console.log('[HLSVideoPlayer] Waiting for metadata before seeking...')
+        video.addEventListener('loadedmetadata', () => {
+          handleSeek(event)
+        }, { once: true })
         return
       }
 
       const duration = video.duration
-
-      // Check if duration is valid
       if (!isFinite(duration) || duration <= 0) {
-        console.warn('[HLSVideoPlayer] Invalid video duration:', duration)
+        console.warn('[HLSVideoPlayer] Invalid duration for seeking:', duration)
         return
       }
 
-      // Use progressBar for accurate position calculation
-      const targetElement = progressBar || progressContainer
-      if (!targetElement) {
-        console.warn('[HLSVideoPlayer] Progress bar element not found')
-        return
+      // Get click/touch position
+      let clientX: number
+      if (event instanceof MouseEvent) {
+        clientX = event.clientX
+      } else {
+        clientX = event.touches[0].clientX
       }
 
-      const rect = targetElement.getBoundingClientRect()
-      const clickX = Math.max(0, Math.min(event.clientX - rect.left, rect.width))
+      // Calculate position relative to progress bar
+      const rect = progressBar.getBoundingClientRect()
+      const clickX = Math.max(0, Math.min(clientX - rect.left, rect.width))
       const percentage = clickX / rect.width
       const newTime = percentage * duration
 
-      // Validate and apply the new time
+      // Apply seek with validation
       if (isFinite(newTime) && newTime >= 0 && newTime <= duration) {
-        try {
-          video.currentTime = newTime
-          // Force update progress bar immediately for visual feedback
-          this.updateProgressBar()
-          console.log(`[HLSVideoPlayer] Seeking to ${newTime.toFixed(2)}s of ${duration.toFixed(2)}s (${(percentage * 100).toFixed(1)}%)`)
-        } catch (error) {
-          console.error('[HLSVideoPlayer] Error setting video time:', error)
-        }
-      } else {
-        console.warn('[HLSVideoPlayer] Invalid seek time:', newTime)
+        video.currentTime = newTime
+        this.updateProgressBar() // Immediate visual feedback
+        console.log(`[HLSVideoPlayer] Seeked to ${newTime.toFixed(2)}s (${(percentage * 100).toFixed(1)}%)`)
       }
     }
 
-    // Add click handler to both container and bar for better UX
-    progressContainer?.addEventListener('click', handleSeek)
-    progressBar?.addEventListener('click', handleSeek)
+    // Add event listeners to progress elements
+    if (progressContainer && progressBar) {
+      // Click to seek
+      progressBar.addEventListener('click', handleSeek)
+      progressContainer.addEventListener('click', handleSeek)
+    }
 
     // Add drag-to-seek functionality for better UX
     let isDragging = false
@@ -1416,6 +1457,11 @@ class HLSVideoPlayer extends HTMLElement {
 
   public getPerformanceMetrics(): PerformanceMetrics {
     return { ...this.performanceMetrics }
+  }
+
+  // Testing support methods
+  public getHLSInstance(): any {
+    return this.hls
   }
 
   // Performance optimization methods

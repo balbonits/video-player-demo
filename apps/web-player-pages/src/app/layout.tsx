@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import Navigation from "@/components/Navigation";
 import "./globals.css";
 
 const inter = Inter({
@@ -20,9 +21,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.variable} antialiased font-sans`}
+        className={`${inter.variable} antialiased font-sans bg-black text-white`}
       >
-        {children}
+        <div className="flex min-h-screen">
+          <Navigation />
+          <main className="flex-1 md:ml-64 min-h-screen">
+            <div className="pt-16 md:pt-0">
+              {children}
+            </div>
+          </main>
+        </div>
       </body>
     </html>
   );

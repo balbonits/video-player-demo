@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>V1 Landing Page - Video Player Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --background: #0a0a0a;
+            --foreground: #fafafa;
+            --card: #141414;
+            --card-hover: #1a1a1a;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --secondary: #10b981;
+            --accent: #8b5cf6;
+            --border: #262626;
+            --muted: #737373;
+            --focus: #3b82f6;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--background);
+            color: var(--foreground);
+        }
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            transition: all 0.2s ease;
+        }
+        .card:hover {
+            background: var(--card-hover);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(59, 130, 246, 0.15);
+        }
+        .focus-ring:focus {
+            outline: 2px solid var(--focus);
+            outline-offset: 2px;
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .metric-card {
+            background: linear-gradient(135deg, var(--card) 0%, var(--card-hover) 100%);
+            border: 1px solid var(--border);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Navigation Header -->
+    <header class="border-b border-gray-800 sticky top-0 bg-black/90 backdrop-blur-sm z-50">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-8">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg"></div>
+                        <span class="text-xl font-semibold">VideoPlayer<span class="text-blue-500">Demo</span></span>
+                    </div>
+                    <div class="hidden md:flex space-x-6">
+                        <a href="#players" class="text-gray-300 hover:text-white focus-ring px-3 py-2 rounded-md">Players</a>
+                        <a href="#features" class="text-gray-300 hover:text-white focus-ring px-3 py-2 rounded-md">Features</a>
+                        <a href="#performance" class="text-gray-300 hover:text-white focus-ring px-3 py-2 rounded-md">Performance</a>
+                        <a href="#docs" class="text-gray-300 hover:text-white focus-ring px-3 py-2 rounded-md">Documentation</a>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="focus-ring px-4 py-2 text-sm bg-gray-800 hover:bg-gray-700 rounded-lg">
+                        View Source
+                    </button>
+                    <button class="focus-ring px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 rounded-lg">
+                        Try Demo
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-blue-600/10 via-purple-600/5 to-transparent"></div>
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+            <div class="text-center">
+                <div class="inline-flex items-center space-x-2 bg-blue-500/10 border border-blue-500/20 rounded-full px-4 py-2 mb-6">
+                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                    <span class="text-sm text-blue-400">Production Ready • 95% Test Coverage</span>
+                </div>
+                <h1 class="text-5xl md:text-6xl font-bold mb-6">
+                    <span class="gradient-text">Enterprise Video Streaming</span><br>
+                    <span class="text-gray-300">for Smart TV & Web</span>
+                </h1>
+                <p class="text-xl text-gray-400 max-w-3xl mx-auto mb-12">
+                    Performance-optimized video players demonstrating modern streaming solutions
+                    with focus on Smart TV constraints, accessibility, and cross-platform support.
+                </p>
+
+                <!-- Key Metrics -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto mb-12">
+                    <div class="metric-card rounded-xl p-6">
+                        <div class="text-3xl font-bold text-green-500 mb-2">95+</div>
+                        <div class="text-sm text-gray-400">Lighthouse Score</div>
+                    </div>
+                    <div class="metric-card rounded-xl p-6">
+                        <div class="text-3xl font-bold text-blue-500 mb-2">&lt;100MB</div>
+                        <div class="text-sm text-gray-400">TV Memory</div>
+                    </div>
+                    <div class="metric-card rounded-xl p-6">
+                        <div class="text-3xl font-bold text-purple-500 mb-2">&lt;1s</div>
+                        <div class="text-sm text-gray-400">First Frame</div>
+                    </div>
+                    <div class="metric-card rounded-xl p-6">
+                        <div class="text-3xl font-bold text-orange-500 mb-2">WCAG AA</div>
+                        <div class="text-sm text-gray-400">Accessibility</div>
+                    </div>
+                </div>
+
+                <!-- CTA Buttons -->
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <button class="focus-ring px-8 py-4 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold text-lg w-full sm:w-auto">
+                        Launch HLS Demo
+                    </button>
+                    <button class="focus-ring px-8 py-4 bg-gray-800 hover:bg-gray-700 rounded-lg font-semibold text-lg w-full sm:w-auto">
+                        View Documentation
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Player Grid Section -->
+    <section id="players" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold mb-4">Choose Your Implementation</h2>
+            <p class="text-gray-400 max-w-2xl mx-auto">
+                Six production-ready player variants optimized for different platforms and use cases
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- HLS.js Player Card -->
+            <div class="card rounded-xl p-6 relative group cursor-pointer" tabindex="0" role="button" aria-label="HLS.js Player">
+                <div class="absolute top-4 right-4">
+                    <span class="bg-green-500/20 text-green-400 text-xs px-3 py-1 rounded-full">Recommended</span>
+                </div>
+                <div class="mb-4">
+                    <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2 group-hover:text-blue-400 transition-colors">HLS.js Player</h3>
+                    <p class="text-gray-400 text-sm mb-4">Production-ready adaptive streaming with enterprise features</p>
+                </div>
+                <div class="space-y-3">
+                    <div class="flex flex-wrap gap-2">
+                        <span class="text-xs bg-gray-800 px-2 py-1 rounded">Adaptive Bitrate</span>
+                        <span class="text-xs bg-gray-800 px-2 py-1 rounded">DRM Ready</span>
+                        <span class="text-xs bg-gray-800 px-2 py-1 rounded">Multi-Audio</span>
+                    </div>
+                    <div class="pt-3 border-t border-gray-800">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-500">Bundle Size</span>
+                            <span class="mono text-gray-300">~200KB</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Native HTML5 Card -->
+            <div class="card rounded-xl p-6 relative group cursor-pointer" tabindex="0" role="button" aria-label="Native HTML5 Player">
+                <div class="mb-4">
+                    <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2 group-hover:text-blue-400 transition-colors">Native HTML5</h3>
+                    <p class="text-gray-400 text-sm mb-4">Lightweight vanilla implementation with zero dependencies</p>
+                </div>
+                <div class="space-y-3">
+                    <div class="flex flex-wrap gap-2">
+                        <span class="text-xs bg-gray-800 px-2 py-1 rounded">Minimal Size</span>
+                        <span class="text-xs bg-gray-800 px-2 py-1 rounded">Fast Load</span>
+                        <span class="text-xs bg-gray-800 px-2 py-1 rounded">Simple API</span>
+                    </div>
+                    <div class="pt-3 border-t border-gray-800">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-500">Bundle Size</span>
+                            <span class="mono text-gray-300">&lt;10KB</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Optimized Card -->
+            <div class="card rounded-xl p-6 relative group cursor-pointer" tabindex="0" role="button" aria-label="Mobile Optimized Player">
+                <div class="absolute top-4 right-4">
+                    <span class="bg-blue-500/20 text-blue-400 text-xs px-3 py-1 rounded-full">Mobile</span>
+                </div>
+                <div class="mb-4">
+                    <div class="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2 group-hover:text-blue-400 transition-colors">Mobile Optimized</h3>
+                    <p class="text-gray-400 text-sm mb-4">Touch-first design with battery and bandwidth optimization</p>
+                </div>
+                <div class="space-y-3">
+                    <div class="flex flex-wrap gap-2">
+                        <span class="text-xs bg-gray-800 px-2 py-1 rounded">Touch Gestures</span>
+                        <span class="text-xs bg-gray-800 px-2 py-1 rounded">Battery Opt</span>
+                        <span class="text-xs bg-gray-800 px-2 py-1 rounded">Responsive</span>
+                    </div>
+                    <div class="pt-3 border-t border-gray-800">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-500">Bundle Size</span>
+                            <span class="mono text-gray-300">~100KB</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Roku Simulation Card -->
+            <div class="card rounded-xl p-6 relative group cursor-pointer" tabindex="0" role="button" aria-label="Roku Simulation Player">
+                <div class="absolute top-4 right-4">
+                    <span class="bg-purple-500/20 text-purple-400 text-xs px-3 py-1 rounded-full">TV</span>
+                </div>
+                <div class="mb-4">
+                    <div class="w-12 h-12 bg-orange-500/20 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2 group-hover:text-blue-400 transition-colors">Roku Simulation</h3>
+                    <p class="text-gray-400 text-sm mb-4">TV remote navigation patterns with D-pad controls</p>
+                </div>
+                <div class="space-y-3">
+                    <div class="flex flex-wrap gap-2">
+                        <span class="text-xs bg-gray-800 px-2 py-1 rounded">D-pad Nav</span>
+                        <span class="text-xs bg-gray-800 px-2 py-1 rounded">Focus Mgmt</span>
+                        <span class="text-xs bg-gray-800 px-2 py-1 rounded">TV Patterns</span>
+                    </div>
+                    <div class="pt-3 border-t border-gray-800">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-500">Bundle Size</span>
+                            <span class="mono text-gray-300">~150KB</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chromecast Card -->
+            <div class="card rounded-xl p-6 relative group cursor-pointer" tabindex="0" role="button" aria-label="Chromecast Receiver">
+                <div class="absolute top-4 right-4">
+                    <span class="bg-orange-500/20 text-orange-400 text-xs px-3 py-1 rounded-full">Cast</span>
+                </div>
+                <div class="mb-4">
+                    <div class="w-12 h-12 bg-cyan-500/20 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2 group-hover:text-blue-400 transition-colors">Chromecast Receiver</h3>
+                    <p class="text-gray-400 text-sm mb-4">Cast protocol implementation for multi-room playback</p>
+                </div>
+                <div class="space-y-3">
+                    <div class="flex flex-wrap gap-2">
+                        <span class="text-xs bg-gray-800 px-2 py-1 rounded">Cast Protocol</span>
+                        <span class="text-xs bg-gray-800 px-2 py-1 rounded">Queue Mgmt</span>
+                        <span class="text-xs bg-gray-800 px-2 py-1 rounded">Multi-Room</span>
+                    </div>
+                    <div class="pt-3 border-t border-gray-800">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-500">Bundle Size</span>
+                            <span class="mono text-gray-300">~180KB</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Performance Benchmark Card -->
+            <div class="card rounded-xl p-6 relative group cursor-pointer" tabindex="0" role="button" aria-label="Performance Benchmark">
+                <div class="absolute top-4 right-4">
+                    <span class="bg-red-500/20 text-red-400 text-xs px-3 py-1 rounded-full">Test</span>
+                </div>
+                <div class="mb-4">
+                    <div class="w-12 h-12 bg-red-500/20 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2 group-hover:text-blue-400 transition-colors">Performance Benchmark</h3>
+                    <p class="text-gray-400 text-sm mb-4">Real-time metrics and optimization testing tools</p>
+                </div>
+                <div class="space-y-3">
+                    <div class="flex flex-wrap gap-2">
+                        <span class="text-xs bg-gray-800 px-2 py-1 rounded">FPS Monitor</span>
+                        <span class="text-xs bg-gray-800 px-2 py-1 rounded">Memory Track</span>
+                        <span class="text-xs bg-gray-800 px-2 py-1 rounded">CPU Profile</span>
+                    </div>
+                    <div class="pt-3 border-t border-gray-800">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-500">Bundle Size</span>
+                            <span class="mono text-gray-300">~250KB</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Feature Comparison Table -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 border-t border-gray-800">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold mb-4">Feature Comparison Matrix</h2>
+            <p class="text-gray-400 max-w-2xl mx-auto">
+                Comprehensive comparison of capabilities across all player implementations
+            </p>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="border-b border-gray-800">
+                        <th class="text-left py-4 px-4 font-medium text-gray-400">Feature</th>
+                        <th class="text-center py-4 px-4 font-medium text-gray-400">HLS.js</th>
+                        <th class="text-center py-4 px-4 font-medium text-gray-400">Native</th>
+                        <th class="text-center py-4 px-4 font-medium text-gray-400">Mobile</th>
+                        <th class="text-center py-4 px-4 font-medium text-gray-400">Roku</th>
+                        <th class="text-center py-4 px-4 font-medium text-gray-400">Cast</th>
+                        <th class="text-center py-4 px-4 font-medium text-gray-400">Bench</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="border-b border-gray-800/50">
+                        <td class="py-4 px-4 text-sm">Adaptive Streaming</td>
+                        <td class="text-center py-4 px-4"><span class="text-green-500">✓</span></td>
+                        <td class="text-center py-4 px-4"><span class="text-red-500">✗</span></td>
+                        <td class="text-center py-4 px-4"><span class="text-green-500">✓</span></td>
+                        <td class="text-center py-4 px-4"><span class="text-green-500">✓</span></td>
+                        <td class="text-center py-4 px-4"><span class="text-green-500">✓</span></td>
+                        <td class="text-center py-4 px-4"><span class="text-green-500">✓</span></td>
+                    </tr>
+                    <tr class="border-b border-gray-800/50 bg-gray-900/30">
+                        <td class="py-4 px-4 text-sm">Touch Gestures</td>
+                        <td class="text-center py-4 px-4"><span class="text-yellow-500">○</span></td>
+                        <td class="text-center py-4 px-4"><span class="text-yellow-500">○</span></td>
+                        <td class="text-center py-4 px-4"><span class="text-green-500">✓</span></td>
+                        <td class="text-center py-4 px-4"><span class="text-red-500">✗</span></td>
+                        <td class="text-center py-4 px-4"><span class="text-red-500">✗</span></td>
+                        <td class="text-center py-4 px-4"><span class="text-yellow-500">○</span></td>
+                    </tr>
+                    <tr class="border-b border-gray-800/50">
+                        <td class="py-4 px-4 text-sm">TV Remote Control</td>
+                        <td class="text-center py-4 px-4"><span class="text-yellow-500">○</span></td>
+                        <td class="text-center py-4 px-4"><span class="text-red-500">✗</span></td>
+                        <td class="text-center py-4 px-4"><span class="text-red-500">✗</span></td>
+                        <td class="text-center py-4 px-4"><span class="text-green-500">✓</span></td>
+                        <td class="text-center py-4 px-4"><span class="text-green-500">✓</span></td>
+                        <td class="text-center py-4 px-4"><span class="text-red-500">✗</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-6 flex items-center justify-center space-x-6 text-sm text-gray-500">
+            <span>✓ = Fully Supported</span>
+            <span>○ = Partial Support</span>
+            <span>✗ = Not Supported</span>
+        </div>
+    </section>
+
+    <!-- Smart TV Navigation Preview -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 border-t border-gray-800">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold mb-4">Smart TV Remote Navigation</h2>
+            <p class="text-gray-400 max-w-2xl mx-auto">
+                D-pad optimized interface with focus management for TV remotes
+            </p>
+        </div>
+
+        <div class="bg-gray-900 rounded-2xl p-8 border border-gray-800">
+            <div class="max-w-4xl mx-auto">
+                <!-- TV Remote Simulator -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Video Player Preview -->
+                    <div class="bg-black rounded-xl aspect-video relative overflow-hidden">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="text-gray-600">
+                                <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <!-- Control Bar -->
+                        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-4">
+                            <div class="flex items-center space-x-4">
+                                <button class="w-10 h-10 bg-white/20 hover:bg-white/30 rounded-lg flex items-center justify-center focus:ring-2 focus:ring-blue-500">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </button>
+                                <div class="flex-1 bg-white/20 rounded-full h-2">
+                                    <div class="bg-blue-500 h-2 rounded-full" style="width: 35%"></div>
+                                </div>
+                                <span class="text-xs mono">12:34 / 45:20</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Remote Control Visual -->
+                    <div class="flex items-center justify-center">
+                        <div class="bg-gray-800 rounded-2xl p-6 w-48">
+                            <div class="text-center mb-6">
+                                <div class="text-xs text-gray-500 mb-2">TV REMOTE</div>
+                                <div class="text-sm text-gray-400">Use Arrow Keys</div>
+                            </div>
+
+                            <!-- D-pad -->
+                            <div class="relative w-32 h-32 mx-auto mb-6">
+                                <button class="absolute top-0 left-1/2 -translate-x-1/2 w-10 h-10 bg-gray-700 hover:bg-gray-600 rounded-lg flex items-center justify-center">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                                    </svg>
+                                </button>
+                                <button class="absolute bottom-0 left-1/2 -translate-x-1/2 w-10 h-10 bg-gray-700 hover:bg-gray-600 rounded-lg flex items-center justify-center">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </button>
+                                <button class="absolute left-0 top-1/2 -translate-y-1/2 w-10 h-10 bg-gray-700 hover:bg-gray-600 rounded-lg flex items-center justify-center">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                                    </svg>
+                                </button>
+                                <button class="absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10 bg-gray-700 hover:bg-gray-600 rounded-lg flex items-center justify-center">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                    </svg>
+                                </button>
+                                <button class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-blue-600 hover:bg-blue-700 rounded-full flex items-center justify-center">
+                                    <span class="text-xs font-semibold">OK</span>
+                                </button>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="grid grid-cols-2 gap-2">
+                                <button class="bg-gray-700 hover:bg-gray-600 rounded-lg py-2 text-xs">Back</button>
+                                <button class="bg-gray-700 hover:bg-gray-600 rounded-lg py-2 text-xs">Home</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-800 mt-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="text-sm text-gray-400 mb-4 md:mb-0">
+                    Built with React 18, Next.js 14, TypeScript, and HLS.js
+                </div>
+                <div class="flex space-x-6">
+                    <a href="#" class="text-gray-400 hover:text-white">GitHub</a>
+                    <a href="#" class="text-gray-400 hover:text-white">Documentation</a>
+                    <a href="#" class="text-gray-400 hover:text-white">API Reference</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

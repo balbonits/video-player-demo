@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desktop Video Player Wireframe - FOX Streaming Demo</title>
+    <style>
+        :root {
+            --primary-bg: #000000;
+            --secondary-bg: #111111;
+            --accent-bg: #1a1a1a;
+            --text-primary: #ffffff;
+            --text-secondary: #cccccc;
+            --text-muted: #888888;
+            --accent-blue: #0066cc;
+            --accent-green: #00cc66;
+            --border-color: #333333;
+            --focus-color: #0088ff;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--primary-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Main Layout */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            min-height: 100vh;
+        }
+
+        /* Video Player Section */
+        .video-section {
+            background: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .video-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+
+        .video-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .video-badge {
+            background: var(--accent-green);
+            color: var(--primary-bg);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: auto;
+        }
+
+        .video-container {
+            position: relative;
+            background: #000;
+            aspect-ratio: 16 / 9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .video-placeholder {
+            color: var(--text-muted);
+            font-size: 48px;
+            font-weight: 300;
+        }
+
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(transparent 60%, rgba(0,0,0,0.8));
+            pointer-events: none;
+        }
+
+        .video-controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            pointer-events: auto;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 3px;
+            margin-bottom: 16px;
+            cursor: pointer;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent-blue);
+            border-radius: 3px;
+            width: 35%;
+            transition: width 0.1s ease;
+        }
+
+        .control-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .control-btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: var(--text-primary);
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .control-btn:hover,
+        .control-btn:focus {
+            background: rgba(255,255,255,0.2);
+            outline: 2px solid var(--focus-color);
+            outline-offset: 2px;
+        }
+
+        .control-btn.primary {
+            background: var(--accent-blue);
+            padding: 12px 16px;
+            font-weight: 600;
+        }
+
+        .time-display {
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .quality-selector {
+            background: rgba(0,0,0,0.8);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        /* Performance Metrics */
+        .metrics-section {
+            background: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .metrics-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .metric-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--accent-bg);
+        }
+
+        .metric-item:last-child {
+            border-bottom: none;
+        }
+
+        .metric-label {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .metric-value {
+            color: var(--text-primary);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .metric-value.good {
+            color: var(--accent-green);
+        }
+
+        .metric-value.warning {
+            color: #ffaa00;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .transcript-section {
+            background: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            flex: 1;
+        }
+
+        .transcript-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .transcript-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .live-indicator {
+            background: #ff4444;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .transcript-content {
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .transcript-line {
+            margin-bottom: 12px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: background 0.2s ease;
+        }
+
+        .transcript-line.active {
+            background: rgba(0, 136, 255, 0.2);
+            border-left: 3px solid var(--accent-blue);
+        }
+
+        .transcript-time {
+            color: var(--text-muted);
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .transcript-text {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* Feature Grid */
+        .features-section {
+            background: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .features-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .feature-icon {
+            color: var(--accent-green);
+            font-weight: 600;
+        }
+
+        .feature-text {
+            color: var(--text-secondary);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .video-section {
+                order: 1;
+            }
+
+            .sidebar {
+                order: 2;
+                flex-direction: row;
+                gap: 20px;
+            }
+
+            .transcript-section,
+            .features-section {
+                flex: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+            }
+
+            .sidebar {
+                flex-direction: column;
+            }
+
+            .control-row {
+                gap: 8px;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Focus Management for Accessibility */
+        .focusable:focus {
+            outline: 2px solid var(--focus-color);
+            outline-offset: 2px;
+        }
+
+        /* Loading States */
+        .loading {
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Main Video Section -->
+        <main class="video-section" role="main">
+            <div class="video-header">
+                <h1 class="video-title">HLS Adaptive Streaming Demo</h1>
+                <span class="video-badge">LIVE</span>
+            </div>
+
+            <div class="video-container">
+                <div class="video-placeholder">▶</div>
+                <div class="video-overlay"></div>
+
+                <div class="video-controls">
+                    <div class="progress-bar focusable" tabindex="0" role="slider" aria-label="Video progress">
+                        <div class="progress-fill"></div>
+                    </div>
+
+                    <div class="control-row">
+                        <button class="control-btn focusable" aria-label="Previous track">⏮</button>
+                        <button class="control-btn primary focusable" aria-label="Play">▶</button>
+                        <button class="control-btn focusable" aria-label="Next track">⏭</button>
+                        <button class="control-btn focusable" aria-label="Volume">🔊</button>
+
+                        <span class="time-display">12:34 / 18:22</span>
+
+                        <select class="quality-selector focusable" aria-label="Video quality">
+                            <option>Auto (1080p)</option>
+                            <option>1080p</option>
+                            <option>720p</option>
+                            <option>480p</option>
+                        </select>
+
+                        <button class="control-btn focusable" aria-label="Captions">CC</button>
+                        <button class="control-btn focusable" aria-label="Picture in picture">⧉</button>
+                        <button class="control-btn focusable" aria-label="Settings">⚙</button>
+                        <button class="control-btn focusable" aria-label="Fullscreen">⛶</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Performance Metrics -->
+            <div class="metrics-section">
+                <h2 class="metrics-title">
+                    📊 Real-time Performance Metrics
+                </h2>
+
+                <div class="metric-item">
+                    <span class="metric-label">Memory Usage</span>
+                    <span class="metric-value good">67.2 MB</span>
+                </div>
+
+                <div class="metric-item">
+                    <span class="metric-label">CPU Usage</span>
+                    <span class="metric-value good">15.3%</span>
+                </div>
+
+                <div class="metric-item">
+                    <span class="metric-label">Network Throughput</span>
+                    <span class="metric-value">4.2 Mbps</span>
+                </div>
+
+                <div class="metric-item">
+                    <span class="metric-label">Buffer Health</span>
+                    <span class="metric-value good">8.7s</span>
+                </div>
+
+                <div class="metric-item">
+                    <span class="metric-label">Decode Latency</span>
+                    <span class="metric-value good">12ms</span>
+                </div>
+
+                <div class="metric-item">
+                    <span class="metric-label">Quality Switches</span>
+                    <span class="metric-value">3</span>
+                </div>
+            </div>
+        </main>
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <!-- Live Transcript -->
+            <section class="transcript-section">
+                <div class="transcript-header">
+                    <h2 class="transcript-title">Live Transcript</h2>
+                    <span class="live-indicator">● REC</span>
+                </div>
+
+                <div class="transcript-content">
+                    <div class="transcript-line">
+                        <div class="transcript-time">[0:12]</div>
+                        <div class="transcript-text">Welcome to the FOX Video Player demo</div>
+                    </div>
+
+                    <div class="transcript-line">
+                        <div class="transcript-time">[0:18]</div>
+                        <div class="transcript-text">showcasing Smart TV optimization and</div>
+                    </div>
+
+                    <div class="transcript-line active">
+                        <div class="transcript-time">[0:24]</div>
+                        <div class="transcript-text">accessibility features that were wishlist</div>
+                    </div>
+
+                    <div class="transcript-line loading">
+                        <div class="transcript-time">[0:30]</div>
+                        <div class="transcript-text">items during my time at FOX Corporation...</div>
+                    </div>
+
+                    <div class="transcript-line">
+                        <div class="transcript-time">[0:36]</div>
+                        <div class="transcript-text">This player demonstrates modern web APIs</div>
+                    </div>
+
+                    <div class="transcript-line">
+                        <div class="transcript-time">[0:42]</div>
+                        <div class="transcript-text">for real-time transcription and performance</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Feature Showcase -->
+            <section class="features-section">
+                <h2 class="features-title">FOX Demo Features</h2>
+
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span class="feature-text">HLS Adaptive Streaming</span>
+                    </div>
+
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span class="feature-text">Smart TV Navigation</span>
+                    </div>
+
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span class="feature-text">Live Transcription</span>
+                    </div>
+
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span class="feature-text">WebVTT Captions</span>
+                    </div>
+
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span class="feature-text">Quality Selection</span>
+                    </div>
+
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span class="feature-text">WCAG 2.1 AA Compliance</span>
+                    </div>
+
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span class="feature-text">Performance Monitoring</span>
+                    </div>
+
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span class="feature-text">Cross-Platform Ready</span>
+                    </div>
+                </div>
+            </section>
+        </aside>
+    </div>
+
+    <script>
+        // Demo interactions
+        document.querySelectorAll('.control-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                console.log('Control activated:', this.getAttribute('aria-label'));
+            });
+        });
+
+        // Progress bar interaction
+        document.querySelector('.progress-bar').addEventListener('click', function(e) {
+            const rect = this.getBoundingClientRect();
+            const progress = (e.clientX - rect.left) / rect.width;
+            this.querySelector('.progress-fill').style.width = (progress * 100) + '%';
+        });
+
+        // Quality selector
+        document.querySelector('.quality-selector').addEventListener('change', function() {
+            console.log('Quality changed to:', this.value);
+        });
+
+        // Keyboard navigation simulation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowRight' ||
+                e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                console.log('D-pad navigation:', e.key);
+            }
+        });
+
+        // Live transcript auto-scroll simulation
+        setInterval(() => {
+            const active = document.querySelector('.transcript-line.active');
+            if (active) {
+                active.classList.remove('active');
+                const next = active.nextElementSibling;
+                if (next && next.classList.contains('transcript-line')) {
+                    next.classList.add('active');
+                    next.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+        }, 3000);
+
+        // Performance metrics simulation
+        setInterval(() => {
+            const metrics = document.querySelectorAll('.metric-value');
+            metrics.forEach(metric => {
+                if (metric.textContent.includes('MB')) {
+                    const current = parseFloat(metric.textContent);
+                    const variation = (Math.random() - 0.5) * 2;
+                    metric.textContent = (current + variation).toFixed(1) + ' MB';
+                }
+            });
+        }, 2000);
+    </script>
+</body>
+</html>

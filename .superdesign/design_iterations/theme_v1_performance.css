@@ -1,0 +1,255 @@
+:root {
+  /* V1 Performance-First Theme - Optimized for Smart TV & Accessibility */
+
+  /* Core Colors - High contrast for WCAG 2.1 AA */
+  --background: oklch(0.0901 0 0);
+  --foreground: oklch(0.9851 0 0);
+  --card: oklch(0.1098 0 0);
+  --card-foreground: oklch(0.9851 0 0);
+
+  /* Primary palette - FOX brand-aligned blue */
+  --primary: oklch(0.6545 0.2133 260.8178);
+  --primary-foreground: oklch(0.9851 0 0);
+  --primary-hover: oklch(0.5830 0.2133 260.8178);
+  --primary-focus: oklch(0.7271 0.2408 260.8178);
+
+  /* Secondary & Accent */
+  --secondary: oklch(0.1647 0 0);
+  --secondary-foreground: oklch(0.9851 0 0);
+  --accent: oklch(0.7271 0.2408 142.4953);
+  --accent-foreground: oklch(0.0901 0 0);
+
+  /* State colors */
+  --success: oklch(0.6970 0.2387 142.4953);
+  --warning: oklch(0.8100 0.2387 90);
+  --error: oklch(0.5830 0.2387 28.4765);
+  --muted: oklch(0.1647 0 0);
+  --muted-foreground: oklch(0.7090 0 0);
+
+  /* Borders & Inputs */
+  --border: oklch(0.2046 0 0);
+  --input: oklch(0.1647 0 0);
+  --ring: oklch(0.6545 0.2133 260.8178);
+
+  /* Typography - Optimized for 10-foot viewing */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+
+  /* Smart TV Specific Sizing */
+  --tv-min-touch-target: 48px;
+  --tv-large-touch-target: 64px;
+  --tv-control-size: 56px;
+  --tv-play-button-size: 80px;
+
+  /* Text sizes for TV viewing distance */
+  --text-xs: 14px;
+  --text-sm: 16px;
+  --text-base: 18px;
+  --text-lg: 24px;
+  --text-xl: 32px;
+  --text-2xl: 40px;
+  --text-3xl: 48px;
+
+  /* TV-specific text sizes */
+  --tv-text-sm: 20px;
+  --tv-text-base: 24px;
+  --tv-text-lg: 32px;
+  --tv-text-xl: 40px;
+
+  /* Focus indicators for D-pad navigation */
+  --focus-width: 4px;
+  --focus-offset: 2px;
+  --focus-color: oklch(0.6545 0.2133 260.8178);
+  --focus-scale: 1.08;
+
+  /* Safe areas for TV displays */
+  --tv-safe-x: 5%;
+  --tv-safe-y: 5%;
+
+  /* Border radius - minimal for performance */
+  --radius: 4px;
+  --radius-lg: 8px;
+  --radius-full: 9999px;
+
+  /* Shadows - CSS-only for performance */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.6);
+  --shadow-xl: 0 16px 32px rgba(0, 0, 0, 0.7);
+  --shadow-focus: 0 0 0 var(--focus-width) var(--focus-color);
+
+  /* Spacing - 8px grid system */
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-5: 40px;
+  --space-6: 48px;
+  --space-8: 64px;
+  --space-10: 80px;
+
+  /* Animation - Performance-optimized durations */
+  --duration-instant: 0ms;
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 350ms;
+  --easing-default: cubic-bezier(0.4, 0, 0.2, 1);
+  --easing-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+  /* Video player specific */
+  --video-controls-height: 80px;
+  --video-progress-height: 8px;
+  --video-progress-height-focused: 12px;
+  --video-overlay-gradient: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.9) 0%,
+    rgba(0, 0, 0, 0.5) 50%,
+    transparent 100%
+  );
+
+  /* Transcript panel */
+  --transcript-width: 400px;
+  --transcript-line-height: 1.8;
+  --transcript-highlight: oklch(0.6545 0.2133 260.8178 / 0.2);
+  --transcript-active: oklch(0.7271 0.2408 142.4953 / 0.3);
+
+  /* Caption customization */
+  --caption-bg: rgba(0, 0, 0, 0.8);
+  --caption-size-sm: 20px;
+  --caption-size-md: 28px;
+  --caption-size-lg: 36px;
+  --caption-outline: 2px 2px 4px rgba(0, 0, 0, 0.9);
+
+  /* Performance flags */
+  --use-gpu: translateZ(0);
+  --reduce-motion: prefers-reduced-motion;
+  --high-contrast: prefers-contrast;
+}
+
+/* Dark mode is default for TV viewing */
+@media (prefers-color-scheme: light) {
+  :root {
+    --background: oklch(0.9851 0 0);
+    --foreground: oklch(0.0901 0 0);
+    --card: oklch(0.9702 0 0);
+    --card-foreground: oklch(0.0901 0 0);
+  }
+}
+
+/* Smart TV Detection */
+@media (min-width: 1920px) and (min-height: 1080px) {
+  :root {
+    --is-tv: true;
+    --interaction: remote;
+    --text-base: var(--tv-text-base);
+    --min-touch-target: var(--tv-min-touch-target);
+  }
+}
+
+/* Reduced motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-normal: 0ms;
+    --duration-slow: 0ms;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  :root {
+    --border: oklch(0.4 0 0);
+    --focus-width: 6px;
+    --shadow-sm: 0 0 0 1px white;
+    --shadow-md: 0 0 0 2px white;
+  }
+}
+
+/* Utility classes for performance */
+.gpu-accelerated {
+  transform: var(--use-gpu);
+  will-change: transform;
+}
+
+.no-motion {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* Focus management for TV remotes */
+.tv-focusable {
+  outline: none;
+  position: relative;
+  transition: transform var(--duration-fast) var(--easing-default),
+              box-shadow var(--duration-fast) var(--easing-default);
+}
+
+.tv-focusable:focus {
+  transform: scale(var(--focus-scale));
+  box-shadow: var(--shadow-focus), var(--shadow-lg);
+  z-index: 10;
+}
+
+.tv-focusable:focus::after {
+  content: '';
+  position: absolute;
+  inset: calc(var(--focus-width) * -1);
+  border: var(--focus-width) solid var(--focus-color);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* Skip navigation for accessibility */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  padding: var(--space-2);
+  border-radius: var(--radius);
+  text-decoration: none;
+  z-index: 100;
+}
+
+.skip-link:focus {
+  top: var(--space-2);
+}
+
+/* Performance-optimized animations */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Loading states */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--muted) 25%,
+    var(--secondary) 50%,
+    var(--muted) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton 2s ease-in-out infinite;
+}
+
+@keyframes skeleton {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

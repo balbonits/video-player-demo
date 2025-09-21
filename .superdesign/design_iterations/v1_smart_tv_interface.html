@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart TV Video Player - FOX Demo</title>
+    <link rel="stylesheet" href="theme_v1_performance.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <style>
+        body {
+            background-color: var(--background) !important;
+            color: var(--foreground) !important;
+            font-family: var(--font-sans) !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            font-size: var(--tv-text-base) !important;
+            overflow: hidden; /* TV screens don't scroll */
+        }
+
+        /* TV Safe Area Container */
+        .tv-container {
+            position: absolute;
+            top: var(--tv-safe-y);
+            left: var(--tv-safe-x);
+            right: var(--tv-safe-y);
+            bottom: var(--tv-safe-x);
+            width: calc(100vw - 2 * var(--tv-safe-x));
+            height: calc(100vh - 2 * var(--tv-safe-y));
+            background-color: var(--background);
+        }
+
+        /* Full-screen video layout */
+        .tv-player-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tv-video-element {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--muted-foreground);
+            font-size: var(--tv-text-xl);
+        }
+
+        /* TV Navigation Overlay */
+        .tv-nav-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(
+                to bottom,
+                rgba(0, 0, 0, 0.8) 0%,
+                rgba(0, 0, 0, 0.4) 50%,
+                transparent 100%
+            );
+            padding: var(--space-4);
+            transform: translateY(-100%);
+            transition: transform var(--duration-slow) var(--easing-default);
+            z-index: 30;
+        }
+
+        .tv-controls-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--video-overlay-gradient);
+            padding: var(--space-6);
+            transform: translateY(100%);
+            transition: transform var(--duration-slow) var(--easing-default);
+            z-index: 30;
+        }
+
+        /* Show overlays on focus or interaction */
+        .tv-player-wrapper:hover .tv-nav-overlay,
+        .tv-player-wrapper:hover .tv-controls-overlay,
+        .tv-nav-overlay:focus-within,
+        .tv-controls-overlay:focus-within,
+        .show-ui .tv-nav-overlay,
+        .show-ui .tv-controls-overlay {
+            transform: translateY(0);
+        }
+
+        /* TV Top Navigation */
+        .tv-nav-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .tv-nav-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+        }
+
+        .tv-brand {
+            font-size: var(--tv-text-lg);
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .tv-nav-center {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+        }
+
+        .tv-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            color: var(--muted-foreground);
+            font-size: var(--tv-text-sm);
+        }
+
+        .tv-nav-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        /* TV Control Buttons - Extra Large */
+        .tv-button {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: var(--radius-lg);
+            padding: var(--space-3);
+            color: white;
+            cursor: pointer;
+            transition: all var(--duration-normal);
+            min-width: var(--tv-large-touch-target);
+            min-height: var(--tv-large-touch-target);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+            font-size: var(--tv-text-sm);
+            gap: var(--space-2);
+        }
+
+        .tv-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        .tv-button:focus {
+            outline: none;
+            background: var(--primary);
+            transform: scale(var(--focus-scale));
+            box-shadow: var(--shadow-focus), var(--shadow-xl);
+            z-index: 10;
+        }
+
+        .tv-button.primary {
+            background: var(--primary);
+            min-width: var(--tv-play-button-size);
+            min-height: var(--tv-play-button-size);
+            border-radius: var(--radius-full);
+        }
+
+        .tv-button.primary:hover {
+            background: var(--primary-hover);
+        }
+
+        /* TV Progress Bar - Thicker for visibility */
+        .tv-progress-container {
+            margin-bottom: var(--space-4);
+            position: relative;
+        }
+
+        .tv-progress-bar {
+            height: 12px;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+            cursor: pointer;
+            transition: height var(--duration-fast);
+        }
+
+        .tv-progress-bar:hover,
+        .tv-progress-bar:focus {
+            height: 16px;
+        }
+
+        .tv-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+            width: 35%;
+            border-radius: inherit;
+            transition: width var(--duration-normal);
+        }
+
+        /* TV Control Layout */
+        .tv-controls-grid {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            gap: var(--space-6);
+        }
+
+        .tv-controls-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .tv-controls-center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-4);
+        }
+
+        .tv-controls-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        /* TV Time Display - Larger */
+        .tv-time-display {
+            color: white;
+            font-family: var(--font-mono);
+            font-size: var(--tv-text-lg);
+            font-weight: 500;
+            min-width: 200px;
+            text-align: center;
+            padding: var(--space-2) var(--space-3);
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: var(--radius);
+        }
+
+        /* TV Captions - Larger and High Contrast */
+        .tv-captions {
+            position: absolute;
+            bottom: 120px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: var(--space-3) var(--space-4);
+            border-radius: var(--radius-lg);
+            font-size: var(--caption-size-lg);
+            font-weight: 500;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 1);
+            max-width: 70%;
+            text-align: center;
+            z-index: 20;
+            border: 2px solid var(--primary);
+        }
+
+        /* TV Side Panel for Transcript */
+        .tv-transcript-panel {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 400px;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(12px);
+            border-left: 2px solid var(--primary);
+            transform: translateX(100%);
+            transition: transform var(--duration-slow) var(--easing-default);
+            z-index: 40;
+            padding: var(--space-4);
+        }
+
+        .tv-transcript-panel.open {
+            transform: translateX(0);
+        }
+
+        .tv-transcript-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-4);
+            padding-bottom: var(--space-3);
+            border-bottom: 2px solid var(--border);
+        }
+
+        .tv-transcript-title {
+            font-size: var(--tv-text-lg);
+            font-weight: 600;
+            color: var(--foreground);
+        }
+
+        .tv-transcript-content {
+            height: calc(100% - 80px);
+            overflow-y: auto;
+            padding-right: var(--space-2);
+        }
+
+        .tv-transcript-line {
+            padding: var(--space-2) 0;
+            cursor: pointer;
+            border-radius: var(--radius);
+            transition: all var(--duration-fast);
+            font-size: var(--tv-text-sm);
+            line-height: 1.8;
+        }
+
+        .tv-transcript-line:hover {
+            background-color: var(--transcript-highlight);
+        }
+
+        .tv-transcript-line.active {
+            background-color: var(--transcript-active);
+            font-weight: 600;
+            border-left: 4px solid var(--primary);
+            padding-left: var(--space-3);
+        }
+
+        /* TV Quality Menu - Larger */
+        .tv-quality-menu {
+            position: absolute;
+            bottom: 120%;
+            right: 0;
+            background: rgba(0, 0, 0, 0.95);
+            border: 2px solid var(--primary);
+            border-radius: var(--radius-lg);
+            min-width: 180px;
+            box-shadow: var(--shadow-xl);
+            z-index: 50;
+            display: none;
+            backdrop-filter: blur(12px);
+        }
+
+        .tv-quality-option {
+            padding: var(--space-3) var(--space-4);
+            color: var(--foreground);
+            cursor: pointer;
+            transition: all var(--duration-fast);
+            font-size: var(--tv-text-sm);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .tv-quality-option:hover,
+        .tv-quality-option:focus {
+            background-color: var(--primary);
+            color: var(--primary-foreground);
+        }
+
+        .tv-quality-option.active {
+            background-color: var(--accent);
+            color: var(--accent-foreground);
+            font-weight: 600;
+        }
+
+        /* Status indicators */
+        .tv-status-indicator {
+            position: absolute;
+            top: var(--space-4);
+            right: var(--space-4);
+            display: flex;
+            gap: var(--space-2);
+            z-index: 25;
+        }
+
+        .tv-status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: var(--radius-full);
+            background: var(--success);
+        }
+
+        .tv-status-dot.streaming {
+            background: var(--primary);
+            animation: pulse 2s infinite;
+        }
+
+        .tv-status-dot.recording {
+            background: var(--error);
+            animation: pulse 1s infinite;
+        }
+
+        /* Remote control hint */
+        .tv-remote-hint {
+            position: absolute;
+            bottom: var(--space-4);
+            left: var(--space-4);
+            color: var(--muted-foreground);
+            font-size: var(--text-sm);
+            opacity: 0.7;
+            z-index: 25;
+        }
+
+        /* Accessibility focus ring for TV */
+        .tv-focusable {
+            outline: none;
+            position: relative;
+            transition: all var(--duration-normal) var(--easing-default);
+        }
+
+        .tv-focusable:focus {
+            transform: scale(var(--focus-scale));
+            z-index: 15;
+        }
+
+        .tv-focusable:focus::before {
+            content: '';
+            position: absolute;
+            inset: calc(var(--focus-width) * -1);
+            border: var(--focus-width) solid var(--focus-color);
+            border-radius: inherit;
+            pointer-events: none;
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Loading state */
+        .tv-loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--space-4);
+            z-index: 20;
+        }
+
+        .tv-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid var(--primary);
+            border-radius: var(--radius-full);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="tv-container">
+        <!-- TV Video Player Wrapper -->
+        <div class="tv-player-wrapper" id="tv-main-content">
+            <!-- Video Element -->
+            <div class="tv-video-element">
+                <div style="text-align: center;">
+                    <i data-lucide="tv" style="width: 120px; height: 120px; margin-bottom: 24px; opacity: 0.6;"></i>
+                    <div style="font-size: var(--tv-text-xl);">Smart TV Video Player</div>
+                    <div style="font-size: var(--tv-text-base); margin-top: 16px; opacity: 0.8;">HLS Streaming - Planete Interdite</div>
+                    <div style="font-size: var(--tv-text-sm); margin-top: 8px; opacity: 0.6;">Press OK to play</div>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div class="tv-loading" style="display: none;">
+                <div class="tv-spinner"></div>
+                <div style="font-size: var(--tv-text-base); color: var(--muted-foreground);">Loading...</div>
+            </div>
+
+            <!-- Status Indicators -->
+            <div class="tv-status-indicator">
+                <div class="tv-status-dot streaming" title="Live Stream"></div>
+                <div class="tv-status-dot" title="Connected"></div>
+            </div>
+
+            <!-- Remote Control Hint -->
+            <div class="tv-remote-hint">
+                Use D-pad to navigate • OK to select • Back to return
+            </div>
+
+            <!-- Top Navigation Overlay -->
+            <div class="tv-nav-overlay">
+                <div class="tv-nav-row">
+                    <div class="tv-nav-left">
+                        <div class="tv-brand">FOX Player</div>
+                    </div>
+
+                    <div class="tv-nav-center">
+                        <div class="tv-breadcrumb">
+                            <span>Video Demo</span>
+                            <i data-lucide="chevron-right" style="width: 16px; height: 16px;"></i>
+                            <span>Planete Interdite</span>
+                        </div>
+                    </div>
+
+                    <div class="tv-nav-right">
+                        <button class="tv-button tv-focusable" aria-label="Search">
+                            <i data-lucide="search"></i>
+                        </button>
+                        <button class="tv-button tv-focusable" aria-label="Settings">
+                            <i data-lucide="settings"></i>
+                        </button>
+                        <button class="tv-button tv-focusable" aria-label="Exit">
+                            <i data-lucide="x"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TV Captions -->
+            <div class="tv-captions">
+                High contrast captions optimized for 10-foot viewing distance
+            </div>
+
+            <!-- Bottom Controls Overlay -->
+            <div class="tv-controls-overlay">
+                <!-- Progress Bar -->
+                <div class="tv-progress-container">
+                    <div class="tv-progress-bar tv-focusable" role="slider" aria-label="Video progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="35" tabindex="0">
+                        <div class="tv-progress-fill"></div>
+                    </div>
+                </div>
+
+                <!-- Control Grid -->
+                <div class="tv-controls-grid">
+                    <!-- Left Controls -->
+                    <div class="tv-controls-left">
+                        <button class="tv-button tv-focusable" aria-label="Previous" tabindex="0">
+                            <i data-lucide="skip-back"></i>
+                        </button>
+                        <button class="tv-button tv-focusable" aria-label="Rewind 10s" tabindex="0">
+                            <i data-lucide="rotate-ccw"></i>
+                            <span>10s</span>
+                        </button>
+                    </div>
+
+                    <!-- Center Controls -->
+                    <div class="tv-controls-center">
+                        <button class="tv-button primary tv-focusable" aria-label="Play video" tabindex="0">
+                            <i data-lucide="play" style="width: 32px; height: 32px;"></i>
+                        </button>
+                        <div class="tv-time-display">12:34 / 45:67</div>
+                    </div>
+
+                    <!-- Right Controls -->
+                    <div class="tv-controls-right">
+                        <button class="tv-button tv-focusable" aria-label="Forward 30s" tabindex="0">
+                            <span>30s</span>
+                            <i data-lucide="rotate-cw"></i>
+                        </button>
+                        <button class="tv-button tv-focusable" aria-label="Next" tabindex="0">
+                            <i data-lucide="skip-forward"></i>
+                        </button>
+                        <button class="tv-button tv-focusable" aria-label="Captions" tabindex="0">
+                            <i data-lucide="closed-captioning"></i>
+                        </button>
+
+                        <div style="position: relative;">
+                            <button class="tv-button tv-focusable" aria-label="Quality" tabindex="0" id="quality-btn">
+                                <i data-lucide="hd"></i>
+                                <span>Auto</span>
+                            </button>
+                            <div class="tv-quality-menu" id="quality-menu">
+                                <div class="tv-quality-option active tv-focusable" tabindex="0">
+                                    Auto <i data-lucide="check" style="width: 16px; height: 16px;"></i>
+                                </div>
+                                <div class="tv-quality-option tv-focusable" tabindex="0">1080p HD</div>
+                                <div class="tv-quality-option tv-focusable" tabindex="0">720p HD</div>
+                                <div class="tv-quality-option tv-focusable" tabindex="0">480p SD</div>
+                            </div>
+                        </div>
+
+                        <button class="tv-button tv-focusable" aria-label="Transcript" tabindex="0" id="transcript-btn">
+                            <i data-lucide="file-text"></i>
+                        </button>
+                        <button class="tv-button tv-focusable" aria-label="Audio" tabindex="0">
+                            <i data-lucide="volume-2"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transcript Side Panel -->
+            <div class="tv-transcript-panel" id="transcript-panel">
+                <div class="tv-transcript-header">
+                    <h2 class="tv-transcript-title">Live Transcript</h2>
+                    <button class="tv-button tv-focusable" aria-label="Close transcript" tabindex="0" id="transcript-close">
+                        <i data-lucide="x"></i>
+                    </button>
+                </div>
+
+                <div class="tv-transcript-content">
+                    <div class="tv-transcript-line">
+                        <span style="color: var(--primary); font-family: var(--font-mono); margin-right: var(--space-2);">00:12</span>
+                        Welcome to this Smart TV demonstration of advanced video streaming.
+                    </div>
+                    <div class="tv-transcript-line active">
+                        <span style="color: var(--primary); font-family: var(--font-mono); margin-right: var(--space-2);">00:18</span>
+                        This interface is optimized for D-pad navigation and 10-foot viewing.
+                    </div>
+                    <div class="tv-transcript-line">
+                        <span style="color: var(--primary); font-family: var(--font-mono); margin-right: var(--space-2);">00:25</span>
+                        Large touch targets ensure easy navigation with TV remotes.
+                    </div>
+                    <div class="tv-transcript-line">
+                        <span style="color: var(--primary); font-family: var(--font-mono); margin-right: var(--space-2);">00:32</span>
+                        High contrast design improves visibility in living room environments.
+                    </div>
+                    <div class="tv-transcript-line">
+                        <span style="color: var(--primary); font-family: var(--font-mono); margin-right: var(--space-2);">00:38</span>
+                        Performance optimizations ensure smooth playback on TV hardware.
+                    </div>
+                    <div class="tv-transcript-line">
+                        <span style="color: var(--primary); font-family: var(--font-mono); margin-right: var(--space-2);">00:45</span>
+                        WCAG accessibility compliance supports all viewing preferences.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const playerWrapper = document.querySelector('.tv-player-wrapper');
+            let uiTimeout;
+
+            // Show UI on any interaction
+            function showUI() {
+                playerWrapper.classList.add('show-ui');
+                clearTimeout(uiTimeout);
+                uiTimeout = setTimeout(() => {
+                    playerWrapper.classList.remove('show-ui');
+                }, 5000);
+            }
+
+            // D-pad simulation and focus management
+            const focusableElements = document.querySelectorAll('.tv-focusable');
+            let currentFocusIndex = 4; // Start on play button
+
+            function setFocus(index) {
+                if (index >= 0 && index < focusableElements.length) {
+                    focusableElements[currentFocusIndex]?.blur();
+                    currentFocusIndex = index;
+                    focusableElements[currentFocusIndex].focus();
+                    showUI();
+                }
+            }
+
+            // Initial focus
+            if (focusableElements.length > 0) {
+                setFocus(currentFocusIndex);
+            }
+
+            // Keyboard navigation for TV remote simulation
+            document.addEventListener('keydown', function(e) {
+                switch(e.key) {
+                    case 'ArrowUp':
+                        e.preventDefault();
+                        setFocus(Math.max(0, currentFocusIndex - 1));
+                        break;
+                    case 'ArrowDown':
+                        e.preventDefault();
+                        setFocus(Math.min(focusableElements.length - 1, currentFocusIndex + 1));
+                        break;
+                    case 'ArrowLeft':
+                        e.preventDefault();
+                        setFocus(Math.max(0, currentFocusIndex - 1));
+                        break;
+                    case 'ArrowRight':
+                        e.preventDefault();
+                        setFocus(Math.min(focusableElements.length - 1, currentFocusIndex + 1));
+                        break;
+                    case 'Enter':
+                    case ' ':
+                        e.preventDefault();
+                        focusableElements[currentFocusIndex]?.click();
+                        break;
+                    case 'Escape':
+                        e.preventDefault();
+                        playerWrapper.classList.remove('show-ui');
+                        break;
+                    default:
+                        showUI();
+                }
+            });
+
+            // Mouse movement shows UI
+            document.addEventListener('mousemove', showUI);
+            document.addEventListener('click', showUI);
+
+            // Transcript panel toggle
+            const transcriptBtn = document.getElementById('transcript-btn');
+            const transcriptPanel = document.getElementById('transcript-panel');
+            const transcriptClose = document.getElementById('transcript-close');
+
+            transcriptBtn.addEventListener('click', function() {
+                transcriptPanel.classList.toggle('open');
+            });
+
+            transcriptClose.addEventListener('click', function() {
+                transcriptPanel.classList.remove('open');
+            });
+
+            // Quality menu toggle
+            const qualityBtn = document.getElementById('quality-btn');
+            const qualityMenu = document.getElementById('quality-menu');
+
+            qualityBtn.addEventListener('click', function() {
+                qualityMenu.style.display = qualityMenu.style.display === 'block' ? 'none' : 'block';
+            });
+
+            // Quality option selection
+            document.querySelectorAll('.tv-quality-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('.tv-quality-option').forEach(opt => opt.classList.remove('active'));
+                    this.classList.add('active');
+                    qualityMenu.style.display = 'none';
+                });
+            });
+
+            // Simulate active transcript line updating
+            const transcriptLines = document.querySelectorAll('.tv-transcript-line');
+            let currentIndex = 1;
+
+            setInterval(() => {
+                transcriptLines.forEach(line => line.classList.remove('active'));
+                transcriptLines[currentIndex].classList.add('active');
+                currentIndex = (currentIndex + 1) % transcriptLines.length;
+            }, 4000);
+
+            // Auto-hide UI after initial display
+            setTimeout(showUI, 1000);
+        });
+    </script>
+</body>
+</html>

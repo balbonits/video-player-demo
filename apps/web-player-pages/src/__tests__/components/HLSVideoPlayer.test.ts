@@ -24,31 +24,38 @@ import Hls from 'hls.js'
 expect.extend(toHaveNoViolations)
 
 // Mock HLS.js for controlled testing
-jest.mock('hls.js/dist/hls.min.js', () => {
+jest.mock('hls.js', () => {
+  const mockHlsInstance = {
+    loadSource: jest.fn(),
+    attachMedia: jest.fn(),
+    destroy: jest.fn(),
+    on: jest.fn(),
+    off: jest.fn(),
+    levels: [
+      { height: 720, bitrate: 2500000 },
+      { height: 1080, bitrate: 5000000 }
+    ],
+    currentLevel: -1,
+    config: {
+      maxBufferLength: 300,
+      backBufferLength: 90,
+      liveSyncDurationCount: 3
+    }
+  }
+
+  const HlsMock = jest.fn(() => mockHlsInstance)
+  HlsMock.isSupported = jest.fn(() => true)
+  HlsMock.Events = {
+    MANIFEST_PARSED: 'hlsManifestParsed',
+    FRAG_LOADED: 'hlsFragLoaded',
+    ERROR: 'hlsError',
+    LEVEL_LOADED: 'hlsLevelLoaded',
+    LEVEL_SWITCHING: 'hlsLevelSwitching'
+  }
+
   return {
     __esModule: true,
-    default: jest.fn().mockImplementation(() => ({
-      loadSource: jest.fn(),
-      attachMedia: jest.fn(),
-      destroy: jest.fn(),
-      on: jest.fn(),
-      levels: [
-        { height: 720, bitrate: 2500000 },
-        { height: 1080, bitrate: 5000000 }
-      ],
-      currentLevel: -1,
-      config: {
-        maxBufferLength: 300,
-        backBufferLength: 90,
-        liveSyncDurationCount: 3
-      }
-    })),
-    isSupported: jest.fn(() => true),
-    Events: {
-      MANIFEST_PARSED: 'hlsManifestParsed',
-      FRAG_LOADED: 'hlsFragLoaded',
-      ERROR: 'hlsError'
-    }
+    default: HlsMock
   }
 })
 
@@ -61,8 +68,63 @@ const mockPerformanceMemory = {
 
 Object.defineProperty(performance, 'memory', {
   value: mockPerformanceMemory,
-  writable: true
+  writable: true,
+  configurable: true
 })
+
+// Mock performance test utilities
+global.performanceTestUtils = {
+  CONSTRAINTS: {
+    MEMORY_LIMIT_MB: 100,
+    CPU_USAGE_PERCENT: 30,
+    INPUT_LATENCY_MS: 150,
+    VIDEO_START_TIME_MS: 3000
+  },
+  simulateMemoryPressure: (targetMB: number) => {
+    mockPerformanceMemory.usedJSHeapSize = targetMB * 1024 * 1024
+  },
+  resetMetrics: () => {
+    mockPerformanceMemory.usedJSHeapSize = 50 * 1024 * 1024
+  }
+}
+
+// Helper function to create a mock video element with all necessary methods
+function createMockVideoElement() {
+  return {
+    play: jest.fn().mockResolvedValue(undefined),
+    pause: jest.fn(),
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    canPlayType: jest.fn(() => ''),
+    load: jest.fn(),
+    currentTime: 0,
+    duration: 100,
+    paused: true,
+    volume: 1,
+    muted: false,
+    playbackRate: 1,
+    buffered: {
+      length: 0,
+      start: jest.fn(),
+      end: jest.fn()
+    },
+    readyState: 0,
+    networkState: 0,
+    error: null,
+    src: '',
+    controls: false,
+    autoplay: false,
+    loop: false,
+    textTracks: [],
+    videoWidth: 1920,
+    videoHeight: 1080
+  }
+}
+
+// Register the custom element if not already registered
+if (!customElements.get('hls-video-player')) {
+  customElements.define('hls-video-player', HLSVideoPlayer)
+}
 
 describe('HLSVideoPlayer Web Component - TDD Specifications', () => {
   let videoPlayer: HLSVideoPlayer
@@ -73,14 +135,23 @@ describe('HLSVideoPlayer Web Component - TDD Specifications', () => {
     document.body.innerHTML = ''
     jest.clearAllMocks()
 
+    // Reset performance metrics
+    if (global.performanceTestUtils) {
+      global.performanceTestUtils.resetMetrics()
+    }
+
     // Create fresh Web Component instance
-    videoPlayer = new HLSVideoPlayer()
+    videoPlayer = document.createElement('hls-video-player') as HLSVideoPlayer
     container = document.createElement('div')
     container.appendChild(videoPlayer)
     document.body.appendChild(container)
   })
 
   afterEach(() => {
+    // Create a proper mock video element for cleanup to work
+    if (!(videoPlayer as any).video || !(videoPlayer as any).video.removeEventListener) {
+      (videoPlayer as any).video = createMockVideoElement()
+    }
     // Cleanup for memory leak prevention
     videoPlayer.disconnectedCallback?.()
     document.body.innerHTML = ''
@@ -569,7 +640,12 @@ describe('HLSVideoPlayer Web Component - TDD Specifications', () => {
   describe('Integration & Edge Cases', () => {
     test('should handle missing HLS support gracefully', () => {
       const originalIsSupported = Hls.isSupported
-      ;(Hls.isSupported as jest.Mock).mockReturnValue(false)
+      if (Hls.isSupported && typeof Hls.isSupported === 'function' && (Hls.isSupported as any).mockReturnValue) {
+        (Hls.isSupported as jest.Mock).mockReturnValue(false)
+      } else {
+        // If not a mock function, replace it temporarily
+        Hls.isSupported = jest.fn().mockReturnValue(false)
+      }
 
       // Mock native HLS support
       const mockVideo = { canPlayType: jest.fn(() => 'probably') }
@@ -579,14 +655,22 @@ describe('HLSVideoPlayer Web Component - TDD Specifications', () => {
 
       expect(mockVideo.canPlayType).toHaveBeenCalledWith('application/vnd.apple.mpegurl')
 
-      ;(Hls.isSupported as jest.Mock).mockImplementation(originalIsSupported)
+      // Restore original
+      Hls.isSupported = originalIsSupported
     })
 
     test('should handle complete HLS failure', async () => {
       const errorSpy = jest.fn()
       videoPlayer.addEventListener('hls-performance', errorSpy)
 
-      ;(Hls.isSupported as jest.Mock).mockReturnValue(false)
+      const originalIsSupported = Hls.isSupported
+      if (Hls.isSupported && typeof Hls.isSupported === 'function' && (Hls.isSupported as any).mockReturnValue) {
+        (Hls.isSupported as jest.Mock).mockReturnValue(false)
+      } else {
+        // If not a mock function, replace it temporarily
+        Hls.isSupported = jest.fn().mockReturnValue(false)
+      }
+
       const mockVideo = { canPlayType: jest.fn(() => '') }
       ;(videoPlayer as any).video = mockVideo
 
@@ -602,6 +686,9 @@ describe('HLSVideoPlayer Web Component - TDD Specifications', () => {
           })
         })
       )
+
+      // Restore original
+      Hls.isSupported = originalIsSupported
     })
 
     test('should maintain performance under rapid attribute changes', async () => {

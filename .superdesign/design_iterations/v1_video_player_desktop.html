@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desktop Video Player - FOX Demo</title>
+    <link rel="stylesheet" href="theme_v1_performance.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <style>
+        body {
+            background-color: var(--background) !important;
+            color: var(--foreground) !important;
+            font-family: var(--font-sans) !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .video-player-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-4);
+            background-color: var(--background);
+        }
+
+        .player-wrapper {
+            position: relative;
+            aspect-ratio: 16/9;
+            background-color: var(--card);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-xl);
+        }
+
+        .video-element {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--muted-foreground);
+            font-size: var(--text-lg);
+        }
+
+        .controls-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--video-overlay-gradient);
+            padding: var(--space-4);
+            transform: translateY(100%);
+            transition: transform var(--duration-normal) var(--easing-default);
+        }
+
+        .player-wrapper:hover .controls-overlay,
+        .controls-overlay:focus-within {
+            transform: translateY(0);
+        }
+
+        .progress-container {
+            margin-bottom: var(--space-3);
+            position: relative;
+        }
+
+        .progress-bar {
+            height: var(--video-progress-height);
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+            cursor: pointer;
+            transition: height var(--duration-fast);
+        }
+
+        .progress-bar:hover,
+        .progress-bar:focus {
+            height: var(--video-progress-height-focused);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+            width: 35%;
+            border-radius: inherit;
+            transition: width var(--duration-normal);
+        }
+
+        .controls-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--space-3);
+        }
+
+        .controls-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .controls-center {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            flex: 1;
+            justify-content: center;
+        }
+
+        .controls-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .control-button {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: var(--radius);
+            padding: var(--space-2);
+            color: white;
+            cursor: pointer;
+            transition: all var(--duration-fast);
+            min-width: var(--tv-min-touch-target);
+            min-height: var(--tv-min-touch-target);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+        }
+
+        .control-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        .control-button:focus {
+            outline: var(--focus-width) solid var(--focus-color);
+            outline-offset: var(--focus-offset);
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .play-button {
+            background: var(--primary);
+            border-radius: var(--radius-full);
+            min-width: var(--tv-large-touch-target);
+            min-height: var(--tv-large-touch-target);
+        }
+
+        .play-button:hover {
+            background: var(--primary-hover);
+        }
+
+        .volume-container {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .volume-slider {
+            width: 80px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: var(--radius-full);
+            position: relative;
+            cursor: pointer;
+        }
+
+        .volume-fill {
+            height: 100%;
+            background: white;
+            width: 75%;
+            border-radius: inherit;
+        }
+
+        .time-display {
+            color: white;
+            font-family: var(--font-mono);
+            font-size: var(--text-sm);
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .sidebar-content {
+            margin-top: var(--space-4);
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: var(--space-4);
+        }
+
+        .video-info {
+            background-color: var(--card);
+            padding: var(--space-4);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+        }
+
+        .video-title {
+            font-size: var(--text-xl);
+            font-weight: 600;
+            margin-bottom: var(--space-2);
+            color: var(--foreground);
+        }
+
+        .video-description {
+            color: var(--muted-foreground);
+            line-height: 1.6;
+            margin-bottom: var(--space-3);
+        }
+
+        .accessibility-controls {
+            display: flex;
+            gap: var(--space-2);
+            flex-wrap: wrap;
+        }
+
+        .transcript-panel {
+            background-color: var(--card);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            padding: var(--space-4);
+            height: fit-content;
+        }
+
+        .transcript-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-3);
+            padding-bottom: var(--space-2);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .transcript-title {
+            font-size: var(--text-lg);
+            font-weight: 600;
+            color: var(--foreground);
+        }
+
+        .transcript-content {
+            max-height: 400px;
+            overflow-y: auto;
+            line-height: var(--transcript-line-height);
+        }
+
+        .transcript-line {
+            padding: var(--space-1) 0;
+            cursor: pointer;
+            border-radius: var(--radius);
+            transition: all var(--duration-fast);
+        }
+
+        .transcript-line:hover {
+            background-color: var(--transcript-highlight);
+        }
+
+        .transcript-line.active {
+            background-color: var(--transcript-active);
+            font-weight: 500;
+        }
+
+        .timestamp {
+            color: var(--primary);
+            font-family: var(--font-mono);
+            font-size: var(--text-xs);
+            margin-right: var(--space-2);
+        }
+
+        .captions-overlay {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--caption-bg);
+            color: white;
+            padding: var(--space-2) var(--space-3);
+            border-radius: var(--radius);
+            font-size: var(--caption-size-md);
+            text-shadow: var(--caption-outline);
+            max-width: 80%;
+            text-align: center;
+            z-index: 20;
+        }
+
+        .quality-menu {
+            position: absolute;
+            bottom: 100%;
+            right: 0;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            min-width: 120px;
+            box-shadow: var(--shadow-lg);
+            z-index: 30;
+            display: none;
+        }
+
+        .quality-option {
+            padding: var(--space-2) var(--space-3);
+            color: var(--foreground);
+            cursor: pointer;
+            transition: background-color var(--duration-fast);
+        }
+
+        .quality-option:hover {
+            background-color: var(--muted);
+        }
+
+        .quality-option.active {
+            background-color: var(--primary);
+            color: var(--primary-foreground);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1024px) {
+            .sidebar-content {
+                grid-template-columns: 1fr;
+            }
+
+            .transcript-panel {
+                order: -1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .video-player-container {
+                padding: var(--space-2);
+            }
+
+            .controls-row {
+                gap: var(--space-1);
+            }
+
+            .controls-center {
+                gap: var(--space-1);
+            }
+
+            .volume-container {
+                display: none;
+            }
+
+            .time-display {
+                font-size: var(--text-xs);
+                min-width: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="video-player-container">
+        <!-- Skip Navigation -->
+        <a href="#main-content" class="skip-link">Skip to main content</a>
+
+        <!-- Video Player -->
+        <div class="player-wrapper" id="main-content">
+            <!-- Video Element Placeholder -->
+            <div class="video-element">
+                <div style="text-align: center;">
+                    <i data-lucide="play-circle" style="width: 80px; height: 80px; margin-bottom: 16px; opacity: 0.6;"></i>
+                    <div>HLS Video Player</div>
+                    <div style="font-size: var(--text-sm); margin-top: 8px;">Planete Interdite Stream</div>
+                </div>
+            </div>
+
+            <!-- Captions Overlay -->
+            <div class="captions-overlay">
+                Current caption text appears here with high contrast
+            </div>
+
+            <!-- Video Controls -->
+            <div class="controls-overlay">
+                <!-- Progress Bar -->
+                <div class="progress-container">
+                    <div class="progress-bar" role="slider" aria-label="Video progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="35" tabindex="0">
+                        <div class="progress-fill"></div>
+                    </div>
+                </div>
+
+                <!-- Control Buttons -->
+                <div class="controls-row">
+                    <!-- Left Controls -->
+                    <div class="controls-left">
+                        <button class="control-button" aria-label="Previous video" tabindex="0">
+                            <i data-lucide="skip-back"></i>
+                        </button>
+                        <button class="control-button play-button" aria-label="Play video" tabindex="0">
+                            <i data-lucide="play"></i>
+                        </button>
+                        <button class="control-button" aria-label="Next video" tabindex="0">
+                            <i data-lucide="skip-forward"></i>
+                        </button>
+                    </div>
+
+                    <!-- Center Controls -->
+                    <div class="controls-center">
+                        <div class="time-display">12:34 / 45:67</div>
+                    </div>
+
+                    <!-- Right Controls -->
+                    <div class="controls-right">
+                        <!-- Volume Controls -->
+                        <div class="volume-container">
+                            <button class="control-button" aria-label="Mute volume" tabindex="0">
+                                <i data-lucide="volume-2"></i>
+                            </button>
+                            <div class="volume-slider" role="slider" aria-label="Volume" aria-valuemin="0" aria-valuemax="100" aria-valuenow="75" tabindex="0">
+                                <div class="volume-fill"></div>
+                            </div>
+                        </div>
+
+                        <!-- Additional Controls -->
+                        <button class="control-button" aria-label="Toggle captions" tabindex="0">
+                            <i data-lucide="closed-captioning"></i>
+                        </button>
+
+                        <div style="position: relative;">
+                            <button class="control-button" aria-label="Quality settings" tabindex="0">
+                                <i data-lucide="settings"></i>
+                            </button>
+                            <div class="quality-menu">
+                                <div class="quality-option active">Auto</div>
+                                <div class="quality-option">1080p</div>
+                                <div class="quality-option">720p</div>
+                                <div class="quality-option">480p</div>
+                            </div>
+                        </div>
+
+                        <button class="control-button" aria-label="Picture in Picture" tabindex="0">
+                            <i data-lucide="picture-in-picture-2"></i>
+                        </button>
+
+                        <button class="control-button" aria-label="Fullscreen" tabindex="0">
+                            <i data-lucide="maximize"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Below Player -->
+        <div class="sidebar-content">
+            <!-- Video Information -->
+            <div class="video-info">
+                <h1 class="video-title">Planete Interdite - Episode Demo</h1>
+                <p class="video-description">
+                    Demonstration of HLS streaming with live transcription and accessibility features.
+                    This showcases modern web video capabilities optimized for Smart TV and cross-platform viewing.
+                </p>
+
+                <div class="accessibility-controls">
+                    <button class="control-button" style="background: var(--accent); color: var(--accent-foreground);">
+                        <i data-lucide="accessibility" style="margin-right: 8px;"></i>
+                        Live Transcription
+                    </button>
+                    <button class="control-button">
+                        <i data-lucide="type" style="margin-right: 8px;"></i>
+                        Caption Settings
+                    </button>
+                    <button class="control-button">
+                        <i data-lucide="contrast" style="margin-right: 8px;"></i>
+                        High Contrast
+                    </button>
+                </div>
+            </div>
+
+            <!-- Live Transcript Panel -->
+            <div class="transcript-panel">
+                <div class="transcript-header">
+                    <h2 class="transcript-title">Live Transcript</h2>
+                    <div style="display: flex; gap: var(--space-2);">
+                        <button class="control-button" style="min-width: auto; min-height: auto; padding: var(--space-1);">
+                            <i data-lucide="download"></i>
+                        </button>
+                        <button class="control-button" style="min-width: auto; min-height: auto; padding: var(--space-1);">
+                            <i data-lucide="search"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="transcript-content">
+                    <div class="transcript-line">
+                        <span class="timestamp">00:12</span>
+                        Welcome to this demonstration of advanced video streaming capabilities.
+                    </div>
+                    <div class="transcript-line active">
+                        <span class="timestamp">00:18</span>
+                        This player showcases HLS adaptive streaming with real-time accessibility features.
+                    </div>
+                    <div class="transcript-line">
+                        <span class="timestamp">00:25</span>
+                        The interface is optimized for Smart TV navigation using D-pad controls.
+                    </div>
+                    <div class="transcript-line">
+                        <span class="timestamp">00:32</span>
+                        Live transcription provides real-time text synchronized with video playback.
+                    </div>
+                    <div class="transcript-line">
+                        <span class="timestamp">00:38</span>
+                        All controls maintain WCAG 2.1 AA accessibility compliance.
+                    </div>
+                    <div class="transcript-line">
+                        <span class="timestamp">00:45</span>
+                        Performance optimizations ensure smooth playback on TV hardware.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Basic interaction simulation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Focus management for accessibility
+            const focusableElements = document.querySelectorAll('button, [tabindex="0"]');
+
+            focusableElements.forEach(element => {
+                element.addEventListener('focus', function() {
+                    this.style.transform = 'scale(1.05)';
+                });
+
+                element.addEventListener('blur', function() {
+                    this.style.transform = 'scale(1)';
+                });
+            });
+
+            // Simulate active transcript line updating
+            const transcriptLines = document.querySelectorAll('.transcript-line');
+            let currentIndex = 1;
+
+            setInterval(() => {
+                transcriptLines.forEach(line => line.classList.remove('active'));
+                transcriptLines[currentIndex].classList.add('active');
+                currentIndex = (currentIndex + 1) % transcriptLines.length;
+            }, 3000);
+
+            // Quality menu toggle
+            const qualityButton = document.querySelector('[aria-label="Quality settings"]');
+            const qualityMenu = document.querySelector('.quality-menu');
+
+            if (qualityButton && qualityMenu) {
+                qualityButton.addEventListener('click', function() {
+                    qualityMenu.style.display = qualityMenu.style.display === 'block' ? 'none' : 'block';
+                });
+
+                // Close menu when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!qualityButton.contains(e.target) && !qualityMenu.contains(e.target)) {
+                        qualityMenu.style.display = 'none';
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
