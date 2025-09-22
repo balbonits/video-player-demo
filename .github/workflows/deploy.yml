@@ -62,7 +62,7 @@ jobs:
         run: npm run test:a11y --if-present
 
       - name: Upload Coverage Reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: coverage-reports
           path: coverage/
@@ -148,7 +148,7 @@ jobs:
 
       - name: Upload Test Results
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: test-results
           path: |
@@ -220,7 +220,7 @@ jobs:
           format: 'HTML'
 
       - name: Upload Security Reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: security-reports
           path: reports/
