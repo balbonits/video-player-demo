@@ -38,7 +38,7 @@
     "@types/react-dom": "^18",
     "axe-playwright": "^2.2.2",
     "eslint": "^8",
-    "eslint-config-next": "^14.2.0",
+    "eslint-config-next": "^15.5.4",
     "hls.js": "^1.4.12",
     "jest": "^29.7.0",
     "jest-axe": "^8.0.0",
